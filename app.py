@@ -1736,91 +1736,9 @@ document.addEventListener("DOMContentLoaded",()=>{
 });
 </script>
 
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
- const hud=document.createElement("div");
- hud.className="hud-panel";
- hud.innerHTML='<div><span class="dot"></span></div><div id="scanCount">SCANS : 0</div>';
- document.body.appendChild(hud);
 
- let scans=0;
- const btn=document.querySelector(".btn-search");
- if(btn){
-   btn.addEventListener("click",()=>{
-      scans++;
-      const c=document.getElementById("scanCount");
-      if(c) c.textContent="SCANS : "+scans;
-   });
- }
 
- const ring=document.createElement("div");
- ring.className="loading-ring";
- const form=document.querySelector(".card-body");
- if(form) form.prepend(ring);
 
- if(btn){
-   btn.addEventListener("click",()=>{
-      ring.classList.add("show");
-      setTimeout(()=>ring.classList.remove("show"),1200);
-   });
- }
-});
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
- const grid=document.createElement("div");
- grid.className="cyber-grid";
- document.body.appendChild(grid);
-
- const title=document.querySelector(".card-title");
- if(title){
-   const raw=title.textContent;
-   let i=0;
-   title.textContent="";
-   const timer=setInterval(()=>{
-      title.textContent+=raw.charAt(i++);
-      if(i>=raw.length) clearInterval(timer);
-   },35);
- }
-});
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
- const mc=document.querySelector(".main-container");
- if(!mc || mc.parentElement.classList.contains("dashboard-shell")) return;
- const shell=document.createElement("div");
- shell.className="dashboard-shell";
- const left=document.createElement("aside");
- left.className="sidebar";
- left.innerHTML="<h3>OSINT MENU</h3><div class='item'>📱 Number Lookup</div><div class='item'>🛰️ Intelligence</div><div class='item'>🛡️ Security</div>";
- const right=document.createElement("aside");
- right.className="rightbar";
- right.innerHTML="<h3>LIVE STATUS</h3><div class='item'>API : ONLINE</div><div class='item'>SERVER : READY</div><div class='item'>VERSION : V7.1</div>";
- mc.parentNode.insertBefore(shell,mc);
- shell.appendChild(left);
- shell.appendChild(mc);
- shell.appendChild(right);
-});
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
- const hud=document.createElement("div");
- hud.className="top-hud";
- hud.innerHTML=`
- <div class="hud-box"><div class="hud-title">SYSTEM</div><div class="hud-value">ONLINE</div></div>
- <div class="hud-box"><div class="hud-title">VERSION</div><div class="hud-value">V7.2</div></div>
- <div class="hud-box"><div class="hud-title">TIME</div><div class="hud-value" id="clockHud"></div></div>`;
- const header=document.querySelector(".main-header");
- if(header) header.after(hud);
- setInterval(()=>{
-  const e=document.getElementById("clockHud");
-  if(e)e.textContent=new Date().toLocaleTimeString();
- },1000);
-});
-</script>
 
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
