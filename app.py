@@ -330,19 +330,22 @@ HTML_TEMPLATE = '''
 
         /* ===== CARD ===== */
         .card {
-            background: #FFFFFF;
-            border-radius: 20px;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.06);
+            background: rgba(15,20,40,0.45);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: 22px;
+            box-shadow: 0 0 25px rgba(0,191,255,.18),0 0 60px rgba(0,191,255,.08);
             overflow: hidden;
-            border: 1px solid rgba(0,0,0,0.04);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border:1px solid rgba(0,191,255,.25);
+            transition:.35s ease;
         }
         .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 60px rgba(0,0,0,0.08);
+            transform: translateY(-6px);
+            box-shadow:0 0 35px rgba(0,191,255,.35),0 0 80px rgba(0,191,255,.18);
         }
         .card-header {
-            background: linear-gradient(135deg, #0a0a2a, #1a1a5a);
+            background: rgba(10,20,40,.55);
+            backdrop-filter: blur(20px);
             padding: 25px 30px;
             border-bottom: 3px solid #FF9933;
             text-align: center;
