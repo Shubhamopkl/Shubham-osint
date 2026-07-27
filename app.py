@@ -1229,6 +1229,167 @@ transform:translateY(-2px) scale(1.02);
 box-shadow:0 0 24px rgba(0,255,255,.28);
 }
 
+
+/* ===== V8.1 DASHBOARD REBUILD ===== */
+.v8-topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:14px 22px;
+margin:12px auto;
+max-width:1500px;
+border-radius:18px;
+background:rgba(10,18,38,.72);
+backdrop-filter:blur(18px);
+border:1px solid rgba(0,255,255,.18);
+}
+.v8-brand{
+font-size:22px;
+font-weight:700;
+letter-spacing:1px;
+color:#9ff8ff;
+}
+.v8-actions{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+.v8-chip{
+padding:8px 14px;
+border-radius:999px;
+background:rgba(255,255,255,.05);
+border:1px solid rgba(0,255,255,.2);
+color:#d8fcff;
+font-size:12px;
+}
+.v8-hero{
+margin:18px auto;
+max-width:1500px;
+padding:18px 24px;
+border-radius:20px;
+background:linear-gradient(135deg,rgba(0,170,255,.12),rgba(0,255,170,.06));
+border:1px solid rgba(0,255,255,.18);
+}
+.v8-hero h2{margin:0;color:#fff}
+.v8-hero p{margin:8px 0 0;color:#b8dfe8}
+
+
+/* ===== V8.2 SEARCH EXPERIENCE ===== */
+.search-panel{
+position:relative;
+border:1px solid rgba(0,255,255,.22);
+border-radius:20px;
+padding:14px;
+background:rgba(10,20,40,.55);
+box-shadow:0 0 25px rgba(0,255,255,.08);
+}
+.search-panel:focus-within{
+box-shadow:0 0 40px rgba(0,255,255,.22);
+}
+#v82Loader{
+position:fixed;
+inset:0;
+display:none;
+align-items:center;
+justify-content:center;
+background:rgba(4,10,20,.72);
+backdrop-filter:blur(6px);
+z-index:99999;
+font-size:22px;
+color:#bffcff;
+}
+.v82-spinner{
+width:70px;
+height:70px;
+border:6px solid rgba(255,255,255,.15);
+border-top-color:#55eaff;
+border-radius:50%;
+animation:v82spin 1s linear infinite;
+margin:auto auto 18px;
+}
+@keyframes v82spin{to{transform:rotate(360deg)}}
+
+
+/* ===== V8.3 RESULTS DASHBOARD ===== */
+.v83-toolbar{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin:14px 0;
+}
+.v83-tab{
+padding:8px 14px;
+border-radius:999px;
+border:1px solid rgba(0,255,255,.22);
+background:rgba(255,255,255,.04);
+color:#dffcff;
+cursor:pointer;
+transition:.25s;
+}
+.v83-tab.active,.v83-tab:hover{
+background:rgba(0,255,255,.14);
+}
+.copy-btn{
+float:right;
+padding:5px 10px;
+font-size:12px;
+border-radius:8px;
+border:1px solid rgba(0,255,255,.25);
+background:rgba(255,255,255,.05);
+cursor:pointer;
+}
+
+
+/* ===== V8.4 HISTORY & EXPORT ===== */
+.v84-tools{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin:14px 0;
+}
+.v84-btn{
+padding:8px 14px;
+border-radius:10px;
+border:1px solid rgba(0,255,255,.22);
+background:rgba(255,255,255,.05);
+color:#dffcff;
+cursor:pointer;
+}
+
+
+/* ===== V8.5 FINAL POLISH ===== */
+.theme-toggle{
+position:fixed;
+top:18px;
+right:18px;
+z-index:9999;
+padding:10px 14px;
+border-radius:999px;
+border:1px solid rgba(0,255,255,.25);
+background:rgba(10,20,40,.75);
+color:#dffcff;
+cursor:pointer;
+backdrop-filter:blur(14px);
+}
+body.light-mode{
+filter:invert(.94) hue-rotate(180deg);
+}
+.toast-msg{
+position:fixed;
+left:50%;
+bottom:24px;
+transform:translateX(-50%);
+padding:12px 18px;
+border-radius:12px;
+background:rgba(10,20,40,.85);
+border:1px solid rgba(0,255,255,.25);
+color:#dffcff;
+opacity:0;
+transition:.3s;
+z-index:10000;
+}
+.toast-msg.show{opacity:1;}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -1940,7 +2101,172 @@ document.addEventListener("DOMContentLoaded",()=>{
   }
 });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ if(document.querySelector(".v8-topbar")) return;
+
+ const top=document.createElement("div");
+ top.className="v8-topbar";
+ top.innerHTML=`
+   <div class="v8-brand">⚡ SHUBHAM OSINT</div>
+   <div class="v8-actions">
+      <div class="v8-chip">API ONLINE</div>
+      <div class="v8-chip">SECURE</div>
+      <div class="v8-chip">V8.1</div>
+   </div>`;
+
+ const hero=document.createElement("div");
+ hero.className="v8-hero";
+ hero.innerHTML="<h2>Professional OSINT Dashboard</h2><p>Fast number intelligence lookup with a modern dashboard interface.</p>";
+
+ document.body.prepend(top);
+ const shell=document.querySelector(".dashboard-shell");
+ if(shell) shell.before(hero);
+ else document.body.appendChild(hero);
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  const form=document.querySelector("form");
+  const input=form?form.querySelector("input"):null;
+
+  if(form) form.classList.add("search-panel");
+
+  const overlay=document.createElement("div");
+  overlay.id="v82Loader";
+  overlay.innerHTML="<div><div class='v82-spinner'></div><div>Searching...</div></div>";
+  document.body.appendChild(overlay);
+
+  if(input){
+    input.setAttribute("autocomplete","off");
+    input.setAttribute("placeholder","Enter mobile number...");
+    input.addEventListener("keydown",e=>{
+      if(e.key==="Enter"){form.requestSubmit();}
+    });
+  }
+
+  if(form){
+    form.addEventListener("submit",e=>{
+      if(input && !input.value.trim()){
+        e.preventDefault();
+        alert("Please enter a mobile number.");
+        input.focus();
+        return;
+      }
+      overlay.style.display="flex";
+      setTimeout(()=>overlay.style.display="none",3000);
+    });
+  }
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  const result=document.querySelector(".result-box");
+  if(!result) return;
+
+  const bar=document.createElement("div");
+  bar.className="v83-toolbar";
+  bar.innerHTML=`
+    <div class="v83-tab active">Basic</div>
+    <div class="v83-tab">Telecom</div>
+    <div class="v83-tab">Location</div>
+    <div class="v83-tab">Other</div>
+    <button class="copy-btn">Copy</button>`;
+
+  result.prepend(bar);
+
+  const tabs=bar.querySelectorAll(".v83-tab");
+  tabs.forEach(t=>{
+    t.onclick=()=>{
+      tabs.forEach(x=>x.classList.remove("active"));
+      t.classList.add("active");
+    };
+  });
+
+  bar.querySelector(".copy-btn").onclick=async()=>{
+    try{
+      await navigator.clipboard.writeText(result.innerText);
+      const b=bar.querySelector(".copy-btn");
+      b.textContent="Copied!";
+      setTimeout(()=>b.textContent="Copy",1500);
+    }catch(e){}
+  };
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ const form=document.querySelector("form");
+ const input=form?form.querySelector("input"):null;
+ if(!form||!input) return;
+
+ const tools=document.createElement("div");
+ tools.className="v84-tools";
+ tools.innerHTML='<button type="button" class="v84-btn" id="histBtn">Recent</button><button type="button" class="v84-btn" id="expBtn">Export JSON</button>';
+ form.after(tools);
+
+ form.addEventListener("submit",()=>{
+   const n=input.value.trim();
+   if(!n) return;
+   let arr=JSON.parse(localStorage.getItem("osint_recent")||"[]");
+   arr=arr.filter(x=>x!==n);
+   arr.unshift(n);
+   arr=arr.slice(0,10);
+   localStorage.setItem("osint_recent",JSON.stringify(arr));
+ });
+
+ document.getElementById("histBtn").onclick=()=>{
+   const arr=JSON.parse(localStorage.getItem("osint_recent")||"[]");
+   alert(arr.length?("Recent Searches:\n\n"+arr.join("\n")):"No recent searches.");
+ };
+
+ document.getElementById("expBtn").onclick=()=>{
+   const result=document.querySelector(".result-box");
+   if(!result){alert("No result available.");return;}
+   const blob=new Blob([JSON.stringify({result:result.innerText},null,2)],{type:"application/json"});
+   const a=document.createElement("a");
+   a.href=URL.createObjectURL(blob);
+   a.download="osint_result.json";
+   a.click();
+   URL.revokeObjectURL(a.href);
+ };
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ const btn=document.createElement("button");
+ btn.className="theme-toggle";
+ btn.textContent="🌙 Theme";
+ document.body.appendChild(btn);
+
+ const toast=document.createElement("div");
+ toast.className="toast-msg";
+ document.body.appendChild(toast);
+
+ function notify(msg){
+   toast.textContent=msg;
+   toast.classList.add("show");
+   setTimeout(()=>toast.classList.remove("show"),1800);
+ }
+
+ btn.onclick=()=>{
+   document.body.classList.toggle("light-mode");
+   notify(document.body.classList.contains("light-mode")?"Light mode enabled":"Dark mode enabled");
+ };
+
+ window.addEventListener("load",()=>notify("SHUBHAM OSINT V8.5 Ready"));
+});
+</script>
 </body>
+
+
+
+
+
 
 
 
