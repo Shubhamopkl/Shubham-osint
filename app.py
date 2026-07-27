@@ -904,6 +904,41 @@ from{filter:hue-rotate(0deg);}
 to{filter:hue-rotate(360deg);}
 }
 
+
+/* ==== V4 ULTRA CYBER ==== */
+.input-group{
+background:rgba(8,18,40,.75)!important;
+border:1px solid rgba(0,191,255,.35)!important;
+box-shadow:0 0 20px rgba(0,191,255,.08);
+}
+.input-group input,
+.input-group .country-code{
+background:transparent!important;
+color:#e8f6ff!important;
+}
+.input-group input::placeholder{color:#8fb8d9!important;}
+.result-box,.security-badge,.social-section{
+background:rgba(10,20,40,.72)!important;
+border:1px solid rgba(0,191,255,.22)!important;
+backdrop-filter:blur(14px);
+}
+.result-item:hover{background:rgba(0,191,255,.08)!important;}
+.social-btn:hover{
+box-shadow:0 0 25px rgba(0,191,255,.45)!important;
+}
+body::after{
+content:"";
+position:fixed;
+inset:0;
+pointer-events:none;
+background:repeating-linear-gradient(to bottom,transparent 0 3px,rgba(0,255,255,.025) 4px 5px);
+animation:scanMove 7s linear infinite;
+}
+@keyframes scanMove{
+from{transform:translateY(-100%);}
+to{transform:translateY(100%);}
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -1366,6 +1401,20 @@ addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updat
 }
 </script>
 
+
+<script>
+document.addEventListener('mousemove',e=>{
+ let g=document.getElementById('mouseGlow');
+ if(!g){
+   g=document.createElement('div');
+   g.id='mouseGlow';
+   g.style.cssText='position:fixed;width:260px;height:260px;border-radius:50%;pointer-events:none;z-index:-1;background:radial-gradient(circle,rgba(0,191,255,.18),transparent 70%);filter:blur(12px)';
+   document.body.appendChild(g);
+ }
+ g.style.left=(e.clientX-130)+'px';
+ g.style.top=(e.clientY-130)+'px';
+});
+</script>
 </body>
 </html>
 '''
