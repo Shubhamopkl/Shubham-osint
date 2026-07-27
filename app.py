@@ -1028,13 +1028,6 @@ HTML_TEMPLATE = '''
             <a href="#"><i class="fas fa-shield-halved"></i> Privacy Policy</a>
             <a href="#"><i class="fas fa-gavel"></i> Terms & Conditions</a>
             <a href="https://t.me/Sms_read" target="_blank"><i class="fas fa-headset"></i> Support</a>
-            <a href="https://t.me/Sms_read" target="_blank" class="social-btn telegram">
-    <i class="fab fa-telegram"></i> Telegram
-</a>
-
-<a href="https://wa.me/qr/TAO5T4SBXPNKP1" target="_blank" class="social-btn whatsapp">
-    <i class="fab fa-whatsapp"></i> WhatsApp
-</a>
             <a href="tel:+917379117261"><i class="fas fa-phone"></i> Contact</a>
         </div>
         <div class="copyright">
