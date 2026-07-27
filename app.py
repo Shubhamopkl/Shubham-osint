@@ -939,6 +939,156 @@ from{transform:translateY(-100%);}
 to{transform:translateY(100%);}
 }
 
+
+/* ===== V5 ULTRA CYBER ===== */
+.main-header,.top-header{
+background:linear-gradient(90deg,#071226,#102a54,#071226)!important;
+position:relative;
+overflow:hidden;
+}
+.main-header::after,.top-header::after{
+content:"";
+position:absolute;
+left:-30%;
+top:0;
+width:30%;
+height:100%;
+background:linear-gradient(90deg,transparent,rgba(0,255,255,.15),transparent);
+animation:headerScan 5s linear infinite;
+}
+@keyframes headerScan{
+from{transform:translateX(0);}
+to{transform:translateX(500%);}
+}
+.result-box{
+box-shadow:0 0 25px rgba(0,191,255,.18)!important;
+}
+.json-toggle{
+border-color:rgba(0,191,255,.35)!important;
+color:#9edcff!important;
+}
+.json-toggle:hover{
+background:rgba(0,191,255,.08)!important;
+}
+
+
+/* ===== V6 PHASE 1 ===== */
+.main-container{max-width:900px!important}
+.card{
+background:rgba(8,16,32,.55)!important;
+backdrop-filter:blur(24px)!important;
+border:1px solid rgba(0,255,255,.35)!important;
+box-shadow:0 0 40px rgba(0,180,255,.18),0 0 120px rgba(0,180,255,.08)!important;
+}
+.card-header{
+background:linear-gradient(135deg,rgba(0,40,80,.65),rgba(0,10,25,.75))!important;
+border-bottom:1px solid rgba(0,255,255,.35)!important;
+}
+.card-title{
+text-shadow:0 0 18px rgba(0,255,255,.5);
+letter-spacing:2px!important;
+}
+.btn-search{
+border-radius:18px!important;
+background:linear-gradient(135deg,#00d2ff,#0066ff)!important;
+box-shadow:0 0 30px rgba(0,191,255,.45)!important;
+}
+
+
+/* ===== V6 PHASE 2 ===== */
+body::before{
+animation:bgMove 8s ease-in-out infinite alternate!important;
+filter:saturate(1.3);
+}
+#mouseGlow{
+position:fixed;
+width:260px;
+height:260px;
+border-radius:50%;
+pointer-events:none;
+background:radial-gradient(circle,rgba(0,255,255,.18),transparent 70%);
+transform:translate(-50%,-50%);
+z-index:-1;
+}
+.result-box{
+border-radius:18px!important;
+box-shadow:0 0 35px rgba(0,255,255,.18)!important;
+}
+.result-header{
+background:linear-gradient(90deg,#071b34,#0d2d58)!important;
+}
+.result-item{
+transition:.25s ease!important;
+}
+.result-item:hover{
+transform:translateX(6px);
+}
+
+
+/* ===== V6 PHASE 3 ===== */
+.loading-ring{
+width:70px;height:70px;border-radius:50%;
+border:4px solid rgba(0,255,255,.15);
+border-top-color:#00e5ff;
+animation:v6spin 1s linear infinite;
+margin:20px auto;
+display:none;
+}
+.loading-ring.show{display:block}
+@keyframes v6spin{to{transform:rotate(360deg)}}
+
+.hud-panel{
+position:fixed;
+top:120px;
+right:20px;
+padding:14px;
+border-radius:14px;
+background:rgba(5,20,40,.72);
+border:1px solid rgba(0,255,255,.3);
+backdrop-filter:blur(18px);
+color:#bffcff;
+font:12px monospace;
+box-shadow:0 0 24px rgba(0,255,255,.15);
+z-index:900;
+}
+.hud-panel .dot{
+display:inline-block;
+width:8px;height:8px;
+border-radius:50%;
+background:#00ff7f;
+box-shadow:0 0 12px #00ff7f;
+animation:hudpulse 1.2s infinite;
+margin-right:8px;
+}
+@keyframes hudpulse{
+50%{opacity:.35;transform:scale(.6)}
+}
+
+
+/* ===== V6 FINAL POLISH ===== */
+.cyber-grid{
+position:fixed;inset:0;pointer-events:none;z-index:-1;
+background-image:
+linear-gradient(rgba(0,255,255,.06) 1px,transparent 1px),
+linear-gradient(90deg,rgba(0,255,255,.06) 1px,transparent 1px);
+background-size:40px 40px;
+animation:gridMove 18s linear infinite;
+}
+@keyframes gridMove{
+from{transform:translateY(0)}
+to{transform:translateY(40px)}
+}
+.card,.result-box,.social-section,.security-badge{
+transition:all .35s ease!important;
+}
+.card:hover{
+transform:translateY(-8px) scale(1.01)!important;
+}
+.btn-search{
+letter-spacing:3px!important;
+text-transform:uppercase;
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -1415,7 +1565,105 @@ document.addEventListener('mousemove',e=>{
  g.style.top=(e.clientY-130)+'px';
 });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ document.querySelectorAll(".social-btn").forEach(b=>{
+   b.addEventListener("mousemove",()=>{
+      b.style.transform="translateY(-3px) scale(1.04)";
+   });
+   b.addEventListener("mouseleave",()=>{
+      b.style.transform="";
+   });
+ });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ const t=document.createElement("div");
+ t.style.position="fixed";
+ t.style.right="18px";
+ t.style.bottom="18px";
+ t.style.padding="10px 16px";
+ t.style.borderRadius="999px";
+ t.style.background="rgba(0,20,40,.75)";
+ t.style.border="1px solid rgba(0,255,255,.35)";
+ t.style.color="#7fffd4";
+ t.style.fontFamily="monospace";
+ t.style.zIndex="9999";
+ document.body.appendChild(t);
+ setInterval(()=>{t.textContent="SYSTEM ONLINE • "+new Date().toLocaleTimeString();},1000);
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ const g=document.createElement("div");
+ g.id="mouseGlow";
+ document.body.appendChild(g);
+ document.addEventListener("mousemove",e=>{
+   g.style.left=e.clientX+"px";
+   g.style.top=e.clientY+"px";
+ });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ const hud=document.createElement("div");
+ hud.className="hud-panel";
+ hud.innerHTML='<div><span class="dot"></span>API ONLINE</div><div id="scanCount">SCANS : 0</div>';
+ document.body.appendChild(hud);
+
+ let scans=0;
+ const btn=document.querySelector(".btn-search");
+ if(btn){
+   btn.addEventListener("click",()=>{
+      scans++;
+      const c=document.getElementById("scanCount");
+      if(c) c.textContent="SCANS : "+scans;
+   });
+ }
+
+ const ring=document.createElement("div");
+ ring.className="loading-ring";
+ const form=document.querySelector(".card-body");
+ if(form) form.prepend(ring);
+
+ if(btn){
+   btn.addEventListener("click",()=>{
+      ring.classList.add("show");
+      setTimeout(()=>ring.classList.remove("show"),1200);
+   });
+ }
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ const grid=document.createElement("div");
+ grid.className="cyber-grid";
+ document.body.appendChild(grid);
+
+ const title=document.querySelector(".card-title");
+ if(title){
+   const raw=title.textContent;
+   let i=0;
+   title.textContent="";
+   const timer=setInterval(()=>{
+      title.textContent+=raw.charAt(i++);
+      if(i>=raw.length) clearInterval(timer);
+   },35);
+ }
+});
+</script>
 </body>
+
+
+
+
+
 </html>
 '''
 
