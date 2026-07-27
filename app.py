@@ -277,7 +277,7 @@ HTML_TEMPLATE = '''
         }
         @keyframes logoFloat {
             0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-3px) scale(1.03); }
+            50% { transform: translateY(-10px) scale(1.03); }
         }
         .main-header .title-section h1 {
             color: #FFFFFF;
@@ -395,7 +395,7 @@ HTML_TEMPLATE = '''
         }
         @keyframes iconFloat {
             0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-5px) scale(1.05); }
+            50% { transform: translateY(-15px) scale(1.05); }
         }
         .card-header .card-title {
             color: #FFFFFF;
