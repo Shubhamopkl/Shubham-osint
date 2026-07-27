@@ -1346,11 +1346,7 @@ box-shadow:0 0 24px rgba(0,255,255,.28);
                 <div class="badge-item"><i class="fas fa-check-circle"></i> Verified</div>
                 <div class="badge-item"><i class="fas fa-clock"></i> 24x7 Service</div>
             </div>
-
-            <!-- API Info -->
-            <div id="apiInfo" style="display:none; margin-top:14px; padding:12px; background:#f8f9fa; border-radius:10px; display:flex; justify-content:center; gap:25px; flex-wrap:wrap; font-size:11px; color:#666; border:1px solid #e8e8e8;"></div>
-
-            <!-- Social Media -->
+<!-- Social Media -->
             <div class="social-section">
                 <div class="social-title"><i class="fas fa-share-alt"></i> Connect With Shubham Patel</div>
                 <div class="social-buttons">
@@ -1825,16 +1821,16 @@ document.addEventListener("DOMContentLoaded",()=>{
   document.querySelectorAll(".card,.main-container,.result-box,.metric-card")
     .forEach(el=>el.classList.add("fade-up"));
 
-  const badge=document.createElement("div");
-  badge.className="cyber-badge";
-  badge.innerHTML="⚡ SHUBHAM OSINT • V7.5 READY";
-  document.body.appendChild(badge);
+  const badge=null;/*removed*/
+  
+  
+  
 
   const form=document.querySelector("form");
   if(form){
     form.addEventListener("submit",()=>{
-      badge.innerHTML="🔍 Processing Request...";
-      setTimeout(()=>badge.innerHTML="⚡ SHUBHAM OSINT • V7.5 READY",2500);
+      if(badge) badge.innerHTML="🔍 Processing Request...";
+      setTimeout(()=>{if(badge) badge.innerHTML="⚡ SHUBHAM OSINT • V7.5 READY",2500);
     });
   }
 });
