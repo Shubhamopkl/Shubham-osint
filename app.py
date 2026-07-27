@@ -860,9 +860,17 @@ HTML_TEMPLATE = '''
             user-drag: none;
             pointer-events: none;
         }
-    </style>
+    
+#cyber-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-2;background:#030712}
+body{background:#030712!important}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 20% 20%,rgba(0,140,255,.18),transparent 35%),radial-gradient(circle at 80% 60%,rgba(0,255,255,.12),transparent 35%),radial-gradient(circle at 50% 100%,rgba(0,80,255,.15),transparent 40%);animation:bgMove 12s ease-in-out infinite alternate;z-index:-1}
+@keyframes bgMove{0%{transform:translate(0,0) scale(1)}100%{transform:translate(-3%,3%) scale(1.15)}}
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
+<canvas id="cyber-bg"></canvas>
 
 <!-- ===== DISCLAIMER POPUP ===== -->
 <div class="disclaimer-overlay" id="disclaimerOverlay">
@@ -1299,6 +1307,25 @@ document.addEventListener('DOMContentLoaded', function() {
         searchNumber();
     }, 1500);
 });
+</script>
+
+
+<script>
+const canvas=document.getElementById("cyber-bg");
+if(canvas && window.THREE){
+const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,1000);
+camera.position.z=5;
+const g=new THREE.BufferGeometry(),a=[];
+for(let i=0;i<3000;i++)a.push((Math.random()-.5)*20,(Math.random()-.5)*20,(Math.random()-.5)*20);
+g.setAttribute('position',new THREE.Float32BufferAttribute(a,3));
+const pts=new THREE.Points(g,new THREE.PointsMaterial({color:0x00bfff,size:.03}));
+scene.add(pts);
+(function anim(){requestAnimationFrame(anim);pts.rotation.y+=0.0008;pts.rotation.x+=0.0003;renderer.render(scene,camera)})();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+}
 </script>
 
 </body>
