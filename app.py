@@ -1309,53 +1309,6 @@ margin:auto auto 18px;
 }
 @keyframes v82spin{to{transform:rotate(360deg)}}
 
-
-/* ===== V8.3 RESULTS DASHBOARD ===== */
-.v83-toolbar{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin:14px 0;
-}
-.v83-tab{
-padding:8px 14px;
-border-radius:999px;
-border:1px solid rgba(0,255,255,.22);
-background:rgba(255,255,255,.04);
-color:#dffcff;
-cursor:pointer;
-transition:.25s;
-}
-.v83-tab.active,.v83-tab:hover{
-background:rgba(0,255,255,.14);
-}
-.copy-btn{
-float:right;
-padding:5px 10px;
-font-size:12px;
-border-radius:8px;
-border:1px solid rgba(0,255,255,.25);
-background:rgba(255,255,255,.05);
-cursor:pointer;
-}
-
-
-/* ===== V8.4 HISTORY & EXPORT ===== */
-.v84-tools{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin:14px 0;
-}
-.v84-btn{
-padding:8px 14px;
-border-radius:10px;
-border:1px solid rgba(0,255,255,.22);
-background:rgba(255,255,255,.05);
-color:#dffcff;
-cursor:pointer;
-}
-
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -2127,83 +2080,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   }
 });
 </script>
-
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
-  const result=document.querySelector(".result-box");
-  if(!result) return;
-
-  const bar=document.createElement("div");
-  bar.className="v83-toolbar";
-  bar.innerHTML=`
-    <div class="v83-tab active">Basic</div>
-    <div class="v83-tab">Telecom</div>
-    <div class="v83-tab">Location</div>
-    <div class="v83-tab">Other</div>
-    <button class="copy-btn">Copy</button>`;
-
-  result.prepend(bar);
-
-  const tabs=bar.querySelectorAll(".v83-tab");
-  tabs.forEach(t=>{
-    t.onclick=()=>{
-      tabs.forEach(x=>x.classList.remove("active"));
-      t.classList.add("active");
-    };
-  });
-
-  bar.querySelector(".copy-btn").onclick=async()=>{
-    try{
-      await navigator.clipboard.writeText(result.innerText);
-      const b=bar.querySelector(".copy-btn");
-      b.textContent="Copied!";
-      setTimeout(()=>b.textContent="Copy",1500);
-    }catch(e){}
-  };
-});
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
- const form=document.querySelector("form");
- const input=form?form.querySelector("input"):null;
- if(!form||!input) return;
-
- const tools=document.createElement("div");
- tools.className="v84-tools";
- tools.innerHTML='<button type="button" class="v84-btn" id="histBtn">Recent</button><button type="button" class="v84-btn" id="expBtn">Export JSON</button>';
- form.after(tools);
-
- form.addEventListener("submit",()=>{
-   const n=input.value.trim();
-   if(!n) return;
-   let arr=JSON.parse(localStorage.getItem("osint_recent")||"[]");
-   arr=arr.filter(x=>x!==n);
-   arr.unshift(n);
-   arr=arr.slice(0,10);
-   localStorage.setItem("osint_recent",JSON.stringify(arr));
- });
-
- document.getElementById("histBtn").onclick=()=>{
-   const arr=JSON.parse(localStorage.getItem("osint_recent")||"[]");
-   alert(arr.length?("Recent Searches:\n\n"+arr.join("\n")):"No recent searches.");
- };
-
- document.getElementById("expBtn").onclick=()=>{
-   const result=document.querySelector(".result-box");
-   if(!result){alert("No result available.");return;}
-   const blob=new Blob([JSON.stringify({result:result.innerText},null,2)],{type:"application/json"});
-   const a=document.createElement("a");
-   a.href=URL.createObjectURL(blob);
-   a.download="osint_result.json";
-   a.click();
-   URL.revokeObjectURL(a.href);
- };
-});
-</script>
 </body>
-
-
 
 
 
