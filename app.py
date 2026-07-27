@@ -1019,7 +1019,7 @@ HTML_TEMPLATE = '''
             <a href="#"><i class="fas fa-shield-halved"></i> Privacy Policy</a>
             <a href="#"><i class="fas fa-gavel"></i> Terms & Conditions</a>
             <a href="https://t.me/Anish_Exploits" target="_blank"><i class="fas fa-headset"></i> Support</a>
-            <a href="tel:+916209856775"><i class="fas fa-phone"></i> Contact</a>
+            <a href="tel:+917379117261"><i class="fas fa-phone"></i> Contact</a>
         </div>
         <div class="copyright">
             © 2024 <span class="brand-name">Shubham Patel</span> · All Rights Reserved
