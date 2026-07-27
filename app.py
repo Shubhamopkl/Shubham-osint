@@ -1800,17 +1800,11 @@ document.addEventListener("DOMContentLoaded",()=>{
  wrap.className="metric-grid";
  wrap.innerHTML=`
  <div class="metric-card">
-   <div class="metric-title">TODAY SCANS</div>
-   <div class="metric-value" id="mScan">0</div>
- </div>
+   
  <div class="metric-card">
-   <div class="metric-title">API STATUS</div>
-   <div class="metric-value">ONLINE</div>
- </div>
+   
  <div class="metric-card">
-   <div class="metric-title">NETWORK</div>
-   <div class="metric-value">SECURE</div>
- </div>`;
+   `;
 
  body.prepend(wrap);
 
