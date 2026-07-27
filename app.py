@@ -1089,6 +1089,146 @@ letter-spacing:3px!important;
 text-transform:uppercase;
 }
 
+
+/* ===== V7.1 DASHBOARD LAYOUT ===== */
+.dashboard-shell{
+display:grid;
+grid-template-columns:260px 1fr 280px;
+gap:20px;
+max-width:1500px;
+margin:24px auto;
+padding:0 20px;
+}
+.sidebar,.rightbar{
+background:rgba(8,20,40,.62);
+border:1px solid rgba(0,255,255,.22);
+backdrop-filter:blur(18px);
+border-radius:20px;
+padding:18px;
+box-shadow:0 0 30px rgba(0,180,255,.12);
+}
+.sidebar h3,.rightbar h3{
+color:#9beeff;
+margin-bottom:14px;
+font-size:15px;
+letter-spacing:2px;
+}
+.sidebar .item,.rightbar .item{
+padding:10px 12px;
+margin:8px 0;
+border-radius:12px;
+background:rgba(255,255,255,.03);
+color:#d7f7ff;
+}
+@media(max-width:1100px){
+.dashboard-shell{grid-template-columns:1fr}
+.sidebar,.rightbar{display:none}
+}
+
+
+/*===== V7.2 =====*/
+.top-hud{
+display:flex;justify-content:space-between;align-items:center;
+gap:12px;margin:18px auto;max-width:1500px;padding:0 20px}
+.hud-box{flex:1;background:rgba(5,20,40,.6);border:1px solid rgba(0,255,255,.25);
+border-radius:16px;padding:14px;color:#dffcff;backdrop-filter:blur(16px)}
+.hud-title{font-size:11px;opacity:.7;letter-spacing:2px}
+.hud-value{font-size:20px;font-weight:bold;margin-top:6px}
+@media(max-width:900px){.top-hud{flex-direction:column}.hud-box{width:100%}}
+
+
+/* ===== V7.3 PARTICLE & SCAN ===== */
+#v73Canvas{
+position:fixed;
+inset:0;
+z-index:-3;
+pointer-events:none;
+opacity:.55;
+}
+.scan-line{
+position:fixed;
+left:0;
+top:-20%;
+width:100%;
+height:180px;
+background:linear-gradient(to bottom,
+transparent,
+rgba(0,255,255,.06),
+rgba(0,255,255,.14),
+transparent);
+pointer-events:none;
+animation:v73scan 7s linear infinite;
+z-index:-2;
+}
+@keyframes v73scan{
+0%{transform:translateY(-30vh)}
+100%{transform:translateY(140vh)}
+}
+
+
+/* ===== V7.4 RESULT DASHBOARD ===== */
+.metric-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+gap:14px;
+margin:18px 0;
+}
+.metric-card{
+background:rgba(8,22,45,.65);
+border:1px solid rgba(0,255,255,.22);
+border-radius:16px;
+padding:16px;
+backdrop-filter:blur(18px);
+box-shadow:0 0 20px rgba(0,255,255,.08);
+transition:.3s;
+}
+.metric-card:hover{
+transform:translateY(-5px);
+box-shadow:0 0 30px rgba(0,255,255,.18);
+}
+.metric-title{
+font-size:11px;
+letter-spacing:2px;
+color:#89dfff;
+}
+.metric-value{
+font-size:24px;
+font-weight:700;
+color:#fff;
+margin-top:8px;
+}
+
+
+/* ===== V7.5 FINAL POLISH ===== */
+.fade-up{
+animation:v75fade .7s ease both;
+}
+@keyframes v75fade{
+from{opacity:0;transform:translateY(18px)}
+to{opacity:1;transform:translateY(0)}
+}
+.cyber-badge{
+position:fixed;
+right:18px;
+bottom:18px;
+padding:10px 16px;
+border-radius:999px;
+background:rgba(8,22,45,.72);
+border:1px solid rgba(0,255,255,.25);
+color:#bffcff;
+backdrop-filter:blur(14px);
+box-shadow:0 0 20px rgba(0,255,255,.15);
+font-size:12px;
+letter-spacing:1px;
+}
+.btn-search,.search-btn,button[type=submit]{
+transition:transform .2s ease, box-shadow .2s ease;
+}
+.btn-search:hover,.search-btn:hover,button[type=submit]:hover{
+transform:translateY(-2px) scale(1.02);
+box-shadow:0 0 24px rgba(0,255,255,.28);
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -1658,7 +1798,154 @@ document.addEventListener("DOMContentLoaded",()=>{
  }
 });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ const mc=document.querySelector(".main-container");
+ if(!mc || mc.parentElement.classList.contains("dashboard-shell")) return;
+ const shell=document.createElement("div");
+ shell.className="dashboard-shell";
+ const left=document.createElement("aside");
+ left.className="sidebar";
+ left.innerHTML="<h3>OSINT MENU</h3><div class='item'>📱 Number Lookup</div><div class='item'>🛰️ Intelligence</div><div class='item'>🛡️ Security</div>";
+ const right=document.createElement("aside");
+ right.className="rightbar";
+ right.innerHTML="<h3>LIVE STATUS</h3><div class='item'>API : ONLINE</div><div class='item'>SERVER : READY</div><div class='item'>VERSION : V7.1</div>";
+ mc.parentNode.insertBefore(shell,mc);
+ shell.appendChild(left);
+ shell.appendChild(mc);
+ shell.appendChild(right);
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ const hud=document.createElement("div");
+ hud.className="top-hud";
+ hud.innerHTML=`
+ <div class="hud-box"><div class="hud-title">SYSTEM</div><div class="hud-value">ONLINE</div></div>
+ <div class="hud-box"><div class="hud-title">VERSION</div><div class="hud-value">V7.2</div></div>
+ <div class="hud-box"><div class="hud-title">TIME</div><div class="hud-value" id="clockHud"></div></div>`;
+ const header=document.querySelector(".main-header");
+ if(header) header.after(hud);
+ setInterval(()=>{
+  const e=document.getElementById("clockHud");
+  if(e)e.textContent=new Date().toLocaleTimeString();
+ },1000);
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ const scan=document.createElement("div");
+ scan.className="scan-line";
+ document.body.appendChild(scan);
+
+ const c=document.createElement("canvas");
+ c.id="v73Canvas";
+ document.body.appendChild(c);
+
+ const ctx=c.getContext("2d");
+ function resize(){c.width=innerWidth;c.height=innerHeight;}
+ resize();
+ addEventListener("resize",resize);
+
+ const pts=[];
+ for(let i=0;i<55;i++){
+   pts.push({x:Math.random()*c.width,y:Math.random()*c.height,
+             vx:(Math.random()-.5)*0.5,vy:(Math.random()-.5)*0.5});
+ }
+
+ function draw(){
+   ctx.clearRect(0,0,c.width,c.height);
+   ctx.fillStyle="#55eaff";
+   for(let i=0;i<pts.length;i++){
+      const p=pts[i];
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>c.width)p.vx*=-1;
+      if(p.y<0||p.y>c.height)p.vy*=-1;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,2,0,Math.PI*2);
+      ctx.fill();
+      for(let j=i+1;j<pts.length;j++){
+        const q=pts[j];
+        const dx=p.x-q.x, dy=p.y-q.y;
+        const d=Math.hypot(dx,dy);
+        if(d<120){
+          ctx.strokeStyle="rgba(85,234,255,"+(1-d/120)*0.22+")";
+          ctx.beginPath();
+          ctx.moveTo(p.x,p.y);
+          ctx.lineTo(q.x,q.y);
+          ctx.stroke();
+        }
+      }
+   }
+   requestAnimationFrame(draw);
+ }
+ draw();
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ const body=document.querySelector(".card-body");
+ if(!body) return;
+
+ const wrap=document.createElement("div");
+ wrap.className="metric-grid";
+ wrap.innerHTML=`
+ <div class="metric-card">
+   <div class="metric-title">TODAY SCANS</div>
+   <div class="metric-value" id="mScan">0</div>
+ </div>
+ <div class="metric-card">
+   <div class="metric-title">API STATUS</div>
+   <div class="metric-value">ONLINE</div>
+ </div>
+ <div class="metric-card">
+   <div class="metric-title">NETWORK</div>
+   <div class="metric-value">SECURE</div>
+ </div>`;
+
+ body.prepend(wrap);
+
+ let count=0;
+ const btn=document.querySelector(".btn-search");
+ if(btn){
+   btn.addEventListener("click",()=>{
+      count++;
+      const el=document.getElementById("mScan");
+      if(el) el.textContent=count;
+   });
+ }
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  document.querySelectorAll(".card,.main-container,.result-box,.metric-card")
+    .forEach(el=>el.classList.add("fade-up"));
+
+  const badge=document.createElement("div");
+  badge.className="cyber-badge";
+  badge.innerHTML="⚡ SHUBHAM OSINT • V7.5 READY";
+  document.body.appendChild(badge);
+
+  const form=document.querySelector("form");
+  if(form){
+    form.addEventListener("submit",()=>{
+      badge.innerHTML="🔍 Processing Request...";
+      setTimeout(()=>badge.innerHTML="⚡ SHUBHAM OSINT • V7.5 READY",2500);
+    });
+  }
+});
+</script>
 </body>
+
+
+
+
+
 
 
 
