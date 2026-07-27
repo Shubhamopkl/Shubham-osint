@@ -869,6 +869,41 @@ body{background:#030712!important}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 20% 20%,rgba(0,140,255,.18),transparent 35%),radial-gradient(circle at 80% 60%,rgba(0,255,255,.12),transparent 35%),radial-gradient(circle at 50% 100%,rgba(0,80,255,.15),transparent 40%);animation:bgMove 12s ease-in-out infinite alternate;z-index:-1}
 @keyframes bgMove{0%{transform:translate(0,0) scale(1)}100%{transform:translate(-3%,3%) scale(1.15)}}
 
+
+
+/* ===== V3 NEON EFFECT ===== */
+.btn-search{
+background:linear-gradient(135deg,#009dff,#005eff)!important;
+box-shadow:0 0 20px rgba(0,191,255,.35);
+}
+.btn-search:hover:not(:disabled){
+box-shadow:0 0 40px rgba(0,191,255,.7)!important;
+}
+.input-group:focus-within{
+border-color:#00bfff!important;
+box-shadow:0 0 15px rgba(0,191,255,.45)!important;
+}
+.card{
+position:relative;
+}
+.card::after{
+content:"";
+position:absolute;
+inset:-2px;
+border-radius:22px;
+padding:2px;
+background:linear-gradient(45deg,#00bfff,transparent,#00e5ff,transparent,#00bfff);
+-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+-webkit-mask-composite:xor;
+mask-composite:exclude;
+animation:borderSpin 6s linear infinite;
+pointer-events:none;
+}
+@keyframes borderSpin{
+from{filter:hue-rotate(0deg);}
+to{filter:hue-rotate(360deg);}
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
