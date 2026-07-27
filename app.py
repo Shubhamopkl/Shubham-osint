@@ -997,7 +997,14 @@ HTML_TEMPLATE = '''
                 <div class="social-title"><i class="fas fa-share-alt"></i> Connect With Shubham Patel</div>
                 <div class="social-buttons">
                                         <a href="https://www.instagram.com/shubham_patel_737?igsh=Zjh6aGRxOWg0aW5w" target="_blank" class="social-btn instagram"><i class="fab fa-instagram"></i> Instagram</a>
-                    
+                                        
+                    <a href="https://t.me/Sms_read" target="_blank" class="social-btn telegram">
+    <i class="fab fa-telegram"></i> Telegram
+</a>
+
+<a href="https://wa.me/qr/TAO5T4SBXPNKP1" target="_blank" class="social-btn whatsapp">
+    <i class="fab fa-whatsapp"></i> WhatsApp
+</a>
                 </div>
             </div>
 
