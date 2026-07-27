@@ -1126,17 +1126,7 @@ color:#d7f7ff;
 }
 
 
-/*===== V7.2 =====*/
-.top-hud{
-display:flex;justify-content:space-between;align-items:center;
-gap:12px;margin:18px auto;max-width:1500px;padding:0 20px}
-.hud-box{flex:1;background:rgba(5,20,40,.6);border:1px solid rgba(0,255,255,.25);
-border-radius:16px;padding:14px;color:#dffcff;backdrop-filter:blur(16px)}
-.hud-title{font-size:11px;opacity:.7;letter-spacing:2px}
-.hud-value{font-size:20px;font-weight:bold;margin-top:6px}
-@media(max-width:900px){.top-hud{flex-direction:column}.hud-box{width:100%}}
-
-
+/* V7.2 removed */
 /* ===== V7.3 PARTICLE & SCAN ===== */
 #v73Canvas{
 position:fixed;
@@ -1163,6 +1153,70 @@ z-index:-2;
 @keyframes v73scan{
 0%{transform:translateY(-30vh)}
 100%{transform:translateY(140vh)}
+}
+
+
+/* ===== V7.4 RESULT DASHBOARD ===== */
+.metric-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+gap:14px;
+margin:18px 0;
+}
+.metric-card{
+background:rgba(8,22,45,.65);
+border:1px solid rgba(0,255,255,.22);
+border-radius:16px;
+padding:16px;
+backdrop-filter:blur(18px);
+box-shadow:0 0 20px rgba(0,255,255,.08);
+transition:.3s;
+}
+.metric-card:hover{
+transform:translateY(-5px);
+box-shadow:0 0 30px rgba(0,255,255,.18);
+}
+.metric-title{
+font-size:11px;
+letter-spacing:2px;
+color:#89dfff;
+}
+.metric-value{
+font-size:24px;
+font-weight:700;
+color:#fff;
+margin-top:8px;
+}
+
+
+/* ===== V7.5 FINAL POLISH ===== */
+.fade-up{
+animation:v75fade .7s ease both;
+}
+@keyframes v75fade{
+from{opacity:0;transform:translateY(18px)}
+to{opacity:1;transform:translateY(0)}
+}
+.cyber-badge{
+position:fixed;
+right:18px;
+bottom:18px;
+padding:10px 16px;
+border-radius:999px;
+background:rgba(8,22,45,.72);
+border:1px solid rgba(0,255,255,.25);
+color:#bffcff;
+backdrop-filter:blur(14px);
+box-shadow:0 0 20px rgba(0,255,255,.15);
+font-size:12px;
+letter-spacing:1px;
+}
+.btn-search,.search-btn,button[type=submit]{
+transition:transform .2s ease, box-shadow .2s ease;
+}
+.btn-search:hover,.search-btn:hover,button[type=submit]:hover{
+transform:translateY(-2px) scale(1.02);
+box-shadow:0 0 24px rgba(0,255,255,.28);
 }
 
 </style>
@@ -1203,10 +1257,7 @@ z-index:-2;
             <i class="fas fa-shield-halved"></i>
             SHUBHAM PATEL <span>|</span> CYBER SECURITY DIVISION
         </div>
-        <div class="helpline">
-            <i class="fas fa-phone"></i> <strong>Helpline: +91 7379117261</strong>
-        </div>
-    </div>
+</div>
 </div>
 
 <!-- ===== MAIN HEADER ===== -->
@@ -1669,7 +1720,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  t.style.fontFamily="monospace";
  t.style.zIndex="9999";
  document.body.appendChild(t);
- setInterval(()=>{t.textContent="SYSTEM ONLINE • "+new Date().toLocaleTimeString();},1000);
+ setInterval(()=>{t.textContent=" • "+new Date().toLocaleTimeString();},1000);
 });
 </script>
 
@@ -1689,7 +1740,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 document.addEventListener("DOMContentLoaded",()=>{
  const hud=document.createElement("div");
  hud.className="hud-panel";
- hud.innerHTML='<div><span class="dot"></span>API ONLINE</div><div id="scanCount">SCANS : 0</div>';
+ hud.innerHTML='<div><span class="dot"></span></div><div id="scanCount">SCANS : 0</div>';
  document.body.appendChild(hud);
 
  let scans=0;
@@ -1821,7 +1872,64 @@ document.addEventListener("DOMContentLoaded",()=>{
  draw();
 });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ const body=document.querySelector(".card-body");
+ if(!body) return;
+
+ const wrap=document.createElement("div");
+ wrap.className="metric-grid";
+ wrap.innerHTML=`
+ <div class="metric-card">
+   <div class="metric-title">TODAY SCANS</div>
+   <div class="metric-value" id="mScan">0</div>
+ </div>
+ <div class="metric-card">
+   <div class="metric-title">API STATUS</div>
+   <div class="metric-value">ONLINE</div>
+ </div>
+ <div class="metric-card">
+   <div class="metric-title">NETWORK</div>
+   <div class="metric-value">SECURE</div>
+ </div>`;
+
+ body.prepend(wrap);
+
+ let count=0;
+ const btn=document.querySelector(".btn-search");
+ if(btn){
+   btn.addEventListener("click",()=>{
+      count++;
+      const el=document.getElementById("mScan");
+      if(el) el.textContent=count;
+   });
+ }
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  document.querySelectorAll(".card,.main-container,.result-box,.metric-card")
+    .forEach(el=>el.classList.add("fade-up"));
+
+  const badge=document.createElement("div");
+  badge.className="cyber-badge";
+  badge.innerHTML="⚡ SHUBHAM OSINT • V7.5 READY";
+  document.body.appendChild(badge);
+
+  const form=document.querySelector("form");
+  if(form){
+    form.addEventListener("submit",()=>{
+      badge.innerHTML="🔍 Processing Request...";
+      setTimeout(()=>badge.innerHTML="⚡ SHUBHAM OSINT • V7.5 READY",2500);
+    });
+  }
+});
+</script>
 </body>
+
+
 
 
 
