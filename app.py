@@ -1525,39 +1525,6 @@ line-height:1.6;
 .v94-switch{margin:10px 0;color:#dffcff}
 @media(max-width:900px){.v94-panel{grid-template-columns:1fr}}
 
-
-/* ===== V9.5 FINAL ===== */
-.v95-statusbar{
-position:fixed;
-left:50%;
-bottom:18px;
-transform:translateX(-50%);
-display:flex;
-gap:12px;
-padding:10px 18px;
-border-radius:999px;
-background:rgba(8,20,40,.82);
-border:1px solid rgba(0,255,255,.2);
-backdrop-filter:blur(14px);
-z-index:9999;
-font-size:12px;
-color:#dffcff;
-box-shadow:0 0 24px rgba(0,255,255,.12);
-}
-.v95-pulse{
-display:inline-block;
-width:8px;
-height:8px;
-border-radius:50%;
-background:#3cff7a;
-animation:v95pulse 1.5s infinite;
-}
-@keyframes v95pulse{
-0%,100%{transform:scale(1);opacity:1}
-50%{transform:scale(1.8);opacity:.5}
-}
-html{scroll-behavior:smooth;}
-
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -2552,25 +2519,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  };
 });
 </script>
-
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
- if(document.querySelector(".v95-statusbar")) return;
-
- const bar=document.createElement("div");
- bar.className="v95-statusbar";
- bar.innerHTML="<span class='v95-pulse'></span><span>SYSTEM ONLINE</span><span>|</span><span>RENDER READY</span><span>|</span><span>V9.5</span>";
- document.body.appendChild(bar);
-
- const observer=new MutationObserver(()=>{
-   document.querySelectorAll("button,input,.metric-card,.v92-card,.result-box")
-     .forEach(el=>el.style.transition="all .25s ease");
- });
- observer.observe(document.body,{childList:true,subtree:true});
-});
-</script>
 </body>
-
 
 
 
