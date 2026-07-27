@@ -1390,6 +1390,346 @@ z-index:10000;
 }
 .toast-msg.show{opacity:1;}
 
+
+/* ===== V9.1 LAYOUT FOUNDATION ===== */
+.v91-sidebar{
+position:fixed;
+left:0;top:0;bottom:0;
+width:250px;
+padding:24px 16px;
+background:rgba(6,16,32,.88);
+border-right:1px solid rgba(0,255,255,.15);
+backdrop-filter:blur(18px);
+z-index:900;
+transition:.25s;
+}
+.v91-sidebar.collapsed{width:72px;}
+.v91-logo{
+font-size:20px;
+font-weight:700;
+color:#9ffcff;
+margin-bottom:24px;
+}
+.v91-nav a{
+display:block;
+padding:12px;
+margin:8px 0;
+border-radius:12px;
+color:#dffcff;
+text-decoration:none;
+background:rgba(255,255,255,.04);
+}
+.v91-topbar{
+position:fixed;
+left:250px;
+right:0;
+top:0;
+height:64px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 18px;
+background:rgba(8,18,36,.82);
+border-bottom:1px solid rgba(0,255,255,.15);
+backdrop-filter:blur(16px);
+z-index:899;
+transition:.25s;
+}
+.v91-toggle{
+cursor:pointer;
+font-size:22px;
+}
+@media(max-width:900px){
+.v91-sidebar{transform:translateX(-100%);}
+.v91-topbar{left:0;}
+}
+
+
+/* ===== V9.2 ANALYTICS ===== */
+.v92-stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+gap:16px;
+max-width:1400px;
+margin:90px auto 20px;
+padding:0 20px;
+}
+.v92-card{
+background:rgba(8,20,40,.7);
+border:1px solid rgba(0,255,255,.18);
+border-radius:18px;
+padding:18px;
+backdrop-filter:blur(16px);
+transition:.25s;
+}
+.v92-card:hover{
+transform:translateY(-4px);
+box-shadow:0 0 24px rgba(0,255,255,.18);
+}
+.v92-label{font-size:12px;color:#9fefff;letter-spacing:1px}
+.v92-value{font-size:28px;font-weight:700;color:#fff;margin-top:8px}
+
+
+/* ===== V9.3 RESULTS PRO ===== */
+.v93-actions{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+margin:12px 0;
+}
+.v93-btn{
+padding:8px 12px;
+border-radius:10px;
+border:1px solid rgba(0,255,255,.22);
+background:rgba(255,255,255,.05);
+color:#dffcff;
+cursor:pointer;
+}
+.v93-btn:hover{
+background:rgba(0,255,255,.12);
+}
+.v93-highlight{
+border-left:3px solid #55eaff;
+padding-left:10px;
+animation:v93fade .4s ease;
+}
+@keyframes v93fade{
+from{opacity:.5;transform:translateY(6px)}
+to{opacity:1;transform:translateY(0)}
+}
+
+
+/* ===== V9.4 ACTIVITY & SETTINGS ===== */
+.v94-panel{
+display:grid;
+grid-template-columns:2fr 1fr;
+gap:16px;
+max-width:1400px;
+margin:20px auto;
+padding:0 20px;
+}
+.v94-card{
+background:rgba(8,20,40,.72);
+border:1px solid rgba(0,255,255,.18);
+border-radius:18px;
+padding:18px;
+backdrop-filter:blur(16px);
+}
+.v94-log{
+max-height:220px;
+overflow:auto;
+font-family:monospace;
+font-size:13px;
+line-height:1.6;
+}
+.v94-switch{margin:10px 0;color:#dffcff}
+@media(max-width:900px){.v94-panel{grid-template-columns:1fr}}
+
+
+/* ===== V9.5 FINAL ===== */
+.v95-statusbar{
+position:fixed;
+left:50%;
+bottom:18px;
+transform:translateX(-50%);
+display:flex;
+gap:12px;
+padding:10px 18px;
+border-radius:999px;
+background:rgba(8,20,40,.82);
+border:1px solid rgba(0,255,255,.2);
+backdrop-filter:blur(14px);
+z-index:9999;
+font-size:12px;
+color:#dffcff;
+box-shadow:0 0 24px rgba(0,255,255,.12);
+}
+.v95-pulse{
+display:inline-block;
+width:8px;
+height:8px;
+border-radius:50%;
+background:#3cff7a;
+animation:v95pulse 1.5s infinite;
+}
+@keyframes v95pulse{
+0%,100%{transform:scale(1);opacity:1}
+50%{transform:scale(1.8);opacity:.5}
+}
+html{scroll-behavior:smooth;}
+
+
+/* ===== V10.1 FOUNDATION ===== */
+:root{
+ --v10-bg:#07111f;
+ --v10-panel:rgba(12,22,40,.78);
+ --v10-border:rgba(90,240,255,.18);
+ --v10-accent:#59ecff;
+}
+.v10-shell{
+max-width:1600px;
+margin:0 auto;
+padding:90px 24px 32px;
+}
+.v10-banner{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:18px;
+padding:22px;
+border-radius:22px;
+background:linear-gradient(135deg,rgba(0,180,255,.14),rgba(0,255,180,.06));
+border:1px solid var(--v10-border);
+backdrop-filter:blur(18px);
+margin-bottom:20px;
+}
+.v10-title{
+font-size:30px;
+font-weight:800;
+color:#fff;
+}
+.v10-sub{
+color:#bfeef6;
+margin-top:6px;
+}
+.v10-pill{
+padding:8px 14px;
+border-radius:999px;
+border:1px solid var(--v10-border);
+background:var(--v10-panel);
+color:#dffcff;
+}
+
+
+/* ===== V10.2 WORKSPACE ===== */
+.v10-grid{
+display:grid;
+grid-template-columns:320px 1fr;
+gap:20px;
+margin-top:20px;
+}
+.v10-panel{
+background:rgba(10,22,42,.75);
+border:1px solid rgba(89,236,255,.18);
+border-radius:20px;
+backdrop-filter:blur(18px);
+padding:18px;
+}
+.v10-panel h3{
+margin:0 0 14px;
+color:#9ff8ff;
+letter-spacing:1px;
+}
+.v10-quick{
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+.v10-item{
+padding:12px;
+border-radius:12px;
+background:rgba(255,255,255,.04);
+color:#dffcff;
+}
+@media(max-width:950px){
+ .v10-grid{grid-template-columns:1fr;}
+}
+
+
+/* ===== V10.3 ANALYTICS DASHBOARD ===== */
+.v103-dashboard{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:16px;
+margin:20px 0;
+}
+.v103-widget{
+background:rgba(10,22,42,.75);
+border:1px solid rgba(89,236,255,.18);
+border-radius:18px;
+padding:18px;
+backdrop-filter:blur(16px);
+}
+.v103-title{font-size:12px;color:#9ff8ff;letter-spacing:1px}
+.v103-value{font-size:28px;font-weight:700;color:#fff;margin-top:8px}
+
+
+/* ===== V10.4 NOTIFICATION CENTER ===== */
+.v104-layout{
+display:grid;
+grid-template-columns:1.5fr 1fr;
+gap:18px;
+margin:20px 0;
+}
+.v104-card{
+background:rgba(10,22,42,.75);
+border:1px solid rgba(89,236,255,.18);
+border-radius:18px;
+padding:18px;
+backdrop-filter:blur(16px);
+}
+.v104-feed{
+max-height:220px;
+overflow:auto;
+font-family:monospace;
+font-size:13px;
+line-height:1.6;
+}
+.v104-action{
+display:block;
+width:100%;
+margin:10px 0;
+padding:10px;
+border-radius:10px;
+border:1px solid rgba(89,236,255,.18);
+background:rgba(255,255,255,.05);
+color:#dffcff;
+cursor:pointer;
+}
+@media(max-width:900px){
+.v104-layout{grid-template-columns:1fr;}
+}
+
+
+/* ===== V10.5 FINAL DASHBOARD ===== */
+.v105-grid{
+display:grid;
+grid-template-columns:2fr 1fr;
+gap:18px;
+margin:22px 0;
+}
+.v105-card{
+background:rgba(10,22,42,.78);
+border:1px solid rgba(89,236,255,.18);
+border-radius:18px;
+padding:18px;
+backdrop-filter:blur(16px);
+}
+.v105-chart{
+height:140px;
+display:flex;
+align-items:flex-end;
+gap:10px;
+}
+.v105-bar{
+flex:1;
+border-radius:8px 8px 0 0;
+background:linear-gradient(to top,#1fbfff,#7df7ff);
+transition:height .3s ease;
+}
+.v105-action{
+display:block;
+width:100%;
+padding:10px;
+margin:10px 0;
+border-radius:10px;
+border:1px solid rgba(89,236,255,.18);
+background:rgba(255,255,255,.05);
+color:#dffcff;
+cursor:pointer;
+}
+@media(max-width:900px){.v105-grid{grid-template-columns:1fr;}}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -2261,7 +2601,310 @@ document.addEventListener("DOMContentLoaded",()=>{
  window.addEventListener("load",()=>notify("SHUBHAM OSINT V8.5 Ready"));
 });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ if(document.querySelector(".v91-sidebar")) return;
+
+ const side=document.createElement("aside");
+ side.className="v91-sidebar";
+ side.innerHTML=`
+   <div class="v91-logo">⚡ SHUBHAM</div>
+   <div class="v91-nav">
+     <a href="#">🏠 Dashboard</a>
+     <a href="#">📱 Lookup</a>
+     <a href="#">📊 Analytics</a>
+     <a href="#">⚙️ Settings</a>
+   </div>`;
+
+ const top=document.createElement("div");
+ top.className="v91-topbar";
+ top.innerHTML='<span class="v91-toggle">☰</span><strong>OSINT Dashboard V9.1</strong><span>🟢 Online</span>';
+
+ document.body.prepend(side);
+ document.body.prepend(top);
+
+ const t=top.querySelector(".v91-toggle");
+ t.onclick=()=>{
+   side.classList.toggle("collapsed");
+   top.style.left=side.classList.contains("collapsed")?"72px":"250px";
+ };
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ if(document.querySelector(".v92-stats")) return;
+
+ const stats=document.createElement("section");
+ stats.className="v92-stats";
+ stats.innerHTML=`
+ <div class="v92-card"><div class="v92-label">TODAY LOOKUPS</div><div id="v92lookups" class="v92-value">0</div></div>
+ <div class="v92-card"><div class="v92-label">API STATUS</div><div class="v92-value">ONLINE</div></div>
+ <div class="v92-card"><div class="v92-label">RESPONSE</div><div class="v92-value">&lt;1s</div></div>
+ <div class="v92-card"><div class="v92-label">SECURITY</div><div class="v92-value">ACTIVE</div></div>`;
+
+ const top=document.querySelector(".v91-topbar");
+ if(top) top.after(stats);
+
+ const form=document.querySelector("form");
+ if(form){
+   form.addEventListener("submit",()=>{
+      const el=document.getElementById("v92lookups");
+      if(el) el.textContent=String(Number(el.textContent)+1);
+   });
+ }
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ const result=document.querySelector(".result-box");
+ if(!result || document.querySelector(".v93-actions")) return;
+
+ const bar=document.createElement("div");
+ bar.className="v93-actions";
+ bar.innerHTML=`
+ <button class="v93-btn" id="v93Copy">📋 Copy Result</button>
+ <button class="v93-btn" id="v93Json">💾 Export JSON</button>
+ <button class="v93-btn" id="v93Focus">🎯 Focus Mode</button>`;
+ result.prepend(bar);
+
+ document.getElementById("v93Copy").onclick=async()=>{
+   try{
+     await navigator.clipboard.writeText(result.innerText);
+     alert("Result copied.");
+   }catch(e){}
+ };
+
+ document.getElementById("v93Json").onclick=()=>{
+   const blob=new Blob([JSON.stringify({result:result.innerText},null,2)],{type:"application/json"});
+   const a=document.createElement("a");
+   a.href=URL.createObjectURL(blob);
+   a.download="result_v93.json";
+   a.click();
+   URL.revokeObjectURL(a.href);
+ };
+
+ document.getElementById("v93Focus").onclick=()=>{
+   result.classList.toggle("v93-highlight");
+ };
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ if(document.querySelector(".v94-panel")) return;
+ const panel=document.createElement("section");
+ panel.className="v94-panel";
+ panel.innerHTML=`
+ <div class="v94-card">
+   <h3>Activity Log</h3>
+   <div class="v94-log" id="v94Log">System Ready...</div>
+ </div>
+ <div class="v94-card">
+   <h3>Quick Settings</h3>
+   <div class="v94-switch"><label><input type="checkbox" id="animChk" checked> Animations</label></div>
+   <div class="v94-switch"><label><input type="checkbox" id="notifyChk" checked> Notifications</label></div>
+ </div>`;
+ const stats=document.querySelector(".v92-stats");
+ if(stats) stats.after(panel); else document.body.appendChild(panel);
+
+ const log=document.getElementById("v94Log");
+ const form=document.querySelector("form");
+ if(form){
+   form.addEventListener("submit",()=>{
+      const t=new Date().toLocaleTimeString();
+      log.innerHTML=`[${t}] Lookup submitted<br>`+log.innerHTML;
+   });
+ }
+
+ document.getElementById("animChk").onchange=e=>{
+   document.body.style.scrollBehavior=e.target.checked?"smooth":"auto";
+ };
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ if(document.querySelector(".v95-statusbar")) return;
+
+ const bar=document.createElement("div");
+ bar.className="v95-statusbar";
+ bar.innerHTML="<span class='v95-pulse'></span><span>SYSTEM ONLINE</span><span>|</span><span>RENDER READY</span><span>|</span><span>V9.5</span>";
+ document.body.appendChild(bar);
+
+ const observer=new MutationObserver(()=>{
+   document.querySelectorAll("button,input,.metric-card,.v92-card,.result-box")
+     .forEach(el=>el.style.transition="all .25s ease");
+ });
+ observer.observe(document.body,{childList:true,subtree:true});
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ if(document.querySelector(".v10-shell")) return;
+
+ const shell=document.createElement("div");
+ shell.className="v10-shell";
+
+ const banner=document.createElement("div");
+ banner.className="v10-banner";
+ banner.innerHTML=`
+   <div>
+     <div class="v10-title">SHUBHAM OSINT</div>
+     <div class="v10-sub">Enterprise Dashboard • V10.1 Foundation</div>
+   </div>
+   <div class="v10-pill">SYSTEM READY</div>`;
+
+ document.body.prepend(shell);
+ shell.appendChild(banner);
+
+ const children=[...document.body.children].filter(el=>el!==shell && !el.matches("script"));
+ children.forEach(el=>shell.appendChild(el));
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ if(document.querySelector(".v10-grid")) return;
+
+ const shell=document.querySelector(".v10-shell");
+ if(!shell) return;
+
+ const grid=document.createElement("section");
+ grid.className="v10-grid";
+
+ const left=document.createElement("div");
+ left.className="v10-panel";
+ left.innerHTML=`
+ <h3>Quick Access</h3>
+ <div class="v10-quick">
+   <div class="v10-item">📱 Number Lookup</div>
+   <div class="v10-item">📊 Dashboard</div>
+   <div class="v10-item">🕘 Recent Searches</div>
+   <div class="v10-item">⚙️ Settings</div>
+ </div>`;
+
+ const right=document.createElement("div");
+ right.className="v10-panel";
+ right.innerHTML="<h3>Workspace</h3><p style='color:#cfeff6'>Your search form and lookup results appear below. This panel prepares the layout for future dashboard widgets.</p>";
+
+ grid.appendChild(left);
+ grid.appendChild(right);
+
+ const banner=shell.querySelector(".v10-banner");
+ if(banner) banner.after(grid);
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ if(document.querySelector(".v103-dashboard")) return;
+ const ws=[...document.querySelectorAll(".v10-panel")].pop();
+ if(!ws) return;
+
+ const dash=document.createElement("div");
+ dash.className="v103-dashboard";
+ dash.innerHTML=`
+ <div class="v103-widget"><div class="v103-title">TOTAL LOOKUPS</div><div class="v103-value" id="v103Count">0</div></div>
+ <div class="v103-widget"><div class="v103-title">API HEALTH</div><div class="v103-value">100%</div></div>
+ <div class="v103-widget"><div class="v103-title">AVG RESPONSE</div><div class="v103-value">&lt;1s</div></div>
+ <div class="v103-widget"><div class="v103-title">SECURITY</div><div class="v103-value">ACTIVE</div></div>`;
+ ws.appendChild(dash);
+
+ const form=document.querySelector("form");
+ if(form){
+   form.addEventListener("submit",()=>{
+      const el=document.getElementById("v103Count");
+      if(el) el.textContent=String(+el.textContent+1);
+   });
+ }
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ if(document.querySelector(".v104-layout")) return;
+
+ const host=[...document.querySelectorAll(".v10-panel")].pop() || document.body;
+
+ const wrap=document.createElement("div");
+ wrap.className="v104-layout";
+ wrap.innerHTML=`
+ <div class="v104-card">
+   <h3>Notification Center</h3>
+   <div class="v104-feed" id="v104Feed">[READY] Dashboard initialized.</div>
+ </div>
+ <div class="v104-card">
+   <h3>Quick Actions</h3>
+   <button class="v104-action" id="v104Clear">Clear Feed</button>
+   <button class="v104-action" id="v104Test">Generate Test Event</button>
+ </div>`;
+ host.appendChild(wrap);
+
+ const feed=document.getElementById("v104Feed");
+ const addEvent=(msg)=>{
+   const t=new Date().toLocaleTimeString();
+   feed.innerHTML=`[${t}] ${msg}<br>`+feed.innerHTML;
+ };
+
+ const form=document.querySelector("form");
+ if(form){
+   form.addEventListener("submit",()=>addEvent("Lookup request submitted."));
+ }
+
+ document.getElementById("v104Test").onclick=()=>addEvent("System self-test completed.");
+ document.getElementById("v104Clear").onclick=()=>feed.innerHTML="[READY] Feed cleared.";
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ if(document.querySelector(".v105-grid")) return;
+ const host=[...document.querySelectorAll(".v10-panel")].pop() || document.body;
+
+ const wrap=document.createElement("div");
+ wrap.className="v105-grid";
+ wrap.innerHTML=`
+ <div class="v105-card">
+   <h3>Lookup Trend</h3>
+   <div class="v105-chart" id="v105Chart">
+     <div class="v105-bar" style="height:35%"></div>
+     <div class="v105-bar" style="height:55%"></div>
+     <div class="v105-bar" style="height:45%"></div>
+     <div class="v105-bar" style="height:75%"></div>
+     <div class="v105-bar" style="height:60%"></div>
+     <div class="v105-bar" style="height:90%"></div>
+   </div>
+ </div>
+ <div class="v105-card">
+   <h3>Dashboard Tools</h3>
+   <button class="v105-action" id="v105Refresh">Refresh Widgets</button>
+   <button class="v105-action" id="v105Shuffle">Randomize Chart</button>
+ </div>`;
+ host.appendChild(wrap);
+
+ document.getElementById("v105Refresh").onclick=()=>alert("Widgets refreshed.");
+ document.getElementById("v105Shuffle").onclick=()=>{
+   document.querySelectorAll(".v105-bar").forEach(b=>{
+     b.style.height=(20+Math.random()*75).toFixed(0)+"%";
+   });
+ };
+});
+</script>
 </body>
+
+
+
+
+
+
+
+
+
+
 
 
 
