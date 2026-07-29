@@ -38,7 +38,7 @@ HTML_TEMPLATE = '''
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Noto Sans Devanagari', 'Segoe UI', Arial, sans-serif;
-            background: #f0f2f5;
+            background:#050816;background-image:radial-gradient(circle at 20% 20%,rgba(0,183,255,.12),transparent 35%),radial-gradient(circle at 80% 10%,rgba(0,140,255,.08),transparent 30%),linear-gradient(180deg,#04070f,#081322,#050816);color:#fff;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -198,7 +198,7 @@ HTML_TEMPLATE = '''
             z-index: 1000;
         }
         .tricolor-bar .saffron { width: 33.33%; background: #FF9933; }
-        .tricolor-bar .white { width: 33.33%; background: #FFFFFF; }
+        .tricolor-bar .white { width: 33.33%; background:rgba(255,255,255,.06);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px); }
         .tricolor-bar .green { width: 33.34%; background: #138808; }
 
         /* ===== TOP HEADER ===== */
@@ -330,7 +330,7 @@ HTML_TEMPLATE = '''
 
         /* ===== CARD ===== */
         .card {
-            background: #FFFFFF;
+            background:rgba(255,255,255,.06);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
             border-radius: 20px;
             box-shadow: 0 8px 40px rgba(0,0,0,0.06);
             overflow: hidden;
@@ -787,7 +787,7 @@ HTML_TEMPLATE = '''
             margin-top: 18px;
         }
         .footer-section .tricolor-footer .saffron { width: 33.33%; background: #FF9933; }
-        .footer-section .tricolor-footer .white { width: 33.33%; background: #FFFFFF; }
+        .footer-section .tricolor-footer .white { width: 33.33%; background:rgba(255,255,255,.06);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px); }
         .footer-section .tricolor-footer .green { width: 33.34%; background: #138808; }
 
         
@@ -887,27 +887,179 @@ transform:translateY(-2px);
             user-drag: none;
             pointer-events: none;
         }
-    </style>
+    
+.hero{text-align:center;padding:60px 20px 30px}.hero h1{font-size:52px;color:#00d9ff}.hero p{color:#c6d7ff}.hero span{display:inline-block;padding:10px 20px;border:1px solid rgba(0,217,255,.25);border-radius:40px}
+#particles-js{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1}
+
+
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+.stat-card{background:rgba(0,217,255,.08);border:1px solid rgba(0,217,255,.2);border-radius:14px;padding:16px;text-align:center;transition:.3s}
+.stat-card:hover{transform:translateY(-4px);box-shadow:0 0 20px rgba(0,217,255,.25)}
+.stat-card i{font-size:22px;color:#00d9ff;margin-bottom:8px}
+.stat-card h3{color:#fff;font-size:18px}
+.stat-card p{color:#9ecfff;font-size:11px}
+.copy-btn{margin-left:10px}
+
+
+/* PART4 */
+.result-box{box-shadow:0 0 25px rgba(0,217,255,.18)}
+.result-item:hover .value{color:#00d9ff}
+.footer-section{box-shadow:0 -10px 30px rgba(0,217,255,.08)}
+
+
+/* V2 PHASE1 */
+#matrixCanvas{position:fixed;inset:0;z-index:-2;opacity:.18}
+.terminal-box{background:#020b12;border:1px solid #00d9ff;border-radius:12px;padding:14px;margin:18px 0;font-family:monospace;color:#00ff66;box-shadow:0 0 20px rgba(0,217,255,.2)}
+.typing::after{content:"_";animation:blink 1s infinite}
+@keyframes blink{50%{opacity:0}}
+
+
+/* V2 PHASE2 */
+.toast{position:fixed;top:20px;right:20px;background:#07111f;color:#00ff66;padding:12px 18px;border:1px solid #00d9ff;border-radius:10px;display:none;z-index:9999}
+.theme-toggle{position:fixed;bottom:20px;right:20px;background:#00d9ff;color:#000;border:none;padding:12px;border-radius:50%;cursor:pointer}
+
+
+
+/* V2 PHASE3 */
+.glow-card{box-shadow:0 0 30px rgba(0,217,255,.25);}
+.fade-in{animation:fadeIn .5s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+
+/* V2 PHASE4 */
+.cyber-border{position:relative;overflow:hidden}
+.cyber-border:before{
+content:'';position:absolute;inset:0;
+border:1px solid rgba(0,217,255,.35);
+box-shadow:0 0 20px rgba(0,217,255,.2) inset;
+pointer-events:none}
+.scan-line{
+position:fixed;left:0;top:-5px;width:100%;height:3px;
+background:linear-gradient(90deg,transparent,#00d9ff,transparent);
+animation:scan 5s linear infinite;z-index:9998;opacity:.7}
+@keyframes scan{to{top:100%}}
+
+
+
+/* V2 PHASE5 */
+.grid-bg{
+position:fixed;inset:0;pointer-events:none;opacity:.08;
+background-image:linear-gradient(rgba(0,217,255,.35) 1px,transparent 1px),linear-gradient(90deg,rgba(0,217,255,.35) 1px,transparent 1px);
+background-size:32px 32px;
+z-index:-3}
+.card:hover,.result-box:hover{transform:translateY(-4px) scale(1.01)}
+
+
+
+/* V2 PHASE6 */
+.neon-border{position:relative}
+.neon-border:after{
+content:"";
+position:absolute;
+inset:-2px;
+border:1px solid rgba(0,217,255,.35);
+border-radius:16px;
+pointer-events:none;
+box-shadow:0 0 25px rgba(0,217,255,.25);
+}
+.result-item{transition:.25s ease}
+.result-item:hover{
+padding-left:26px;
+background:rgba(0,217,255,.06);
+}
+
+
+
+/* V2 PHASE7 */
+.status-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid rgba(0,217,255,.25);border-radius:999px;background:rgba(0,217,255,.08);color:#9fe8ff}
+.pulse-ring{position:relative}
+.pulse-ring:before{content:"";position:absolute;inset:-6px;border:1px solid rgba(0,217,255,.25);border-radius:inherit;animation:ring 2s infinite}
+@keyframes ring{0%{transform:scale(.9);opacity:.8}100%{transform:scale(1.25);opacity:0}}
+
+
+
+/* V2 PHASE8 */
+.holo-panel{background:linear-gradient(135deg,rgba(0,217,255,.08),rgba(37,99,235,.08));border:1px solid rgba(0,217,255,.25);border-radius:16px;padding:12px;margin:12px 0;box-shadow:0 0 25px rgba(0,217,255,.12)}
+.glitch{position:relative;display:inline-block}
+.glitch:hover{animation:glitch .25s linear 2}
+@keyframes glitch{
+25%{transform:translate(2px,-1px)}
+50%{transform:translate(-2px,1px)}
+75%{transform:translate(1px,2px)}
+}
+
+
+
+/* V2 PHASE9 */
+.ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:14px 0}
+.ai-box{background:rgba(0,217,255,.06);border:1px solid rgba(0,217,255,.2);padding:12px;border-radius:12px;text-align:center;transition:.3s}
+.ai-box:hover{transform:translateY(-3px);box-shadow:0 0 20px rgba(0,217,255,.25)}
+
+
+
+/* V2 PHASE10 */
+.cyber-radar{
+position:fixed;top:20px;left:20px;width:90px;height:90px;
+border:1px solid rgba(0,217,255,.25);border-radius:50%;
+box-shadow:0 0 20px rgba(0,217,255,.18);
+pointer-events:none;opacity:.7;z-index:5}
+.cyber-radar:before{
+content:"";position:absolute;inset:10px;border:1px solid rgba(0,217,255,.25);border-radius:50%}
+.cyber-radar:after{
+content:"";position:absolute;left:50%;top:50%;width:2px;height:45%;
+background:#00d9ff;transform-origin:bottom;
+animation:radarsweep 3s linear infinite}
+@keyframes radarsweep{to{transform:rotate(360deg)}}
+
+
+
+/* V2 PHASE11 */
+.hex-overlay{
+position:fixed;inset:0;pointer-events:none;opacity:.05;z-index:-4;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='34.64' viewBox='0 0 40 34.64'%3E%3Cpath d='M10 0h20l10 17.32-10 17.32H10L0 17.32z' fill='none' stroke='%2300d9ff' stroke-width='1'/%3E%3C/svg%3E");
+background-size:40px 34.64px}
+
+</style>
 </head>
 <body>
+<div class="hex-overlay"></div>
+<div class="cyber-radar"></div>
+<div class='grid-bg'></div>
+<div class="scan-line"></div>
 
-<!-- ===== DISCLAIMER POPUP ===== -->
-<div class="disclaimer-overlay" id="disclaimerOverlay">
-    <div class="disclaimer-box">
-        <span class="icon-big">🛡️</span>
-        <div class="brand-name">SHUBHAM OSINT</div>
-        <h2>DISCLAIMER</h2>
-        <div class="divider"></div>
-        <div class="content">
-            This tool is for <strong>educational and security awareness</strong> purposes only.<br>
-            All data is obtained from <strong>publicly available sources</strong>.<br><br>
-            <i class="fas fa-link" style="color:#FF9933;"></i> Use responsibly &amp; ethically.
-        </div>
-        <button class="btn-accept" onclick="acceptDisclaimer()">
-            <i class="fas fa-check-circle"></i> I UNDERSTAND
-        </button>
-    </div>
+<canvas id="matrixCanvas"></canvas>
+<div class="terminal-box"><span class="typing">Initializing Cyber Intelligence Engine...</span></div>
+
+
+
+<div class="toast" id="toast">System Ready</div>
+<button class="theme-toggle" onclick="document.body.classList.toggle('light')">☀️</button>
+
+
+<div style="text-align:center;margin:12px 0">
+<span class="status-chip pulse-ring">● Cyber Engine Active</span>
 </div>
+
+<div class="holo-panel" style="text-align:center">
+<b class="glitch">AI Threat Monitor</b><br>
+<small>Realtime Security Layer Enabled</small>
+</div>
+
+<div class="ai-grid">
+<div class="ai-box">🛰️ Network Scan</div>
+<div class="ai-box">🛡️ Threat Shield</div>
+<div class="ai-box">⚡ AI Engine</div>
+</div>
+<div class="hero"><h1>SHUBHAM OSINT</h1><p>Cyber Intelligence Platform</p><span>Secure • Fast • Modern</span></div>
+<div class="stats-grid">
+<div class="stat-card"><i class="fas fa-server"></i><h3>API</h3><p>ONLINE</p></div>
+<div class="stat-card"><i class="fas fa-shield-halved"></i><h3>SECURE</h3><p>PROTECTED</p></div>
+<div class="stat-card"><i class="fas fa-bolt"></i><h3>FAST</h3><p>REALTIME</p></div>
+</div>
+
+
+
+<div id="particles-js"></div>
 
 <!-- ===== TRICOLOR TOP BAR ===== -->
 <div class="tricolor-bar">
@@ -1325,6 +1477,84 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
         searchNumber();
     }, 1500);
+});
+</script>
+
+
+<div id="particles-js"></div><script src="https://cdn.jsdelivr.net/npm/particles.js"></script><script>particlesJS("particles-js",{particles:{number:{value:70},color:{value:"#00d9ff"},shape:{type:"circle"},opacity:{value:.3},size:{value:3},move:{enable:true,speed:2}}});</script>
+
+<script>
+document.addEventListener("click",e=>{
+ if(e.target.classList.contains("copy-btn")){
+   navigator.clipboard.writeText(e.target.dataset.copy||"");
+   e.target.innerText="Copied";
+   setTimeout(()=>e.target.innerText="Copy",1200);
+ }
+});
+</script>
+
+
+<script>
+const c=document.getElementById('matrixCanvas');
+if(c){
+const x=c.getContext('2d');function r(){c.width=innerWidth;c.height=innerHeight;}r();onresize=r;
+const cols=Math.floor(c.width/16),drops=Array(cols).fill(1),chars='01ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+setInterval(()=>{x.fillStyle='rgba(0,0,0,.08)';x.fillRect(0,0,c.width,c.height);x.fillStyle='#00ff66';x.font='14px monospace';for(let i=0;i<drops.length;i++){const t=chars[Math.floor(Math.random()*chars.length)];x.fillText(t,i*16,drops[i]*16);if(drops[i]*16>c.height&&Math.random()>.975)drops[i]=0;drops[i]++;}},50);}
+</script>
+
+
+<script>
+setTimeout(()=>{const t=document.getElementById('toast');if(t){t.style.display='block';setTimeout(()=>t.style.display='none',2500);}},800);
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  document.querySelectorAll(".result-box").forEach(e=>e.classList.add("glow-card","fade-in"));
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ document.querySelectorAll(".card,.result-box").forEach(e=>e.classList.add("cyber-border"));
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ document.querySelectorAll(".result-item").forEach((e,i)=>{
+   e.style.animation=`fadeIn .4s ease ${i*0.05}s both`;
+ });
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  const toast=document.getElementById("toast");
+  if(toast){
+    toast.style.display="block";
+    setTimeout(()=>toast.style.display="none",2500);
+  }
+  document.querySelectorAll(".card").forEach(c=>c.classList.add("neon-border"));
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ document.querySelectorAll(".result-item").forEach((e,i)=>{
+   e.style.animation=`fadeIn .4s ease ${i*0.05}s both`;
+ });
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ document.querySelectorAll(".ai-box").forEach((e,i)=>setTimeout(()=>e.classList.add("fade-in"),i*120));
 });
 </script>
 
