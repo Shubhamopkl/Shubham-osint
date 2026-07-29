@@ -1019,10 +1019,334 @@ position:fixed;inset:0;pointer-events:none;opacity:.05;z-index:-4;
 background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='34.64' viewBox='0 0 40 34.64'%3E%3Cpath d='M10 0h20l10 17.32-10 17.32H10L0 17.32z' fill='none' stroke='%2300d9ff' stroke-width='1'/%3E%3C/svg%3E");
 background-size:40px 34.64px}
 
+
+/* V2 PHASE12 */
+.orb-bg{position:fixed;right:30px;bottom:30px;width:140px;height:140px;border-radius:50%;
+background:radial-gradient(circle,rgba(0,217,255,.18),transparent 70%);
+filter:blur(8px);animation:floatOrb 5s ease-in-out infinite;pointer-events:none;z-index:-2}
+@keyframes floatOrb{50%{transform:translateY(-15px) scale(1.08)}}
+
+
+
+/* V2 PHASE13 */
+.cyber-grid-lines{position:fixed;inset:0;pointer-events:none;opacity:.05;
+background-image:repeating-linear-gradient(0deg,transparent 0 39px,rgba(0,217,255,.5) 40px),
+repeating-linear-gradient(90deg,transparent 0 39px,rgba(0,217,255,.5) 40px);
+z-index:-5}
+
+
+
+/* V2 PHASE14 */
+.data-stream{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:-6}
+.data-stream:before{
+content:"010101 11001010 00110101 10101010 11100011 01010101 00110011 11001100";
+position:absolute;left:-100%;top:15%;
+font:700 18px monospace;color:rgba(0,217,255,.08);white-space:nowrap;
+animation:datastream 18s linear infinite}
+@keyframes datastream{to{transform:translateX(220%)}}
+
+
+
+/* V2 PHASE15 */
+.corner-hud{position:fixed;top:18px;right:18px;width:120px;height:120px;pointer-events:none;z-index:6;opacity:.45}
+.corner-hud:before,.corner-hud:after{content:"";position:absolute;border:2px solid rgba(0,217,255,.55);width:36px;height:36px}
+.corner-hud:before{top:0;left:0;border-right:none;border-bottom:none}
+.corner-hud:after{bottom:0;right:0;border-left:none;border-top:none}
+
+
+
+/* V2 PHASE16 */
+.cyber-corners{position:fixed;inset:0;pointer-events:none;z-index:7;opacity:.35}
+.cyber-corners:before,.cyber-corners:after{content:"";position:absolute;width:90px;height:90px;border:2px solid rgba(0,217,255,.45)}
+.cyber-corners:before{left:18px;bottom:18px;border-top:none;border-right:none}
+.cyber-corners:after{right:18px;top:160px;border-left:none;border-bottom:none}
+
+
+
+/* V2 PHASE17 */
+.cyber-pulse{
+position:fixed;left:50%;top:50%;width:220px;height:220px;transform:translate(-50%,-50%);
+border:1px solid rgba(0,217,255,.18);border-radius:50%;pointer-events:none;z-index:-1;
+animation:cyberPulse 4s ease-out infinite}
+@keyframes cyberPulse{
+0%{transform:translate(-50%,-50%) scale(.4);opacity:.5}
+100%{transform:translate(-50%,-50%) scale(2.6);opacity:0}
+}
+
+
+
+/* V2 PHASE18 */
+.cyber-vignette{
+position:fixed;inset:0;pointer-events:none;z-index:-1;
+background:radial-gradient(circle at center,transparent 45%,rgba(0,0,0,.35) 100%);
+animation:vignettePulse 6s ease-in-out infinite}
+@keyframes vignettePulse{
+50%{opacity:.75}
+}
+
+
+
+/* V2 PHASE19 */
+.cyber-noise{
+position:fixed;inset:0;pointer-events:none;z-index:-2;opacity:.035;
+background-image:
+radial-gradient(rgba(255,255,255,.5) 1px,transparent 1px),
+radial-gradient(rgba(0,217,255,.35) 1px,transparent 1px);
+background-size:24px 24px,32px 32px;
+animation:noiseShift 10s linear infinite}
+@keyframes noiseShift{
+50%{transform:translate(8px,-8px)}
+100%{transform:translate(0,0)}
+}
+
+
+
+/* V2 PHASE20 */
+.signal-bars{position:fixed;left:18px;top:50%;transform:translateY(-50%);display:flex;gap:4px;pointer-events:none;z-index:8;opacity:.45}
+.signal-bars span{width:4px;background:rgba(0,217,255,.7);animation:bars 1.2s ease-in-out infinite;border-radius:3px}
+.signal-bars span:nth-child(1){height:18px}
+.signal-bars span:nth-child(2){height:28px;animation-delay:.15s}
+.signal-bars span:nth-child(3){height:38px;animation-delay:.3s}
+.signal-bars span:nth-child(4){height:48px;animation-delay:.45s}
+@keyframes bars{50%{transform:scaleY(.45);opacity:.35}}
+
+
+
+/* V2 PHASE21 */
+.hud-target{
+position:fixed;
+right:32px;
+bottom:28px;
+width:80px;
+height:80px;
+border:1px solid rgba(0,217,255,.35);
+border-radius:50%;
+pointer-events:none;
+opacity:.4;
+z-index:8;
+animation:hudSpin 10s linear infinite}
+.hud-target:before,.hud-target:after{content:"";position:absolute;background:rgba(0,217,255,.6)}
+.hud-target:before{left:50%;top:8px;width:1px;height:64px;transform:translateX(-50%)}
+.hud-target:after{top:50%;left:8px;width:64px;height:1px;transform:translateY(-50%)}
+@keyframes hudSpin{to{transform:rotate(360deg)}}
+
+
+
+/* V2 PHASE22 */
+.cyber-scan-circle{
+position:fixed;
+left:50%;
+top:50%;
+width:340px;
+height:340px;
+transform:translate(-50%,-50%);
+border:1px dashed rgba(0,217,255,.22);
+border-radius:50%;
+pointer-events:none;
+z-index:-1;
+animation:scanCircle 12s linear infinite;
+}
+@keyframes scanCircle{
+to{transform:translate(-50%,-50%) rotate(360deg)}
+}
+
+
+
+/* V2 PHASE23 */
+.cyber-stars{position:fixed;inset:0;pointer-events:none;z-index:-7;
+background-image:radial-gradient(rgba(0,217,255,.7) 1px,transparent 1px);
+background-size:80px 80px;opacity:.08;animation:starDrift 30s linear infinite}
+@keyframes starDrift{to{background-position:80px 80px}}
+
+
+
+/* V2 PHASE24 */
+.corner-dots{position:fixed;inset:0;pointer-events:none;z-index:-8}
+.corner-dots:before,.corner-dots:after{content:"";position:absolute;width:8px;height:8px;background:#00d9ff;border-radius:50%;box-shadow:0 0 18px rgba(0,217,255,.8)}
+.corner-dots:before{left:18px;top:18px}
+.corner-dots:after{right:18px;bottom:18px}
+
+
+
+/* V2 PHASE25 */
+.cyber-beacon{
+position:fixed;
+right:22px;
+top:50%;
+transform:translateY(-50%);
+width:14px;
+height:14px;
+border-radius:50%;
+background:#00d9ff;
+box-shadow:0 0 18px rgba(0,217,255,.9);
+pointer-events:none;
+z-index:9;
+animation:beaconPulse 1.8s ease-in-out infinite}
+.cyber-beacon:before{
+content:"";
+position:absolute;
+inset:-10px;
+border:1px solid rgba(0,217,255,.35);
+border-radius:50%;
+animation:beaconRing 1.8s linear infinite}
+@keyframes beaconPulse{50%{transform:scale(1.3);opacity:.6}}
+@keyframes beaconRing{to{transform:scale(2.2);opacity:0}}
+
+
+
+/* V2 PHASE26 */
+.cyber-orbit{position:fixed;left:22px;bottom:22px;width:70px;height:70px;border:1px solid rgba(0,217,255,.28);border-radius:50%;pointer-events:none;z-index:9;opacity:.45}
+.cyber-orbit:before{content:"";position:absolute;width:10px;height:10px;border-radius:50%;background:#00d9ff;top:-5px;left:50%;transform:translateX(-50%);box-shadow:0 0 14px rgba(0,217,255,.9);animation:orbit26 4s linear infinite}
+@keyframes orbit26{to{transform:translateX(-50%) rotate(360deg);transform-origin:0 40px}}
+
+
+
+/* V2 PHASE27 */
+.cyber-wave{
+position:fixed;
+left:50%;
+bottom:18px;
+width:260px;
+height:90px;
+transform:translateX(-50%);
+border-top:1px solid rgba(0,217,255,.28);
+border-radius:50%;
+pointer-events:none;
+opacity:.45;
+z-index:9;
+animation:waveGlow 3.5s ease-in-out infinite;
+}
+.cyber-wave:before{
+content:"";
+position:absolute;
+inset:-8px;
+border-top:1px dashed rgba(0,217,255,.22);
+border-radius:50%;
+}
+@keyframes waveGlow{
+50%{transform:translateX(-50%) scaleX(1.08);opacity:.8}
+}
+
+
+
+/* V2 PHASE28 */
+.cyber-spinner{
+position:fixed;
+top:50%;
+right:24px;
+width:56px;
+height:56px;
+transform:translateY(-50%);
+border:1px solid rgba(0,217,255,.3);
+border-radius:50%;
+pointer-events:none;
+opacity:.45;
+z-index:9;
+}
+.cyber-spinner:before{
+content:"";
+position:absolute;
+inset:8px;
+border-top:2px solid #00d9ff;
+border-right:2px solid transparent;
+border-radius:50%;
+animation:spin28 2.5s linear infinite}
+@keyframes spin28{to{transform:rotate(360deg)}}
+
+
+
+/* V2 PHASE29 */
+.cyber-crosshair{
+position:fixed;
+left:24px;
+top:24px;
+width:64px;
+height:64px;
+border:1px solid rgba(0,217,255,.35);
+border-radius:50%;
+pointer-events:none;
+opacity:.45;
+z-index:9;
+animation:crossPulse 3s ease-in-out infinite}
+.cyber-crosshair:before,.cyber-crosshair:after{
+content:"";
+position:absolute;
+background:rgba(0,217,255,.7)}
+.cyber-crosshair:before{left:50%;top:8px;width:1px;height:48px;transform:translateX(-50%)}
+.cyber-crosshair:after{top:50%;left:8px;width:48px;height:1px;transform:translateY(-50%)}
+@keyframes crossPulse{50%{transform:scale(1.08);opacity:.75}}
+
+
+/* V2 PHASE30 */
+.cyber-reticle{position:fixed;left:50%;top:24px;transform:translateX(-50%);width:120px;height:24px;pointer-events:none;opacity:.5;z-index:9}.cyber-reticle:before,.cyber-reticle:after{content:"";position:absolute;top:50%;width:48px;height:1px;background:rgba(0,217,255,.7)}.cyber-reticle:before{left:0}.cyber-reticle:after{right:0}.cyber-reticle span{position:absolute;left:50%;top:50%;width:8px;height:8px;border:1px solid #00d9ff;transform:translate(-50%,-50%) rotate(45deg);box-shadow:0 0 10px rgba(0,217,255,.7);animation:ret30 2s ease-in-out infinite}@keyframes ret30{50%{transform:translate(-50%,-50%) rotate(45deg) scale(1.3)}}
+
+
+/* V2 PHASE31 */
+.cyber-diamond{
+position:fixed;
+right:28px;
+bottom:120px;
+width:42px;
+height:42px;
+border:1px solid rgba(0,217,255,.35);
+transform:rotate(45deg);
+pointer-events:none;
+opacity:.5;
+z-index:9;
+animation:diamond31 3s ease-in-out infinite}
+.cyber-diamond:before{
+content:"";
+position:absolute;
+inset:8px;
+border:1px solid rgba(0,217,255,.25)}
+@keyframes diamond31{
+50%{transform:rotate(45deg) scale(1.2);box-shadow:0 0 18px rgba(0,217,255,.5)}
+}
+
+
+
+/* V2 PHASE32 */
+.cyber-arc{
+position:fixed;
+left:28px;
+bottom:120px;
+width:90px;
+height:90px;
+border-left:2px solid rgba(0,217,255,.35);
+border-bottom:2px solid rgba(0,217,255,.35);
+border-radius:0 0 0 100%;
+pointer-events:none;
+opacity:.5;
+z-index:9;
+animation:arc32 2.8s ease-in-out infinite}
+@keyframes arc32{50%{transform:scale(1.12);opacity:.8}}
+
 </style>
 </head>
 <body>
+<div class="cyber-arc"></div>
+<div class="cyber-diamond"></div>
+<div class="cyber-reticle"><span></span></div>
+
+<div class="cyber-crosshair"></div>
+<div class="cyber-spinner"></div>
+<div class="cyber-wave"></div>
+<div class="cyber-beacon"></div>
+<div class="corner-dots"></div>
+<div class="cyber-stars"></div>
+<div class="cyber-scan-circle"></div>
+<div class="hud-target"></div>
+<div class="signal-bars"><span></span><span></span><span></span><span></span></div>
+
+<div class="cyber-noise"></div>
+<div class="cyber-pulse"></div>
+<div class="cyber-vignette"></div>
+<div class="corner-hud"></div>
+<div class="cyber-corners"></div>
+<div class="data-stream"></div>
+<div class="cyber-grid-lines"></div>
 <div class="hex-overlay"></div>
+<div class="orb-bg"></div>
 <div class="cyber-radar"></div>
 <div class='grid-bg'></div>
 <div class="scan-line"></div>
