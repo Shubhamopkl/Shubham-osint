@@ -3,7 +3,7 @@
 
 """
 ============================================
-SHUBHAM PATEL - NUMBER INFORMATION
+SHUBHAM OSINT - CYBER INTELLIGENCE
 Python Flask Server for Termux
 ============================================
 """
@@ -31,7 +31,7 @@ HTML_TEMPLATE = '''
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHUBHAM PATEL - NUMBER INFORMATION</title>
+    <title>SHUBHAM OSINT</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -124,7 +124,7 @@ HTML_TEMPLATE = '''
             display: block;
         }
         .disclaimer-box .brand-name {
-            color: #FF9933;
+            color:#00d9ff;
             font-size: 14px;
             font-weight: 700;
             letter-spacing: 3px;
@@ -150,11 +150,11 @@ HTML_TEMPLATE = '''
             margin-bottom: 20px;
         }
         .disclaimer-box .content strong {
-            color: #FF9933;
+            color:#00d9ff;
         }
         .disclaimer-box .btn-accept {
             padding: 14px 50px;
-            background: linear-gradient(135deg, #FF9933, #e68a00);
+            background:linear-gradient(135deg,#00d9ff,#2563eb);
             border: none;
             border-radius: 50px;
             color: #fff;
@@ -204,10 +204,10 @@ HTML_TEMPLATE = '''
         /* ===== TOP HEADER ===== */
         .top-header {
             width: 100%;
-            background: #0a0a2a;
+            background: linear-gradient(135deg,#07111f,#0c1f38,#07111f);
             padding: 10px 0;
             margin-top: 6px;
-            border-bottom: 2px solid #FF9933;
+            border-bottom:2px solid #00d9ff;
             position: sticky;
             top: 6px;
             z-index: 999;
@@ -223,7 +223,7 @@ HTML_TEMPLATE = '''
             gap: 10px;
         }
         .top-header .gov-text {
-            color: #FF9933;
+            color:#00d9ff;
             font-size: 12px;
             font-weight: 700;
             letter-spacing: 1.5px;
@@ -239,14 +239,14 @@ HTML_TEMPLATE = '''
             border-radius: 20px;
             border: 1px solid rgba(255,153,51,0.15);
         }
-        .top-header .helpline i { color: #FF9933; margin-right: 8px; }
+        .top-header .helpline i { color:#00d9ff; margin-right: 8px; }
 
         /* ===== MAIN HEADER ===== */
         .main-header {
             width: 100%;
             background: linear-gradient(135deg, #0a0a2a 0%, #1a1a5a 50%, #0a0a2a 100%);
             padding: 20px 0;
-            border-bottom: 3px solid #138808;
+            border-bottom:3px solid #00d9ff;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         }
         .main-header .container {
@@ -285,7 +285,7 @@ HTML_TEMPLATE = '''
             font-weight: 800;
             letter-spacing: 0.5px;
         }
-        .main-header .title-section h1 .brand { color: #FF9933; font-weight: 800; }
+        .main-header .title-section h1 .brand { color:#00d9ff; font-weight: 800; }
         .main-header .title-section .sub-title {
             color: rgba(255,255,255,0.4);
             font-size: 12px;
@@ -423,7 +423,7 @@ HTML_TEMPLATE = '''
             display: block;
             font-size: 12px;
             font-weight: 700;
-            color: #333;
+            color:var(--text);
             margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -432,20 +432,20 @@ HTML_TEMPLATE = '''
         .input-group {
             display: flex;
             align-items: center;
-            background: #f8f9fa;
-            border: 2px solid #e0e0e0;
+            background: rgba(10,20,40,.85);
+            border:2px solid rgba(0,217,255,.25);
             border-radius: 12px;
             transition: all 0.3s ease;
             overflow: hidden;
         }
         .input-group:focus-within {
-            border-color: #FF9933;
+            border-color:#00d9ff;
             box-shadow: 0 0 0 4px rgba(255,153,51,0.08);
             background: #ffffff;
         }
         .input-group .country-code {
             padding: 14px 14px 14px 20px;
-            color: #333;
+            color:var(--text);
             font-weight: 700;
             font-size: 15px;
             background: rgba(0,0,0,0.02);
@@ -454,9 +454,9 @@ HTML_TEMPLATE = '''
         .input-group input {
             flex: 1;
             padding: 14px 18px;
-            background: transparent;
+            background: rgba(0,217,255,.06);
             border: none;
-            color: #333;
+            color:var(--text);
             font-size: 17px;
             outline: none;
             font-family: 'Noto Sans Devanagari', 'Segoe UI', Arial, sans-serif;
@@ -527,7 +527,7 @@ HTML_TEMPLATE = '''
         .btn-search:hover:not(:disabled)::before { left: 100%; }
         .btn-search:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(255,153,51,0.25);
+            box-shadow:0 0 35px rgba(0,217,255,.45);
         }
         .btn-search:active:not(:disabled) { transform: translateY(0) scale(0.98); }
         .btn-search:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
@@ -536,11 +536,11 @@ HTML_TEMPLATE = '''
         /* ===== RESULT ===== */
         .result-box {
             margin-top: 25px;
-            border: 1px solid #e8e8e8;
+            border:1px solid rgba(0,217,255,.18);
             border-radius: 14px;
             overflow: hidden;
             display: none;
-            background: #fafbfc;
+            background:rgba(8,16,30,.88);
         }
         .result-box.show {
             display: block;
@@ -551,9 +551,9 @@ HTML_TEMPLATE = '''
             100% { opacity: 1; transform: translateY(0) scale(1); }
         }
         .result-header {
-            background: #f0f1f3;
+            background:linear-gradient(135deg,#081528,#12345a);
             padding: 12px 20px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom:1px solid rgba(0,217,255,.18);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -561,15 +561,15 @@ HTML_TEMPLATE = '''
         .result-header .title {
             font-size: 12px;
             font-weight: 700;
-            color: #333;
+            color:#eaf6ff;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         .result-header .title i { color: #FF9933; margin-right: 8px; }
         .result-header .count {
             font-size: 11px;
-            color: #666;
-            background: #e8e8e8;
+            color:#8bcfff;
+            background:rgba(0,217,255,.12);
             padding: 3px 14px;
             border-radius: 20px;
             font-weight: 600;
@@ -577,10 +577,10 @@ HTML_TEMPLATE = '''
         .result-item {
             display: flex;
             padding: 14px 20px;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom:1px solid rgba(255,255,255,.06);
             transition: all 0.2s ease;
         }
-        .result-item:hover { background: #f8f9fa; }
+        .result-item:hover { background: rgba(10,20,40,.85); }
         .result-item:last-child { border-bottom: none; }
         .result-item .label {
             color: #777;
@@ -599,7 +599,7 @@ HTML_TEMPLATE = '''
             width: 18px;
         }
         .result-item .value {
-            color: #222;
+            color:#ffffff;
             font-size: 14px;
             font-weight: 500;
             width: 68%;
@@ -614,7 +614,7 @@ HTML_TEMPLATE = '''
         .security-badge {
             margin-top: 18px;
             padding: 14px;
-            background: #f8f9fa;
+            background:rgba(10,20,40,.85);
             border-radius: 12px;
             display: flex;
             justify-content: center;
@@ -699,7 +699,7 @@ HTML_TEMPLATE = '''
             margin-top: 14px;
             padding: 12px;
             background: transparent;
-            border: 1px solid #e0e0e0;
+            border:1px solid rgba(0,217,255,.20);
             border-radius: 10px;
             color: #888;
             font-size: 11px;
@@ -721,7 +721,7 @@ HTML_TEMPLATE = '''
         .json-toggle i { font-size: 14px; }
         .json-box {
             margin-top: 12px;
-            background: #0a0a0a;
+            background:#050b16;
             border-radius: 10px;
             padding: 14px;
             font-family: 'Courier New', monospace;
@@ -745,8 +745,8 @@ HTML_TEMPLATE = '''
         /* ===== FOOTER ===== */
         .footer-section {
             width: 100%;
-            background: #0a0a2a;
-            border-top: 3px solid #FF9933;
+            background: linear-gradient(135deg,#07111f,#0c1f38,#07111f);
+            border-top:3px solid #00d9ff;
             padding: 25px 0;
             margin-top: 20px;
         }
@@ -790,7 +790,34 @@ HTML_TEMPLATE = '''
         .footer-section .tricolor-footer .white { width: 33.33%; background: #FFFFFF; }
         .footer-section .tricolor-footer .green { width: 33.34%; background: #138808; }
 
-        /* ===== RESPONSIVE ===== */
+        
+/* ===== FINAL CYBER EFFECTS ===== */
+.loading-ring{
+display:inline-block;
+width:18px;
+height:18px;
+border:3px solid rgba(255,255,255,.2);
+border-top:3px solid #00d9ff;
+border-radius:50%;
+animation:spin 1s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.copy-btn{
+background:linear-gradient(135deg,#00d9ff,#2563eb);
+border:none;
+color:#fff;
+padding:6px 12px;
+border-radius:8px;
+cursor:pointer;
+transition:.25s;
+}
+.copy-btn:hover{
+box-shadow:0 0 20px rgba(0,217,255,.45);
+transform:translateY(-2px);
+}
+
+/* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .main-header .title-section h1 { font-size: 18px; }
             .main-header .title-section .sub-title { font-size: 9px; letter-spacing: 1.5px; }
@@ -868,7 +895,7 @@ HTML_TEMPLATE = '''
 <div class="disclaimer-overlay" id="disclaimerOverlay">
     <div class="disclaimer-box">
         <span class="icon-big">🛡️</span>
-        <div class="brand-name">SHUBHAM PATEL</div>
+        <div class="brand-name">SHUBHAM OSINT</div>
         <h2>DISCLAIMER</h2>
         <div class="divider"></div>
         <div class="content">
@@ -894,10 +921,10 @@ HTML_TEMPLATE = '''
     <div class="container">
         <div class="gov-text">
             <i class="fas fa-shield-halved"></i>
-            SHUBHAM PATEL <span>|</span> CYBER SECURITY DIVISION
+            SHUBHAM OSINT <span>|</span> CYBER INTELLIGENCE SYSTEM
         </div>
         <div class="helpline">
-            <i class="fas fa-phone"></i> <strong>Helpline: +91 7379117261</strong>
+            <i class="fas fa-phone"></i> <strong>SYSTEM ONLINE</strong>
         </div>
     </div>
 </div>
