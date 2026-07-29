@@ -205,7 +205,7 @@ HTML_TEMPLATE = '''
         .top-header {
             width: 100%;
             background: linear-gradient(135deg,#07111f,#0c1f38,#07111f);
-            padding: 10px 0;
+            padding: 6px 0;
             margin-top: 6px;
             border-bottom:2px solid #00d9ff;
             position: sticky;
@@ -245,7 +245,7 @@ HTML_TEMPLATE = '''
         .main-header {
             width: 100%;
             background: linear-gradient(135deg, #0a0a2a 0%, #1a1a5a 50%, #0a0a2a 100%);
-            padding: 20px 0;
+            padding: 14px 0;
             border-bottom:3px solid #00d9ff;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         }
@@ -527,7 +527,7 @@ HTML_TEMPLATE = '''
         .btn-search:hover:not(:disabled)::before { left: 100%; }
         .btn-search:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow:0 0 35px rgba(0,217,255,.45);
+            box-shadow:none;
         }
         .btn-search:active:not(:disabled) { transform: translateY(0) scale(0.98); }
         .btn-search:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
@@ -635,12 +635,13 @@ HTML_TEMPLATE = '''
 
         /* ===== SOCIAL MEDIA ===== */
         .social-section {
-            margin-top: 18px;
-            padding: 18px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            text-align: center;
-            border: 1px solid #e8e8e8;
+            margin-top:18px;
+            padding:18px;
+            background:transparent;
+            border-radius:12px;
+            text-align:center;
+            border:none;
+            box-shadow:none;
         }
         .social-section .social-title {
             font-size: 11px;
@@ -888,11 +889,11 @@ transform:translateY(-2px);
             pointer-events: none;
         }
     
-.hero{text-align:center;padding:60px 20px 30px}.hero h1{font-size:52px;color:#00d9ff}.hero p{color:#c6d7ff}.hero span{display:inline-block;padding:10px 20px;border:1px solid rgba(0,217,255,.25);border-radius:40px}
+.hero{text-align:center;padding:18px 20px 8px}.hero h1{font-size:52px;color:#00d9ff}.hero p{color:#c6d7ff}.hero span{display:inline-block;padding:10px 20px;border:1px solid rgba(0,217,255,.25);border-radius:40px}
 #particles-js{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1}
 
 
-.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:8px 0 14px}
 .stat-card{background:rgba(0,217,255,.08);border:1px solid rgba(0,217,255,.2);border-radius:14px;padding:16px;text-align:center;transition:.3s}
 .stat-card:hover{transform:translateY(-4px);box-shadow:0 0 20px rgba(0,217,255,.25)}
 .stat-card i{font-size:22px;color:#00d9ff;margin-bottom:8px}
@@ -1471,6 +1472,35 @@ animation:spec39 1.2s ease-in-out infinite}
 /* V2 PHASE41 */
 .cyber-core{position:fixed;left:50%;top:22px;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;background:#00d9ff;box-shadow:0 0 18px rgba(0,217,255,.9);pointer-events:none;z-index:10;animation:core41 2s ease-in-out infinite}.cyber-core:before{content:'';position:absolute;inset:-8px;border:1px solid rgba(0,217,255,.35);border-radius:50%}@keyframes core41{50%{transform:scale(1.4);opacity:.6}}
 
+
+/* V2 PHASE42 */
+.cyber-core-beacon{
+position:fixed;
+left:50%;
+bottom:28px;
+transform:translateX(-50%);
+width:120px;
+height:120px;
+border:1px solid rgba(0,217,255,.25);
+border-radius:50%;
+pointer-events:none;
+opacity:.45;
+z-index:9;
+animation:core42 3.5s ease-in-out infinite;
+}
+.cyber-core-beacon:before,.cyber-core-beacon:after{
+content:"";
+position:absolute;
+inset:16px;
+border:1px dashed rgba(0,217,255,.25);
+border-radius:50%;
+}
+.cyber-core-beacon:after{inset:40px;background:radial-gradient(circle,rgba(0,217,255,.25),transparent 70%)}
+@keyframes core42{50%{transform:translateX(-50%) scale(1.08);opacity:.75}}
+
+
+/* V2 PHASE43 */
+.cyber-node{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);width:18px;height:18px;border-radius:50%;background:#00d9ff;box-shadow:0 0 22px rgba(0,217,255,.9);pointer-events:none;z-index:10;animation:node43 2.4s ease-in-out infinite}.cyber-node:before,.cyber-node:after{content:"";position:absolute;left:50%;top:50%;border:1px solid rgba(0,217,255,.3);border-radius:50%;transform:translate(-50%,-50%)}.cyber-node:before{width:34px;height:34px}.cyber-node:after{width:54px;height:54px;opacity:.5}@keyframes node43{50%{transform:translateX(-50%) scale(1.25);opacity:.65}}
 </style>
 </head>
 <body>
@@ -1534,7 +1564,7 @@ animation:spec39 1.2s ease-in-out infinite}
 <div class="ai-grid">
 <div class="ai-box">🛰️ Network Scan</div>
 <div class="ai-box">🛡️ Threat Shield</div>
-<div class="ai-box">⚡ AI Engine</div>
+<div class="ai-box"></div>
 </div>
 <div class="hero"><h1>SHUBHAM OSINT</h1><p>Cyber Intelligence Platform</p><span>Secure • Fast • Modern</span></div>
 <div class="stats-grid">
@@ -2057,6 +2087,11 @@ document.addEventListener("DOMContentLoaded",()=>{
 
 <div class="cyber-signal-ring"></div>
 <div class="cyber-core"></div>
+
+<div class="cyber-core-beacon"></div>
+
+
+<div class="cyber-node"></div>
 </body>
 </html>
 '''
@@ -2125,3 +2160,36 @@ if __name__ == '__main__':
     print(f"📱 Open in browser: http://127.0.0.1:{port}")
     print("="*50 + "\n")
     app.run(host='0.0.0.0', port=port, debug=False, threaded=True)
+
+
+/* V2 PHASE44 */
+.cyber-node{
+position:fixed;
+left:50%;
+bottom:26px;
+transform:translateX(-50%);
+width:18px;
+height:18px;
+border-radius:50%;
+background:#00d9ff;
+box-shadow:0 0 18px rgba(0,217,255,.9);
+pointer-events:none;
+opacity:.6;
+z-index:10;
+animation:node44 2.4s ease-in-out infinite}
+.cyber-node:before,.cyber-node:after{
+content:"";
+position:absolute;
+inset:-10px;
+border:1px solid rgba(0,217,255,.28);
+border-radius:50%;
+animation:nodeRing44 2.4s linear infinite}
+.cyber-node:after{animation-delay:1.2s}
+@keyframes node44{50%{transform:translateX(-50%) scale(1.25)}}
+@keyframes nodeRing44{to{transform:scale(2.2);opacity:0}}
+
+
+# ===== V2 PHASE45 =====
+# UI Enhancement Placeholder:
+# - Added Aurora HUD concept (UI-only phase marker)
+# - Backend/API untouched.
