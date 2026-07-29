@@ -330,22 +330,19 @@ HTML_TEMPLATE = '''
 
         /* ===== CARD ===== */
         .card {
-            background: rgba(15,20,40,0.45);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border-radius: 22px;
-            box-shadow: 0 0 25px rgba(0,191,255,.18),0 0 60px rgba(0,191,255,.08);
+            background: #FFFFFF;
+            border-radius: 20px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.06);
             overflow: hidden;
-            border:1px solid rgba(0,191,255,.25);
-            transition:.35s ease;
+            border: 1px solid rgba(0,0,0,0.04);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .card:hover {
-            transform: translateY(-6px);
-            box-shadow:0 0 35px rgba(0,191,255,.35),0 0 80px rgba(0,191,255,.18);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 60px rgba(0,0,0,0.08);
         }
         .card-header {
-            background: rgba(10,20,40,.55);
-            backdrop-filter: blur(20px);
+            background: linear-gradient(135deg, #0a0a2a, #1a1a5a);
             padding: 25px 30px;
             border-bottom: 3px solid #FF9933;
             text-align: center;
@@ -863,367 +860,9 @@ HTML_TEMPLATE = '''
             user-drag: none;
             pointer-events: none;
         }
-    
-#cyber-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-2;background:#030712}
-body{background:#030712!important}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 20% 20%,rgba(0,140,255,.18),transparent 35%),radial-gradient(circle at 80% 60%,rgba(0,255,255,.12),transparent 35%),radial-gradient(circle at 50% 100%,rgba(0,80,255,.15),transparent 40%);animation:bgMove 12s ease-in-out infinite alternate;z-index:-1}
-@keyframes bgMove{0%{transform:translate(0,0) scale(1)}100%{transform:translate(-3%,3%) scale(1.15)}}
-
-
-
-/* ===== V3 NEON EFFECT ===== */
-.btn-search{
-background:linear-gradient(135deg,#009dff,#005eff)!important;
-box-shadow:0 0 20px rgba(0,191,255,.35);
-}
-.btn-search:hover:not(:disabled){
-box-shadow:0 0 40px rgba(0,191,255,.7)!important;
-}
-.input-group:focus-within{
-border-color:#00bfff!important;
-box-shadow:0 0 15px rgba(0,191,255,.45)!important;
-}
-.card{
-position:relative;
-}
-.card::after{
-content:"";
-position:absolute;
-inset:-2px;
-border-radius:22px;
-padding:2px;
-background:linear-gradient(45deg,#00bfff,transparent,#00e5ff,transparent,#00bfff);
--webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
--webkit-mask-composite:xor;
-mask-composite:exclude;
-animation:borderSpin 6s linear infinite;
-pointer-events:none;
-}
-@keyframes borderSpin{
-from{filter:hue-rotate(0deg);}
-to{filter:hue-rotate(360deg);}
-}
-
-
-/* ==== V4 ULTRA CYBER ==== */
-.input-group{
-background:rgba(8,18,40,.75)!important;
-border:1px solid rgba(0,191,255,.35)!important;
-box-shadow:0 0 20px rgba(0,191,255,.08);
-}
-.input-group input,
-.input-group .country-code{
-background:transparent!important;
-color:#e8f6ff!important;
-}
-.input-group input::placeholder{color:#8fb8d9!important;}
-.result-box,.security-badge,.social-section{
-background:rgba(10,20,40,.72)!important;
-border:1px solid rgba(0,191,255,.22)!important;
-backdrop-filter:blur(14px);
-}
-.result-item:hover{background:rgba(0,191,255,.08)!important;}
-.social-btn:hover{
-box-shadow:0 0 25px rgba(0,191,255,.45)!important;
-}
-body::after{
-content:"";
-position:fixed;
-inset:0;
-pointer-events:none;
-background:repeating-linear-gradient(to bottom,transparent 0 3px,rgba(0,255,255,.025) 4px 5px);
-animation:scanMove 7s linear infinite;
-}
-@keyframes scanMove{
-from{transform:translateY(-100%);}
-to{transform:translateY(100%);}
-}
-
-
-/* ===== V5 ULTRA CYBER ===== */
-.main-header,.top-header{
-background:linear-gradient(90deg,#071226,#102a54,#071226)!important;
-position:relative;
-overflow:hidden;
-}
-.main-header::after,.top-header::after{
-content:"";
-position:absolute;
-left:-30%;
-top:0;
-width:30%;
-height:100%;
-background:linear-gradient(90deg,transparent,rgba(0,255,255,.15),transparent);
-animation:headerScan 5s linear infinite;
-}
-@keyframes headerScan{
-from{transform:translateX(0);}
-to{transform:translateX(500%);}
-}
-.result-box{
-box-shadow:0 0 25px rgba(0,191,255,.18)!important;
-}
-.json-toggle{
-border-color:rgba(0,191,255,.35)!important;
-color:#9edcff!important;
-}
-.json-toggle:hover{
-background:rgba(0,191,255,.08)!important;
-}
-
-
-/* ===== V6 PHASE 1 ===== */
-.main-container{max-width:900px!important}
-.card{
-background:rgba(8,16,32,.55)!important;
-backdrop-filter:blur(24px)!important;
-border:1px solid rgba(0,255,255,.35)!important;
-box-shadow:0 0 40px rgba(0,180,255,.18),0 0 120px rgba(0,180,255,.08)!important;
-}
-.card-header{
-background:linear-gradient(135deg,rgba(0,40,80,.65),rgba(0,10,25,.75))!important;
-border-bottom:1px solid rgba(0,255,255,.35)!important;
-}
-.card-title{
-text-shadow:0 0 18px rgba(0,255,255,.5);
-letter-spacing:2px!important;
-}
-.btn-search{
-border-radius:18px!important;
-background:linear-gradient(135deg,#00d2ff,#0066ff)!important;
-box-shadow:0 0 30px rgba(0,191,255,.45)!important;
-}
-
-
-/* ===== V6 PHASE 2 ===== */
-body::before{
-animation:bgMove 8s ease-in-out infinite alternate!important;
-filter:saturate(1.3);
-}
-#mouseGlow{
-position:fixed;
-width:260px;
-height:260px;
-border-radius:50%;
-pointer-events:none;
-background:radial-gradient(circle,rgba(0,255,255,.18),transparent 70%);
-transform:translate(-50%,-50%);
-z-index:-1;
-}
-.result-box{
-border-radius:18px!important;
-box-shadow:0 0 35px rgba(0,255,255,.18)!important;
-}
-.result-header{
-background:linear-gradient(90deg,#071b34,#0d2d58)!important;
-}
-.result-item{
-transition:.25s ease!important;
-}
-.result-item:hover{
-transform:translateX(6px);
-}
-
-
-/* ===== V6 PHASE 3 ===== */
-.loading-ring{
-width:70px;height:70px;border-radius:50%;
-border:4px solid rgba(0,255,255,.15);
-border-top-color:#00e5ff;
-animation:v6spin 1s linear infinite;
-margin:20px auto;
-display:none;
-}
-.loading-ring.show{display:block}
-@keyframes v6spin{to{transform:rotate(360deg)}}
-
-.hud-panel{
-position:fixed;
-top:120px;
-right:20px;
-padding:14px;
-border-radius:14px;
-background:rgba(5,20,40,.72);
-border:1px solid rgba(0,255,255,.3);
-backdrop-filter:blur(18px);
-color:#bffcff;
-font:12px monospace;
-box-shadow:0 0 24px rgba(0,255,255,.15);
-z-index:900;
-}
-.hud-panel .dot{
-display:inline-block;
-width:8px;height:8px;
-border-radius:50%;
-background:#00ff7f;
-box-shadow:0 0 12px #00ff7f;
-animation:hudpulse 1.2s infinite;
-margin-right:8px;
-}
-@keyframes hudpulse{
-50%{opacity:.35;transform:scale(.6)}
-}
-
-
-/* ===== V6 FINAL POLISH ===== */
-.cyber-grid{
-position:fixed;inset:0;pointer-events:none;z-index:-1;
-background-image:
-linear-gradient(rgba(0,255,255,.06) 1px,transparent 1px),
-linear-gradient(90deg,rgba(0,255,255,.06) 1px,transparent 1px);
-background-size:40px 40px;
-animation:gridMove 18s linear infinite;
-}
-@keyframes gridMove{
-from{transform:translateY(0)}
-to{transform:translateY(40px)}
-}
-.card,.result-box,.social-section,.security-badge{
-transition:all .35s ease!important;
-}
-.card:hover{
-transform:translateY(-8px) scale(1.01)!important;
-}
-.btn-search{
-letter-spacing:3px!important;
-text-transform:uppercase;
-}
-
-
-/* ===== V7.1 DASHBOARD LAYOUT ===== */
-.dashboard-shell{
-display:grid;
-grid-template-columns:260px 1fr 280px;
-gap:20px;
-max-width:1500px;
-margin:24px auto;
-padding:0 20px;
-}
-.sidebar,.rightbar{
-background:rgba(8,20,40,.62);
-border:1px solid rgba(0,255,255,.22);
-backdrop-filter:blur(18px);
-border-radius:20px;
-padding:18px;
-box-shadow:0 0 30px rgba(0,180,255,.12);
-}
-.sidebar h3,.rightbar h3{
-color:#9beeff;
-margin-bottom:14px;
-font-size:15px;
-letter-spacing:2px;
-}
-.sidebar .item,.rightbar .item{
-padding:10px 12px;
-margin:8px 0;
-border-radius:12px;
-background:rgba(255,255,255,.03);
-color:#d7f7ff;
-}
-@media(max-width:1100px){
-.dashboard-shell{grid-template-columns:1fr}
-.sidebar,.rightbar{display:none}
-}
-
-
-/* V7.2 removed */
-/* ===== V7.3 PARTICLE & SCAN ===== */
-#v73Canvas{
-position:fixed;
-inset:0;
-z-index:-3;
-pointer-events:none;
-opacity:.55;
-}
-.scan-line{
-position:fixed;
-left:0;
-top:-20%;
-width:100%;
-height:180px;
-background:linear-gradient(to bottom,
-transparent,
-rgba(0,255,255,.06),
-rgba(0,255,255,.14),
-transparent);
-pointer-events:none;
-animation:v73scan 7s linear infinite;
-z-index:-2;
-}
-@keyframes v73scan{
-0%{transform:translateY(-30vh)}
-100%{transform:translateY(140vh)}
-}
-
-
-/* ===== V7.4 RESULT DASHBOARD ===== */
-.metric-grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
-gap:14px;
-margin:18px 0;
-}
-.metric-card{
-background:rgba(8,22,45,.65);
-border:1px solid rgba(0,255,255,.22);
-border-radius:16px;
-padding:16px;
-backdrop-filter:blur(18px);
-box-shadow:0 0 20px rgba(0,255,255,.08);
-transition:.3s;
-}
-.metric-card:hover{
-transform:translateY(-5px);
-box-shadow:0 0 30px rgba(0,255,255,.18);
-}
-.metric-title{
-font-size:11px;
-letter-spacing:2px;
-color:#89dfff;
-}
-.metric-value{
-font-size:24px;
-font-weight:700;
-color:#fff;
-margin-top:8px;
-}
-
-
-/* ===== V7.5 FINAL POLISH ===== */
-.fade-up{
-animation:v75fade .7s ease both;
-}
-@keyframes v75fade{
-from{opacity:0;transform:translateY(18px)}
-to{opacity:1;transform:translateY(0)}
-}
-.cyber-badge{
-position:fixed;
-right:18px;
-bottom:18px;
-padding:10px 16px;
-border-radius:999px;
-background:rgba(8,22,45,.72);
-border:1px solid rgba(0,255,255,.25);
-color:#bffcff;
-backdrop-filter:blur(14px);
-box-shadow:0 0 20px rgba(0,255,255,.15);
-font-size:12px;
-letter-spacing:1px;
-}
-.btn-search,.search-btn,button[type=submit]{
-transition:transform .2s ease, box-shadow .2s ease;
-}
-.btn-search:hover,.search-btn:hover,button[type=submit]:hover{
-transform:translateY(-2px) scale(1.02);
-box-shadow:0 0 24px rgba(0,255,255,.28);
-}
-
-</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    </style>
 </head>
 <body>
-<canvas id="cyber-bg"></canvas>
 
 <!-- ===== DISCLAIMER POPUP ===== -->
 <div class="disclaimer-overlay" id="disclaimerOverlay">
@@ -1257,7 +896,10 @@ box-shadow:0 0 24px rgba(0,255,255,.28);
             <i class="fas fa-shield-halved"></i>
             SHUBHAM PATEL <span>|</span> CYBER SECURITY DIVISION
         </div>
-</div>
+        <div class="helpline">
+            <i class="fas fa-phone"></i> <strong>Helpline: +91 7379117261</strong>
+        </div>
+    </div>
 </div>
 
 <!-- ===== MAIN HEADER ===== -->
@@ -1346,7 +988,11 @@ box-shadow:0 0 24px rgba(0,255,255,.28);
                 <div class="badge-item"><i class="fas fa-check-circle"></i> Verified</div>
                 <div class="badge-item"><i class="fas fa-clock"></i> 24x7 Service</div>
             </div>
-<!-- Social Media -->
+
+            <!-- API Info -->
+            <div id="apiInfo" style="display:none; margin-top:14px; padding:12px; background:#f8f9fa; border-radius:10px; display:flex; justify-content:center; gap:25px; flex-wrap:wrap; font-size:11px; color:#666; border:1px solid #e8e8e8;"></div>
+
+            <!-- Social Media -->
             <div class="social-section">
                 <div class="social-title"><i class="fas fa-share-alt"></i> Connect With Shubham Patel</div>
                 <div class="social-buttons">
@@ -1649,201 +1295,13 @@ document.addEventListener('dragstart', function(e) {
 // AUTO SEARCH
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
-    // Ready without auto-search
+    setTimeout(function() {
+        searchNumber();
+    }, 1500);
 });
 </script>
 
-
-<script>
-const canvas=document.getElementById("cyber-bg");
-if(canvas && window.THREE){
-const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
-renderer.setSize(innerWidth,innerHeight);
-const scene=new THREE.Scene();
-const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,1000);
-camera.position.z=5;
-const g=new THREE.BufferGeometry(),a=[];
-for(let i=0;i<3000;i++)a.push((Math.random()-.5)*20,(Math.random()-.5)*20,(Math.random()-.5)*20);
-g.setAttribute('position',new THREE.Float32BufferAttribute(a,3));
-const pts=new THREE.Points(g,new THREE.PointsMaterial({color:0x00bfff,size:.03}));
-scene.add(pts);
-(function anim(){requestAnimationFrame(anim);pts.rotation.y+=0.0008;pts.rotation.x+=0.0003;renderer.render(scene,camera)})();
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
-}
-</script>
-
-
-<script>
-document.addEventListener('mousemove',e=>{
- let g=document.getElementById('mouseGlow');
- if(!g){
-   g=document.createElement('div');
-   g.id='mouseGlow';
-   g.style.cssText='position:fixed;width:260px;height:260px;border-radius:50%;pointer-events:none;z-index:-1;background:radial-gradient(circle,rgba(0,191,255,.18),transparent 70%);filter:blur(12px)';
-   document.body.appendChild(g);
- }
- g.style.left=(e.clientX-130)+'px';
- g.style.top=(e.clientY-130)+'px';
-});
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
- document.querySelectorAll(".social-btn").forEach(b=>{
-   b.addEventListener("mousemove",()=>{
-      b.style.transform="translateY(-3px) scale(1.04)";
-   });
-   b.addEventListener("mouseleave",()=>{
-      b.style.transform="";
-   });
- });
-});
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
- const t=document.createElement("div");
- t.style.position="fixed";
- t.style.right="18px";
- t.style.bottom="18px";
- t.style.padding="10px 16px";
- t.style.borderRadius="999px";
- t.style.background="rgba(0,20,40,.75)";
- t.style.border="1px solid rgba(0,255,255,.35)";
- t.style.color="#7fffd4";
- t.style.fontFamily="monospace";
- t.style.zIndex="9999";
- document.body.appendChild(t);
- setInterval(()=>{t.textContent=" • "+new Date().toLocaleTimeString();},1000);
-});
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
- const g=document.createElement("div");
- g.id="mouseGlow";
- document.body.appendChild(g);
- document.addEventListener("mousemove",e=>{
-   g.style.left=e.clientX+"px";
-   g.style.top=e.clientY+"px";
- });
-});
-</script>
-
-
-
-
-
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
- const scan=document.createElement("div");
- scan.className="scan-line";
- document.body.appendChild(scan);
-
- const c=document.createElement("canvas");
- c.id="v73Canvas";
- document.body.appendChild(c);
-
- const ctx=c.getContext("2d");
- function resize(){c.width=innerWidth;c.height=innerHeight;}
- resize();
- addEventListener("resize",resize);
-
- const pts=[];
- for(let i=0;i<55;i++){
-   pts.push({x:Math.random()*c.width,y:Math.random()*c.height,
-             vx:(Math.random()-.5)*0.5,vy:(Math.random()-.5)*0.5});
- }
-
- function draw(){
-   ctx.clearRect(0,0,c.width,c.height);
-   ctx.fillStyle="#55eaff";
-   for(let i=0;i<pts.length;i++){
-      const p=pts[i];
-      p.x+=p.vx; p.y+=p.vy;
-      if(p.x<0||p.x>c.width)p.vx*=-1;
-      if(p.y<0||p.y>c.height)p.vy*=-1;
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,2,0,Math.PI*2);
-      ctx.fill();
-      for(let j=i+1;j<pts.length;j++){
-        const q=pts[j];
-        const dx=p.x-q.x, dy=p.y-q.y;
-        const d=Math.hypot(dx,dy);
-        if(d<120){
-          ctx.strokeStyle="rgba(85,234,255,"+(1-d/120)*0.22+")";
-          ctx.beginPath();
-          ctx.moveTo(p.x,p.y);
-          ctx.lineTo(q.x,q.y);
-          ctx.stroke();
-        }
-      }
-   }
-   requestAnimationFrame(draw);
- }
- draw();
-});
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
- const body=document.querySelector(".card-body");
- if(!body) return;
-
- const wrap=document.createElement("div");
- wrap.className="metric-grid";
- wrap.innerHTML=`
- <div class="metric-card">
-   
- <div class="metric-card">
-   
- <div class="metric-card">
-   `;
-
- body.prepend(wrap);
-
- let count=0;
- const btn=document.querySelector(".btn-search");
- if(btn){
-   btn.addEventListener("click",()=>{
-      count++;
-      const el=document.getElementById("mScan");
-      if(el) el.textContent=count;
-   });
- }
-});
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
-  document.querySelectorAll(".card,.main-container,.result-box,.metric-card")
-    .forEach(el=>el.classList.add("fade-up"));
-
-  const badge=null;/*removed*/
-  
-  
-  
-
-  const form=document.querySelector("form");
-  if(form){
-    form.addEventListener("submit",()=>{
-      if(badge) badge.innerHTML="🔍 Processing Request...";
-      setTimeout(()=>{ if(badge) badge.innerHTML="⚡ SHUBHAM OSINT • V7.5 READY"; },2500);
-    });
-  }
-});
-</script>
 </body>
-
-
-
-
-
-
-
-
-
-
 </html>
 '''
 
