@@ -1668,7 +1668,7 @@ border-radius:50%;
             </div>
 
             <!-- API Info -->
-            <div id="apiInfo" style="display:none; margin-top:14px; padding:12px; background:#f8f9fa; border-radius:10px; display:flex; justify-content:center; gap:25px; flex-wrap:wrap; font-size:11px; color:#666; border:1px solid #e8e8e8;"></div>
+            <div id="apiInfo" style="display:none; margin-top:14px; padding:12px; background:transparent; border-radius:10px; display:flex; justify-content:center; gap:25px; flex-wrap:wrap; font-size:11px; color:#666; border:1px solid transparent;"></div>
 
             <!-- Social Media -->
             <div class="social-section">
