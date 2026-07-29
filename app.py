@@ -440,8 +440,23 @@ HTML_TEMPLATE = '''
         }
         .input-group:focus-within {
             border-color:#00d9ff;
-            box-shadow: 0 0 0 4px rgba(255,153,51,0.08);
-            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(0,217,255,.15);
+            background: rgba(10,20,40,.95);
+        }
+        .input-group:focus-within .country-code{
+            color:#ffffff;
+            background:rgba(0,217,255,.08);
+            border-right:1px solid rgba(0,217,255,.25);
+        }
+        .input-group:focus-within input,
+        .input-group input:focus{
+            background:transparent;
+            color:#ffffff;
+            caret-color:#00d9ff;
+        }
+        .input-group input::selection{
+            background:#00d9ff;
+            color:#000;
         }
         .input-group .country-code {
             padding: 14px 14px 14px 20px;
