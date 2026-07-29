@@ -1649,9 +1649,7 @@ document.addEventListener('dragstart', function(e) {
 // AUTO SEARCH
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-        searchNumber();
-    }, 1500);
+    // Ready without auto-search
 });
 </script>
 
@@ -1830,7 +1828,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   if(form){
     form.addEventListener("submit",()=>{
       if(badge) badge.innerHTML="🔍 Processing Request...";
-      setTimeout(()=>{if(badge) badge.innerHTML="⚡ SHUBHAM OSINT • V7.5 READY",2500);
+      setTimeout(()=>{ if(badge) badge.innerHTML="⚡ SHUBHAM OSINT • V7.5 READY"; },2500);
     });
   }
 });
