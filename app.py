@@ -614,14 +614,14 @@ HTML_TEMPLATE = '''
         .security-badge {
             margin-top: 18px;
             padding: 14px;
-            background:rgba(10,20,40,.85);
+            background:transparent;
             border-radius: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 25px;
             flex-wrap: wrap;
-            border: 1px solid #e8e8e8;
+            border:none;
         }
         .security-badge .badge-item {
             display: flex;
@@ -653,6 +653,7 @@ HTML_TEMPLATE = '''
         }
         .social-section .social-title i { color: #FF9933; margin-right: 8px; }
         .social-buttons {
+            background:transparent;
             display: flex;
             justify-content: center;
             gap: 15px;
@@ -1544,39 +1545,6 @@ border-radius:50%;
 <div class="scan-line"></div>
 
 <canvas id="matrixCanvas"></canvas>
-<div class="terminal-box"><span class="typing">Initializing Cyber Intelligence Engine...</span></div>
-
-
-
-<div class="toast" id="toast">System Ready</div>
-<button class="theme-toggle" onclick="document.body.classList.toggle('light')">☀️</button>
-
-
-<div style="text-align:center;margin:12px 0">
-<span class="status-chip pulse-ring">● Cyber Engine Active</span>
-</div>
-
-<div class="holo-panel" style="text-align:center">
-<b class="glitch">AI Threat Monitor</b><br>
-<small>Realtime Security Layer Enabled</small>
-</div>
-
-<div class="ai-grid">
-<div class="ai-box">🛰️ Network Scan</div>
-<div class="ai-box">🛡️ Threat Shield</div>
-<div class="ai-box"></div>
-</div>
-<div class="hero"><h1>SHUBHAM OSINT</h1><p>Cyber Intelligence Platform</p><span>Secure • Fast • Modern</span></div>
-<div class="stats-grid">
-<div class="stat-card"><i class="fas fa-server"></i><h3>API</h3><p>ONLINE</p></div>
-<div class="stat-card"><i class="fas fa-shield-halved"></i><h3>SECURE</h3><p>PROTECTED</p></div>
-<div class="stat-card"><i class="fas fa-bolt"></i><h3>FAST</h3><p>REALTIME</p></div>
-</div>
-
-
-
-<div id="particles-js"></div>
-
 <!-- ===== TRICOLOR TOP BAR ===== -->
 <div class="tricolor-bar">
     <div class="saffron"></div>
