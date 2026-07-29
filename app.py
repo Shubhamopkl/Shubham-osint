@@ -1321,9 +1321,171 @@ z-index:9;
 animation:arc32 2.8s ease-in-out infinite}
 @keyframes arc32{50%{transform:scale(1.12);opacity:.8}}
 
+
+
+/* V2 PHASE33 */
+.dashboard-glow{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
+margin:18px 0;
+}
+.dashboard-glow .mini{
+background:rgba(0,217,255,.06);
+border:1px solid rgba(0,217,255,.22);
+border-radius:12px;
+padding:10px;
+text-align:center;
+box-shadow:0 0 16px rgba(0,217,255,.12);
+}
+
+
+/* V2 PHASE34 */
+.cyber-status-strip{
+position:fixed;
+left:50%;
+bottom:18px;
+transform:translateX(-50%);
+display:flex;
+gap:10px;
+padding:8px 14px;
+background:rgba(5,15,30,.45);
+border:1px solid rgba(0,217,255,.25);
+border-radius:999px;
+backdrop-filter:blur(10px);
+pointer-events:none;
+z-index:9;
+opacity:.6}
+.cyber-status-strip span{
+width:8px;height:8px;border-radius:50%;
+background:#00d9ff;
+box-shadow:0 0 10px rgba(0,217,255,.8);
+animation:status34 1.8s infinite}
+.cyber-status-strip span:nth-child(2){animation-delay:.3s}
+.cyber-status-strip span:nth-child(3){animation-delay:.6s}
+@keyframes status34{50%{transform:scale(.5);opacity:.3}}
+
+
+
+/* V2 PHASE35 */
+.cyber-equalizer{
+position:fixed;
+left:50%;
+bottom:26px;
+transform:translateX(-50%);
+display:flex;
+gap:5px;
+pointer-events:none;
+opacity:.55;
+z-index:9}
+.cyber-equalizer span{
+width:4px;
+background:rgba(0,217,255,.8);
+border-radius:3px;
+animation:eq35 1.1s ease-in-out infinite}
+.cyber-equalizer span:nth-child(1){height:16px}
+.cyber-equalizer span:nth-child(2){height:26px;animation-delay:.15s}
+.cyber-equalizer span:nth-child(3){height:36px;animation-delay:.3s}
+.cyber-equalizer span:nth-child(4){height:26px;animation-delay:.45s}
+.cyber-equalizer span:nth-child(5){height:16px;animation-delay:.6s}
+@keyframes eq35{50%{transform:scaleY(.45);opacity:.35}}
+
+
+
+/* V2 PHASE36 */
+.cyber-spark{
+position:fixed;
+right:120px;
+top:50%;
+width:12px;
+height:12px;
+background:#00d9ff;
+border-radius:50%;
+box-shadow:0 0 18px rgba(0,217,255,.9);
+pointer-events:none;
+opacity:.6;
+z-index:9;
+animation:spark36 2s ease-in-out infinite}
+@keyframes spark36{
+0%,100%{transform:translateY(-18px) scale(.8);opacity:.3}
+50%{transform:translateY(18px) scale(1.4);opacity:1}
+}
+
+
+/* V2 PHASE37 */
+.cyber-equalizer{position:fixed;right:18px;bottom:30px;display:flex;gap:4px;pointer-events:none;opacity:.55;z-index:9}
+.cyber-equalizer span{width:4px;height:18px;background:#00d9ff;border-radius:3px;animation:eq37 1s ease-in-out infinite}
+.cyber-equalizer span:nth-child(2){height:28px;animation-delay:.15s}
+.cyber-equalizer span:nth-child(3){height:38px;animation-delay:.3s}
+.cyber-equalizer span:nth-child(4){height:24px;animation-delay:.45s}
+@keyframes eq37{50%{transform:scaleY(.4);opacity:.35}}
+
+
+
+/* V2 PHASE38 */
+.cyber-eq{position:fixed;right:20px;bottom:20px;display:flex;gap:4px;pointer-events:none;z-index:10;opacity:.6}
+.cyber-eq span{width:4px;height:18px;background:#00d9ff;border-radius:4px;box-shadow:0 0 10px rgba(0,217,255,.8);animation:eq38 1s ease-in-out infinite}
+.cyber-eq span:nth-child(2){animation-delay:.15s;height:26px}
+.cyber-eq span:nth-child(3){animation-delay:.3s;height:34px}
+.cyber-eq span:nth-child(4){animation-delay:.45s;height:24px}
+.cyber-eq span:nth-child(5){animation-delay:.6s;height:30px}
+@keyframes eq38{50%{transform:scaleY(.4);opacity:.3}}
+
+
+/* V2 PHASE39 */
+.cyber-spectrum{
+position:fixed;
+left:50%;
+top:110px;
+transform:translateX(-50%);
+display:flex;
+gap:6px;
+pointer-events:none;
+opacity:.45;
+z-index:9}
+.cyber-spectrum span{
+width:3px;
+height:18px;
+background:#00d9ff;
+border-radius:3px;
+box-shadow:0 0 10px rgba(0,217,255,.8);
+animation:spec39 1.2s ease-in-out infinite}
+.cyber-spectrum span:nth-child(1){height:14px;animation-delay:0.1s}
+.cyber-spectrum span:nth-child(2){height:18px;animation-delay:0.2s}
+.cyber-spectrum span:nth-child(3){height:22px;animation-delay:0.2s}
+.cyber-spectrum span:nth-child(4){height:26px;animation-delay:0.3s}
+.cyber-spectrum span:nth-child(5){height:30px;animation-delay:0.4s}
+.cyber-spectrum span:nth-child(6){height:34px;animation-delay:0.5s}
+.cyber-spectrum span:nth-child(7){height:38px;animation-delay:0.6s}
+@keyframes spec39{50%{transform:scaleY(.45);opacity:.3}}
+
+
+
+/* V2 PHASE40 */
+.cyber-signal-ring{position:fixed;left:50%;top:90px;transform:translateX(-50%);width:140px;height:140px;border:1px solid rgba(0,217,255,.25);border-radius:50%;pointer-events:none;opacity:.4;z-index:9;animation:phase40ring 4s ease-in-out infinite}
+.cyber-signal-ring:before,.cyber-signal-ring:after{content:"";position:absolute;inset:14px;border:1px dashed rgba(0,217,255,.25);border-radius:50%}
+.cyber-signal-ring:after{inset:34px}
+@keyframes phase40ring{50%{transform:translateX(-50%) scale(1.08);opacity:.7}}
+
+
+/* V2 PHASE41 */
+.cyber-core{position:fixed;left:50%;top:22px;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;background:#00d9ff;box-shadow:0 0 18px rgba(0,217,255,.9);pointer-events:none;z-index:10;animation:core41 2s ease-in-out infinite}.cyber-core:before{content:'';position:absolute;inset:-8px;border:1px solid rgba(0,217,255,.35);border-radius:50%}@keyframes core41{50%{transform:scale(1.4);opacity:.6}}
+
 </style>
 </head>
 <body>
+
+<div class="cyber-spectrum"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+
+<div class="cyber-status-strip"><span></span><span></span><span></span></div>
+
+
+<div class="dashboard-glow">
+<div class="mini"><i class="fas fa-shield-alt"></i></div>
+<div class="mini"><i class="fas fa-satellite-dish"></i></div>
+<div class="mini"><i class="fas fa-database"></i></div>
+</div>
+
 <div class="cyber-arc"></div>
 <div class="cyber-diamond"></div>
 <div class="cyber-reticle"><span></span></div>
@@ -1882,6 +2044,19 @@ document.addEventListener("DOMContentLoaded",()=>{
 });
 </script>
 
+
+<div class="cyber-equalizer"><span></span><span></span><span></span><span></span><span></span></div>
+
+<div class="cyber-spark"></div>
+
+<div class="cyber-equalizer"><span></span><span></span><span></span><span></span></div>
+
+
+<div class="cyber-eq"><span></span><span></span><span></span><span></span><span></span></div>
+
+
+<div class="cyber-signal-ring"></div>
+<div class="cyber-core"></div>
 </body>
 </html>
 '''
