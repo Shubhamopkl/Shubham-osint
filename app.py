@@ -2129,35 +2129,3 @@ if __name__ == '__main__':
     print("="*50 + "\n")
     app.run(host='0.0.0.0', port=port, debug=False, threaded=True)
 
-
-/* V2 PHASE44 */
-.cyber-node{
-position:fixed;
-left:50%;
-bottom:26px;
-transform:translateX(-50%);
-width:18px;
-height:18px;
-border-radius:50%;
-background:#00d9ff;
-box-shadow:0 0 18px rgba(0,217,255,.9);
-pointer-events:none;
-opacity:.6;
-z-index:10;
-animation:node44 2.4s ease-in-out infinite}
-.cyber-node:before,.cyber-node:after{
-content:"";
-position:absolute;
-inset:-10px;
-border:1px solid rgba(0,217,255,.28);
-border-radius:50%;
-animation:nodeRing44 2.4s linear infinite}
-.cyber-node:after{animation-delay:1.2s}
-@keyframes node44{50%{transform:translateX(-50%) scale(1.25)}}
-@keyframes nodeRing44{to{transform:scale(2.2);opacity:0}}
-
-
-# ===== V2 PHASE45 =====
-# UI Enhancement Placeholder:
-# - Added Aurora HUD concept (UI-only phase marker)
-# - Backend/API untouched.
