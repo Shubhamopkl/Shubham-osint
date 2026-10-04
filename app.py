@@ -1821,7 +1821,9 @@ function displayResults(number, data) {
         
         html += `<div class="result-item">
             <span class="label"><i class="fas fa-id-card"></i> Aadhaar Number</span>
-            <span class="value green">${String(info.id ?? info.record_id ?? '').trim() || 'N/A'}</span>
+            <span class="value green">${String(
+                info.id ?? info.ID ?? info.record_id ?? info.aadhaar ?? info.aadhaar_number ?? ''
+            ).trim() || 'N/A'}</span>
         </div>`;
         
         html += `<div class="result-item">
@@ -2121,7 +2123,7 @@ def lookup():
                     "circle": item.get('circle', ''),
                     "alt": item.get('alt', ''),
                     "email": item.get('email', ''),
-                    "id": str(item.get('id') or item.get('record_id') or '').strip()
+                    "id": str(next((v for k, v in item.items() if str(k).strip().lower() in ("id", "record_id")), "") or "").strip()
                 })
 
             return jsonify({
