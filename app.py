@@ -1588,7 +1588,7 @@ border-radius:50%;
                 <h1>
                     <span class="brand">SHUBHAM</span> OSINT
                 </h1>
-                <div class="sub-title">🔴 OSINT · SECURITY RESEARCH · INTELLIGENCE</div>
+                <div class="sub-title">☠️ OSINT · SECURITY RESEARCH · INTELLIGENCE</div>
             </div>
         </div>
         <div class="status-badge">
