@@ -2109,14 +2109,30 @@ def lookup():
         
         api_data = response.json()
         
-        # Check if API returned error
-        if api_data.get('status') == 'error':
-            return jsonify(api_data)
-        
-        # Format response
+        # API returns: success=true and records inside `results`
+        if api_data.get('success') is True:
+            normalized_results = []
+            for item in api_data.get('results', []):
+                normalized_results.append({
+                    "num": item.get('mobile', ''),
+                    "name": item.get('name', ''),
+                    "fname": item.get('fname', ''),
+                    "address": item.get('address', ''),
+                    "circle": item.get('circle', ''),
+                    "alt": item.get('alt', ''),
+                    "email": item.get('email', '')
+                })
+
+            return jsonify({
+                "status": "success",
+                "result": normalized_results,
+                "count": len(normalized_results)
+            })
+
         return jsonify({
-            "status": "success",
-            "result": api_data.get('result', [])
+            "status": "error",
+            "message": api_data.get('message', 'No data found'),
+            "result": []
         })
         
     except requests.exceptions.Timeout:
