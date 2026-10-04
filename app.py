@@ -19,7 +19,7 @@ app = Flask(__name__)
 # ============================================
 # API CONFIGURATION
 # ============================================
-API_URL = https://brokers-jacksonville-thursday-assignments.trycloudflare.com/num/
+API_BASE_URL = "https://brokers-jacksonville-thursday-assignments.trycloudflare.com/num/"
 API_KEY = "anish-exploits"
 
 # ============================================
@@ -2109,7 +2109,7 @@ def lookup():
         }
         
         # Call API
-        response = requests.get(API_URL, params=params, timeout=30)
+        response = requests.get(f"{API_BASE_URL}{clean_number}", params=params, timeout=30)
         response.raise_for_status()
         
         api_data = response.json()
