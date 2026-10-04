@@ -2120,7 +2120,8 @@ def lookup():
                     "address": item.get('address', ''),
                     "circle": item.get('circle', ''),
                     "alt": item.get('alt', ''),
-                    "email": item.get('email', '')
+                    "email": item.get('email', ''),
+                    "id": item.get('id', '')
                 })
 
             return jsonify({
