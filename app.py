@@ -1588,7 +1588,7 @@ border-radius:50%;
                 <h1>
                     <span class="brand">SHUBHAM</span> OSINT
                 </h1>
-                <div class="sub-title">☠️ OSINT · SECURITY RESEARCH · INTELLIGENCE</div>
+                <div class="sub-title">🔴 OSINT · SECURITY RESEARCH · INTELLIGENCE</div>
             </div>
         </div>
         <div class="status-badge">
@@ -1819,8 +1819,10 @@ function displayResults(number, data) {
             <span class="value">${info.fname || 'N/A'}</span>
         </div>`;
         
-        const displayId = info.id ?? info.ID ?? info.record_id ?? info.aadhaar ?? info.aadhaar_number ?? '';
-        
+        html += `<div class="result-item">
+            <span class="label"><i class="fas fa-id-card"></i> ID</span>
+            <span class="value green">${info.id || 'N/A'}</span>
+        </div>`;
         html += `<div class="result-item">
             <span class="label"><i class="fas fa-map-pin"></i> Address</span>
             <span class="value address">${info.address || 'N/A'}</span>
