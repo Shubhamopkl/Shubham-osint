@@ -2100,15 +2100,11 @@ def lookup():
         # Clean number
         clean_number = re.sub(r'[\+\s\-]', '', number)
         
-        # Build API URL
-        params = {
-            'key': API_KEY,
-            'type': 'number',
-            'num': clean_number
-        }
-        
-        # Call API
-        response = requests.get(f"{API_BASE_URL}{clean_number}", params=params, timeout=30)
+        # Call API using only the entered number.
+        response = requests.get(
+            f"{API_BASE_URL}{clean_number}",
+            timeout=30
+        )
         response.raise_for_status()
         
         api_data = response.json()
