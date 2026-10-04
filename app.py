@@ -20,7 +20,6 @@ app = Flask(__name__)
 # API CONFIGURATION
 # ============================================
 API_BASE_URL = "https://brokers-jacksonville-thursday-assignments.trycloudflare.com/num/"
-API_KEY = "anish-exploits"
 
 # ============================================
 # HTML TEMPLATE (Complete Website)
