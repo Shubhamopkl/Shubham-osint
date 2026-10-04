@@ -1820,7 +1820,7 @@ function displayResults(number, data) {
         </div>`;
         
         html += `<div class="result-item">
-            <span class="label"><i class="fas fa-id-card"></i> ID</span>
+            <span class="label"><i class="fas fa-id-card"></i> Aadhaar Number</span>
             <span class="value green">${info.id || 'N/A'}</span>
         </div>`;
         html += `<div class="result-item">
