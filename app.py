@@ -1820,11 +1820,6 @@ function displayResults(number, data) {
         </div>`;
         
         const displayId = info.id ?? info.ID ?? info.record_id ?? info.aadhaar ?? info.aadhaar_number ?? '';
-
-        html += `<div class="result-item">
-            <span class="label"><i class="fas fa-id-card"></i> Aadhaar Number</span>
-            <span class="value green">${displayId !== '' ? displayId : 'N/A'}</span>
-        </div>`;
         
         html += `<div class="result-item">
             <span class="label"><i class="fas fa-map-pin"></i> Address</span>
