@@ -19,7 +19,8 @@ app = Flask(__name__)
 # ============================================
 # API CONFIGURATION
 # ============================================
-API_BASE_URL = "https://sized-reviewed-across-nerve.trycloudflare.com/num/?key=napi_9jgctjUU042SKuzhsiFrb9ha3pzwufCHzwqZsw"
+API_BASE_URL = "https://sized-reviewed-across-nerve.trycloudflare.com/num/"
+API_KEY = "napi_9jgctjUU042SKuzhsiFrb9ha3pzwufCHzwqZsw"
 
 # ============================================
 # HTML TEMPLATE (Complete Website)
@@ -2102,6 +2103,7 @@ def lookup():
         # Call API using only the entered number.
         response = requests.get(
             f"{API_BASE_URL}{clean_number}",
+            params={"key": API_KEY},
             timeout=30
         )
         response.raise_for_status()
