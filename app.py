@@ -1688,6 +1688,33 @@ border-radius:50%;
                 </div>
             </section>
 
+            <!-- IFSC INFO Search -->
+            <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
+            <section aria-labelledby="ifscSearchTitle" class="ifsc-search-section">
+                <div style="text-align:center;margin-bottom:18px;">
+                    <div class="badge-gov"><i class="fas fa-building-columns"></i> IFSC INFO</div>
+                    <h2 id="ifscSearchTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">BANK BRANCH INFORMATION</h2>
+                    <p style="color:#9ecfff;font-size:12px;margin-top:6px;">Search public bank-branch details using an IFSC code.</p>
+                </div>
+                <form id="ifscForm">
+                    <div class="form-group">
+                        <label class="form-label" for="ifscInput"><i class="fas fa-building-columns"></i> Enter 11-Character IFSC Code</label>
+                        <div class="input-group">
+                            <input type="text" id="ifscInput" name="ifsc" placeholder="SBIN0000001" maxlength="11" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="ifscError">
+                        </div>
+                    </div>
+                    <div class="status-bar"><span class="dot" id="ifscStatusDot"></span><span id="ifscStatusText">Ready to search</span></div>
+                    <div class="error-text" id="ifscError" role="alert"></div>
+                    <button type="submit" class="btn-search" id="ifscSearchBtn"><i class="fas fa-search"></i> SEARCH IFSC</button>
+                </form>
+                <div class="result-box" id="ifscResultBox" style="display:none;margin-top:20px;">
+                    <div class="result-header"><div class="title"><i class="fas fa-building-columns"></i> IFSC API RESPONSE</div><div class="count"><i class="fas fa-check-circle"></i> <span id="ifscResultStatus">Response</span></div></div>
+                    <div id="ifscResultContent"></div>
+                    <button type="button" class="json-toggle" id="ifscJsonToggle"><i class="fas fa-code"></i> View Raw JSON</button>
+                    <pre class="json-box" id="ifscJsonBox" style="display:none;"></pre>
+                </div>
+            </section>
+
             <!-- Security Badge -->
             <div class="security-badge">
                 <div class="badge-item"><i class="fas fa-lock"></i> SSL Secure</div>
@@ -2029,6 +2056,88 @@ function escapePanHtml(value) {
 }
 
 // ============================================
+// IFSC INFO SEARCH (server-side API proxy)
+// ============================================
+const ifscForm = document.getElementById('ifscForm');
+const ifscInput = document.getElementById('ifscInput');
+const ifscSearchBtn = document.getElementById('ifscSearchBtn');
+const ifscResultBox = document.getElementById('ifscResultBox');
+const ifscResultContent = document.getElementById('ifscResultContent');
+const ifscJsonBox = document.getElementById('ifscJsonBox');
+const ifscError = document.getElementById('ifscError');
+
+ifscInput.addEventListener('input', function () {
+    this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 11);
+});
+
+document.getElementById('ifscJsonToggle').addEventListener('click', function () {
+    const visible = ifscJsonBox.style.display !== 'block';
+    ifscJsonBox.style.display = visible ? 'block' : 'none';
+    ifscJsonBox.classList.toggle('show', visible);
+});
+
+ifscForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const ifsc = ifscInput.value.trim().toUpperCase();
+    ifscError.classList.remove('show');
+    ifscResultBox.classList.remove('show');
+    ifscResultBox.style.display = 'none';
+    if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc)) {
+        ifscError.textContent = 'Enter a valid 11-character IFSC code.';
+        ifscError.classList.add('show');
+        ifscInput.focus();
+        return;
+    }
+    ifscSearchBtn.disabled = true;
+    ifscSearchBtn.innerHTML = '<span class="loading-ring"></span> SEARCHING...';
+    document.getElementById('ifscStatusText').textContent = 'Request in progress';
+    document.getElementById('ifscStatusDot').classList.remove('error');
+    try {
+        const response = await fetch('/api/ifsc-lookup', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ifsc})
+        });
+        const data = await response.json();
+        ifscJsonBox.textContent = JSON.stringify(data, null, 2);
+        if (!response.ok || data.status === 'error') throw new Error(data.message || 'IFSC request failed');
+        const payload = data.data || {};
+        const aliases = {
+            'Bank Name': ['BANK', 'bank', 'bank_name', 'bankName'],
+            'Branch Name': ['BRANCH', 'branch', 'branch_name', 'branchName'],
+            'IFSC Code': ['IFSC', 'ifsc', 'ifsc_code', 'ifscCode'],
+            'Branch Address': ['ADDRESS', 'address', 'branch_address', 'branchAddress'],
+            'City': ['CITY', 'city', 'centre', 'CENTRE'],
+            'District': ['DISTRICT', 'district'],
+            'State': ['STATE', 'state'],
+            'MICR Code': ['MICR', 'micr', 'micr_code', 'micrCode'],
+            'Contact': ['CONTACT', 'contact', 'phone'],
+            'SWIFT Code': ['SWIFT', 'swift'],
+            'NEFT': ['NEFT', 'neft'], 'RTGS': ['RTGS', 'rtgs'],
+            'IMPS': ['IMPS', 'imps'], 'UPI': ['UPI', 'upi']
+        };
+        const fields = Object.entries(aliases).map(([label, keys]) => {
+            const key = keys.find(k => payload[k] !== undefined && payload[k] !== null && payload[k] !== '');
+            return key ? [label, payload[key]] : null;
+        }).filter(Boolean);
+        ifscResultContent.innerHTML = fields.length ? fields.map(([label, value]) =>
+            `<div class="result-item"><div class="label"><i class="fas fa-circle-info"></i>${escapePanHtml(label)}</div><div class="value">${escapePanHtml(typeof value === 'boolean' ? (value ? 'Available' : 'Not available') : String(value))}</div></div>`
+        ).join('') : '<div class="result-item"><div class="value" style="width:100%;text-align:left;">Response received. Open Raw JSON to inspect the response structure.</div></div>';
+        document.getElementById('ifscResultStatus').textContent = 'Received';
+        ifscResultBox.style.display = 'block';
+        ifscResultBox.classList.add('show');
+        document.getElementById('ifscStatusText').textContent = 'Response received';
+    } catch (err) {
+        ifscError.textContent = '❌ ' + (err.message || 'Could not fetch IFSC response');
+        ifscError.classList.add('show');
+        document.getElementById('ifscStatusText').textContent = 'Request failed';
+        document.getElementById('ifscStatusDot').classList.add('error');
+    } finally {
+        ifscSearchBtn.disabled = false;
+        ifscSearchBtn.innerHTML = '<i class="fas fa-search"></i> SEARCH IFSC';
+    }
+});
+
+// ============================================
 // EVENT LISTENERS
 // ============================================
 document.getElementById('trackForm').addEventListener('submit', function(e) {
@@ -2279,6 +2388,37 @@ def pan_lookup():
     except Exception:
         app.logger.exception("PAN lookup failed")
         return jsonify({"status": "error", "message": "Server error while processing PAN request"}), 500
+
+# ============================================
+# FLASK ROUTE: IFSC INFO API PROXY
+# ============================================
+@app.route('/api/ifsc-lookup', methods=['POST'])
+def ifsc_lookup():
+    try:
+        payload = request.get_json(silent=True) or {}
+        ifsc = str(payload.get('ifsc', '')).strip().upper()
+        if not re.fullmatch(r'[A-Z]{4}0[A-Z0-9]{6}', ifsc):
+            return jsonify({"status": "error", "message": "Valid 11-character IFSC format required"}), 400
+
+        response = requests.get(
+            f"https://oriss-ifsc-info-api.vercel.app/ifsc/{ifsc}",
+            timeout=20,
+        )
+        if response.status_code == 404:
+            return jsonify({"status": "error", "message": "IFSC code not found"}), 404
+        response.raise_for_status()
+        try:
+            api_data = response.json()
+        except ValueError:
+            return jsonify({"status": "error", "message": "IFSC API returned invalid JSON"}), 502
+        return jsonify({"status": "success", "data": api_data})
+    except requests.exceptions.Timeout:
+        return jsonify({"status": "error", "message": "IFSC API timeout"}), 504
+    except requests.exceptions.RequestException:
+        return jsonify({"status": "error", "message": "Could not reach IFSC API"}), 502
+    except Exception:
+        app.logger.exception("IFSC lookup failed")
+        return jsonify({"status": "error", "message": "Server error while processing IFSC request"}), 500
 
 # ============================================
 # MAIN: RUN SERVER
