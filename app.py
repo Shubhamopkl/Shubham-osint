@@ -2286,92 +2286,6 @@ document.addEventListener("DOMContentLoaded",()=>{
 
 
 <div class="cyber-node"></div>
-
-<!-- WEATHER INFORMATION SEARCH -->
-<div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
-<section class="weather-search-section" aria-labelledby="weatherSearchTitle" style="max-width:900px;margin:24px auto;padding:22px;border:1px solid rgba(0,217,255,.25);border-radius:18px;background:rgba(10,20,35,.72);color:#eaf6ff;">
-  <div style="text-align:center;margin-bottom:18px;">
-    <div class="badge-gov"><i class="fas fa-cloud-sun"></i> WEATHER INFO</div>
-    <h2 id="weatherSearchTitle" style="margin:12px 0 6px;">Weather Information</h2>
-    <p style="opacity:.75;margin:0;">City ke naam se current weather aur forecast dekhein</p>
-  </div>
-  <form id="weatherSearchForm" style="display:flex;gap:10px;flex-wrap:wrap;">
-    <input id="weatherCityInput" type="text" maxlength="100" placeholder="City name (e.g. Delhi)" required
-      style="flex:1;min-width:180px;padding:13px 14px;border-radius:10px;border:1px solid rgba(0,217,255,.35);background:#101a28;color:#fff;">
-    <button type="submit" id="weatherSearchBtn" style="padding:12px 20px;border:0;border-radius:10px;background:#00b8d9;color:#06111c;font-weight:700;cursor:pointer;">
-      <i class="fas fa-search"></i> Search Weather
-    </button>
-  </form>
-  <p id="weatherStatus" role="status" style="margin:14px 0 0;opacity:.85;"></p>
-  <div id="weatherResult" style="display:none;margin-top:18px;"></div>
-  <details style="margin-top:14px;"><summary style="cursor:pointer;">Raw JSON Response</summary>
-    <pre id="weatherJsonBox" class="json-box" style="display:none;white-space:pre-wrap;overflow-wrap:anywhere;max-height:380px;overflow:auto;"></pre>
-  </details>
-</section>
-<script>
-(function(){
-  const form = document.getElementById('weatherSearchForm');
-  if (!form) return;
-  const input = document.getElementById('weatherCityInput');
-  const status = document.getElementById('weatherStatus');
-  const result = document.getElementById('weatherResult');
-  const raw = document.getElementById('weatherJsonBox');
-  const btn = document.getElementById('weatherSearchBtn');
-  const safe = v => (v === undefined || v === null || v === '') ? 'N/A' : String(v);
-  const card = (label, value) => `<div style="padding:13px;border:1px solid rgba(0,217,255,.18);border-radius:12px;background:rgba(255,255,255,.035);"><div style="font-size:12px;opacity:.7;margin-bottom:5px;">${label}</div><div style="font-weight:700;overflow-wrap:anywhere;">${safe(value)}</div></div>`;
-  form.addEventListener('submit', async function(e){
-    e.preventDefault();
-    const city = input.value.trim();
-    if (!city) return;
-    status.textContent = 'Weather data load ho raha hai…';
-    result.style.display = 'none'; raw.style.display = 'none'; btn.disabled = true;
-    try {
-      const response = await fetch('/api/weather-lookup', {
-        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({city})
-      });
-      const payload = await response.json();
-      raw.textContent = JSON.stringify(payload, null, 2);
-      raw.style.display = 'block';
-      if (!response.ok || payload.status === 'error') throw new Error(payload.message || 'Weather lookup failed');
-      const root = payload.data || {};
-      const d = root.data || root;
-      const loc = d.location || {};
-      const current = d.current || d.weather || {};
-      const temp = current.temperature || current.temp_c || current.temp || {};
-      const wind = current.wind || {};
-      const humidity = current.humidity ?? current.humidity_percent;
-      const tempVal = (typeof temp === 'object') ? (temp.actual_c ?? temp.current_c ?? temp.celsius ?? temp.value ?? temp.max_c) : temp;
-      const feels = (typeof temp === 'object') ? (temp.feels_like_c ?? temp.feels_like ?? temp.feels_like_c) : (current.feels_like_c ?? current.feels_like);
-      const forecast = Array.isArray(d.forecast) ? d.forecast : (d.forecast && Array.isArray(d.forecast.daily) ? d.forecast.daily : []);
-      const cards = [
-        card('Location', loc.name || d.city || d.searched || city),
-        card('Country / Region', [loc.country, loc.region || loc.state].filter(Boolean).join(' / ') || d.country),
-        card('Temperature (°C)', tempVal ?? current.actual_c ?? current.temperature_c),
-        card('Feels Like (°C)', feels),
-        card('Condition', current.condition?.text || current.condition || current.description || current.weather_description),
-        card('Humidity', humidity !== undefined ? `${humidity}%` : undefined),
-        card('Wind Speed (km/h)', wind.speed_kmh ?? wind.speed_kph ?? current.wind_speed_kmh),
-        card('Wind Direction', wind.direction_label || wind.direction || current.wind_direction),
-        card('UV Index', d.uv_index?.uv_index ?? d.uv_index?.value ?? d.uv_index),
-        card('Air Quality Index', d.air_quality?.us_aqi ?? d.air_quality?.aqi ?? d.air_quality?.index),
-        card('Sunrise', current.sunrise || d.sun?.sunrise),
-        card('Sunset', current.sunset || d.sun?.sunset)
-      ];
-      let forecastHtml = '';
-      if (forecast.length) {
-        forecastHtml = `<h3 style="margin:20px 0 10px;">Forecast</h3><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">` +
-          forecast.slice(0,7).map(day => card(day.date || 'Forecast', `${day.weather?.description || day.weather?.text || ''} · ${day.temperature?.max_c ?? day.temperature?.max ?? day.max_c ?? 'N/A'}° / ${day.temperature?.min_c ?? day.temperature?.min ?? day.min_c ?? 'N/A'}°C`)).join('') + '</div>';
-      }
-      result.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;">${cards.join('')}</div>${forecastHtml}`;
-      result.style.display = 'block';
-      status.textContent = 'Weather information loaded.';
-    } catch(err) {
-      status.textContent = err.message || 'Weather data fetch nahi ho saka.';
-    } finally { btn.disabled = false; }
-  });
-})();
-</script>
-
 </body>
 </html>
 '''
@@ -2505,38 +2419,6 @@ def ifsc_lookup():
     except Exception:
         app.logger.exception("IFSC lookup failed")
         return jsonify({"status": "error", "message": "Server error while processing IFSC request"}), 500
-
-
-# ============================================
-# FLASK ROUTE: WEATHER INFO API PROXY
-# ============================================
-@app.route('/api/weather-lookup', methods=['POST'])
-def weather_lookup():
-    try:
-        payload = request.get_json(silent=True) or {}
-        city = str(payload.get('city', '')).strip()
-        if not city or len(city) > 100:
-            return jsonify({"status": "error", "message": "Enter a valid city name"}), 400
-        response = requests.get(
-            "https://nitin-wather-check-api.vercel.app/api",
-            params={"type": "weather", "search": city},
-            timeout=20,
-        )
-        response.raise_for_status()
-        try:
-            api_data = response.json()
-        except ValueError:
-            return jsonify({"status": "error", "message": "Weather API returned invalid JSON"}), 502
-        if isinstance(api_data, dict) and api_data.get("success") is False:
-            return jsonify({"status": "error", "message": api_data.get("message", "Weather data not found")}), 404
-        return jsonify({"status": "success", "data": api_data})
-    except requests.exceptions.Timeout:
-        return jsonify({"status": "error", "message": "Weather API timeout"}), 504
-    except requests.exceptions.RequestException:
-        return jsonify({"status": "error", "message": "Could not reach Weather API"}), 502
-    except Exception:
-        app.logger.exception("Weather lookup failed")
-        return jsonify({"status": "error", "message": "Server error while processing weather request"}), 500
 
 # ============================================
 # MAIN: RUN SERVER
