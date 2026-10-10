@@ -20,7 +20,9 @@ app = Flask(__name__)
 # API CONFIGURATION
 # ============================================
 API_BASE_URL = "https://sized-reviewed-across-nerve.trycloudflare.com/num/"
-API_KEY = "napi_9jgctjUU042SKuzhsiFrb9ha3pzwufCHzwqZsw"
+API_KEY = os.environ.get("PHONE_API_KEY", "napi_9jgctjUU042SKuzhsiFrb9ha3pzwufCHzwqZsw")
+PAN_API_URL = "https://orissosint-pan.antideploy.app/pan"
+PAN_API_KEY = os.environ.get("PAN_API_KEY", "WKM")
 
 # ============================================
 # HTML TEMPLATE (Complete Website)
@@ -1659,6 +1661,33 @@ border-radius:50%;
                 <div id="resultContent"></div>
             </div>
 
+            <!-- PAN Search -->
+            <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
+            <section aria-labelledby="panSearchTitle" class="pan-search-section">
+                <div style="text-align:center;margin-bottom:18px;">
+                    <div class="badge-gov"><i class="fas fa-id-card"></i> PAN SEARCH</div>
+                    <h2 id="panSearchTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">PAN INFORMATION</h2>
+                    <p style="color:#9ecfff;font-size:12px;margin-top:6px;">Use only for records you are authorized to access.</p>
+                </div>
+                <form id="panForm">
+                    <div class="form-group">
+                        <label class="form-label" for="panInput"><i class="fas fa-id-card"></i> Enter PAN Number</label>
+                        <div class="input-group">
+                            <input type="text" id="panInput" name="pan" placeholder="ABCDE1234F" maxlength="10" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="panError">
+                        </div>
+                    </div>
+                    <div class="status-bar"><span class="dot" id="panStatusDot"></span><span id="panStatusText">Ready to search</span></div>
+                    <div class="error-text" id="panError" role="alert"></div>
+                    <button type="submit" class="btn-search" id="panSearchBtn"><i class="fas fa-search"></i> SEARCH PAN</button>
+                </form>
+                <div class="result-box" id="panResultBox" style="display:none;margin-top:20px;">
+                    <div class="result-header"><div class="title"><i class="fas fa-id-card"></i> PAN API RESPONSE</div><div class="count"><i class="fas fa-check-circle"></i> <span id="panResultStatus">Response</span></div></div>
+                    <div id="panResultContent"></div>
+                    <button type="button" class="json-toggle" id="panJsonToggle"><i class="fas fa-code"></i> View Raw JSON</button>
+                    <pre class="json-box" id="panJsonBox" style="display:none;"></pre>
+                </div>
+            </section>
+
             <!-- Security Badge -->
             <div class="security-badge">
                 <div class="badge-item"><i class="fas fa-lock"></i> SSL Secure</div>
@@ -1926,6 +1955,80 @@ async function searchNumber() {
 }
 
 // ============================================
+// PAN SEARCH (server-side API proxy)
+// ============================================
+const panForm = document.getElementById('panForm');
+const panInput = document.getElementById('panInput');
+const panSearchBtn = document.getElementById('panSearchBtn');
+const panResultBox = document.getElementById('panResultBox');
+const panResultContent = document.getElementById('panResultContent');
+const panJsonBox = document.getElementById('panJsonBox');
+const panError = document.getElementById('panError');
+
+panInput.addEventListener('input', function () {
+    this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+});
+
+document.getElementById('panJsonToggle').addEventListener('click', function () {
+    const visible = panJsonBox.style.display !== 'block';
+    panJsonBox.style.display = visible ? 'block' : 'none';
+    panJsonBox.classList.toggle('show', visible);
+});
+
+panForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const pan = panInput.value.trim().toUpperCase();
+    panError.classList.remove('show');
+    panResultBox.classList.remove('show');
+    panResultBox.style.display = 'none';
+    if (!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan)) {
+        panError.textContent = 'Enter a valid 10-character PAN format.';
+        panError.classList.add('show');
+        panInput.focus();
+        return;
+    }
+    panSearchBtn.disabled = true;
+    panSearchBtn.innerHTML = '<span class="loading-ring"></span> SEARCHING...';
+    document.getElementById('panStatusText').textContent = 'Request in progress';
+    document.getElementById('panStatusDot').classList.remove('error');
+    try {
+        const response = await fetch('/api/pan-lookup', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({pan})
+        });
+        const data = await response.json();
+        panJsonBox.textContent = JSON.stringify(data, null, 2);
+        if (!response.ok || data.status === 'error') throw new Error(data.message || 'PAN request failed');
+        const payload = data.data || {};
+        const fields = [
+            ['PAN Status', payload.panStatus ?? payload.pan_status],
+            ['Name', payload.name ?? [payload.firstName, payload.middleName, payload.lastName].filter(Boolean).join(' ')],
+            ['Date of Birth', payload.dob],
+            ['PAN', payload.pan]
+        ].filter(([label, value]) => value !== undefined && value !== null && value !== '');
+        panResultContent.innerHTML = fields.length ? fields.map(([label, value]) =>
+            `<div class="result-item"><div class="label"><i class="fas fa-circle-info"></i>${escapePanHtml(label)}</div><div class="value">${escapePanHtml(String(value))}</div></div>`
+        ).join('') : '<div class="result-item"><div class="value" style="width:100%;text-align:left;">Request completed. Open Raw JSON to inspect the response structure.</div></div>';
+        document.getElementById('panResultStatus').textContent = data.ok === false ? 'Not found' : 'Received';
+        panResultBox.style.display = 'block';
+        panResultBox.classList.add('show');
+        document.getElementById('panStatusText').textContent = 'Response received';
+    } catch (err) {
+        panError.textContent = '❌ ' + (err.message || 'Could not fetch PAN response');
+        panError.classList.add('show');
+        document.getElementById('panStatusText').textContent = 'Request failed';
+        document.getElementById('panStatusDot').classList.add('error');
+    } finally {
+        panSearchBtn.disabled = false;
+        panSearchBtn.innerHTML = '<i class="fas fa-search"></i> SEARCH PAN';
+    }
+});
+
+function escapePanHtml(value) {
+    return value.replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+// ============================================
 // EVENT LISTENERS
 // ============================================
 document.getElementById('trackForm').addEventListener('submit', function(e) {
@@ -2143,6 +2246,39 @@ def lookup():
         return jsonify({"status": "error", "message": f"API error: {str(e)}"})
     except Exception as e:
         return jsonify({"status": "error", "message": f"Server error: {str(e)}"})
+
+# ============================================
+# FLASK ROUTE: PAN API PROXY
+# ============================================
+@app.route('/api/pan-lookup', methods=['POST'])
+def pan_lookup():
+    try:
+        payload = request.get_json(silent=True) or {}
+        pan = str(payload.get('pan', '')).strip().upper()
+        if not re.fullmatch(r'[A-Z]{5}[0-9]{4}[A-Z]', pan):
+            return jsonify({"status": "error", "message": "Valid PAN format required"}), 400
+
+        # API key stays on the server; it is never sent to the browser.
+        response = requests.get(
+            PAN_API_URL,
+            params={"pan": pan, "key": PAN_API_KEY},
+            timeout=20,
+        )
+        response.raise_for_status()
+        try:
+            api_data = response.json()
+        except ValueError:
+            return jsonify({"status": "error", "message": "PAN API returned invalid JSON"}), 502
+
+        # Return the API payload without guessing its schema; the UI renders known fields.
+        return jsonify({"status": "success", "ok": api_data.get("ok", True), "data": api_data})
+    except requests.exceptions.Timeout:
+        return jsonify({"status": "error", "message": "PAN API timeout"}), 504
+    except requests.exceptions.RequestException:
+        return jsonify({"status": "error", "message": "Could not reach PAN API"}), 502
+    except Exception:
+        app.logger.exception("PAN lookup failed")
+        return jsonify({"status": "error", "message": "Server error while processing PAN request"}), 500
 
 # ============================================
 # MAIN: RUN SERVER
