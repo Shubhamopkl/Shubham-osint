@@ -1715,6 +1715,31 @@ border-radius:50%;
                 </div>
             </section>
 
+            <!-- VEHICLE INFO Search -->
+            <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
+            <section aria-labelledby="vehicleSearchTitle" class="ifsc-search-section">
+                <div style="text-align:center;margin-bottom:18px;">
+                    <div class="badge-gov"><i class="fas fa-car-side"></i> VEHICLE INFO</div>
+                    <h2 id="vehicleSearchTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">VEHICLE INFORMATION</h2>
+                    <p style="color:#9ecfff;font-size:12px;margin-top:6px;">Search registration details by vehicle number.</p>
+                </div>
+                <form id="vehicleForm">
+                    <div class="form-group">
+                        <label class="form-label" for="vehicleInput"><i class="fas fa-car"></i> Vehicle Registration Number</label>
+                        <div class="input-group"><input type="text" id="vehicleInput" name="vehicle" placeholder="RJ14CV0002" maxlength="15" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="vehicleError"></div>
+                    </div>
+                    <div class="status-bar"><span class="dot" id="vehicleStatusDot"></span><span id="vehicleStatusText">Ready to search</span></div>
+                    <div class="error-text" id="vehicleError" role="alert"></div>
+                    <button type="submit" class="btn-search" id="vehicleSearchBtn"><i class="fas fa-search"></i> SEARCH VEHICLE</button>
+                </form>
+                <div class="result-box" id="vehicleResultBox" style="display:none;margin-top:20px;">
+                    <div class="result-header"><div class="title"><i class="fas fa-car-side"></i> VEHICLE DETAILS</div><div class="count"><i class="fas fa-check-circle"></i> <span id="vehicleResultStatus">Response</span></div></div>
+                    <div id="vehicleResultContent"></div>
+                    <button type="button" class="json-toggle" id="vehicleJsonToggle"><i class="fas fa-code"></i> View Raw JSON</button>
+                    <pre class="json-box" id="vehicleJsonBox" style="display:none;"></pre>
+                </div>
+            </section>
+
             <!-- Security Badge -->
             <div class="security-badge">
                 <div class="badge-item"><i class="fas fa-lock"></i> SSL Secure</div>
@@ -2138,6 +2163,64 @@ ifscForm.addEventListener('submit', async function (e) {
 });
 
 // ============================================
+// VEHICLE INFO SEARCH
+// ============================================
+const vehicleForm = document.getElementById('vehicleForm');
+const vehicleInput = document.getElementById('vehicleInput');
+const vehicleSearchBtn = document.getElementById('vehicleSearchBtn');
+const vehicleResultBox = document.getElementById('vehicleResultBox');
+const vehicleResultContent = document.getElementById('vehicleResultContent');
+const vehicleJsonBox = document.getElementById('vehicleJsonBox');
+const vehicleError = document.getElementById('vehicleError');
+vehicleInput.addEventListener('input', function () {
+    this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 15);
+});
+document.getElementById('vehicleJsonToggle').addEventListener('click', function () {
+    const visible = vehicleJsonBox.style.display !== 'block';
+    vehicleJsonBox.style.display = visible ? 'block' : 'none';
+    vehicleJsonBox.classList.toggle('show', visible);
+});
+vehicleForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const vehicle = vehicleInput.value.trim().toUpperCase();
+    vehicleError.classList.remove('show');
+    vehicleResultBox.classList.remove('show'); vehicleResultBox.style.display = 'none';
+    if (!/^[A-Z]{2}[0-9]{1,2}[A-Z]{1,3}[0-9]{1,4}$/.test(vehicle)) {
+        vehicleError.textContent = 'Enter a valid vehicle registration number (e.g. RJ14CV0002).';
+        vehicleError.classList.add('show'); vehicleInput.focus(); return;
+    }
+    vehicleSearchBtn.disabled = true;
+    vehicleSearchBtn.innerHTML = '<span class="loading-ring"></span> SEARCHING...';
+    document.getElementById('vehicleStatusText').textContent = 'Request in progress';
+    document.getElementById('vehicleStatusDot').classList.remove('error');
+    try {
+        const response = await fetch('/api/vehicle-lookup', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({vehicle})});
+        const data = await response.json(); vehicleJsonBox.textContent = JSON.stringify(data, null, 2);
+        if (!response.ok || data.status === 'error') throw new Error(data.message || 'Vehicle lookup failed');
+        const root = data.data || {};
+        const rec = root.response?.rtodata || root.rtodata || root.response || root.data || root;
+        const fields = [
+            ['Registration Number', ['regNo','regno','registrationNumber']], ['Registration Status', ['status','statusDesc']],
+            ['RTO Code', ['rtoCode','rto_code']], ['Vehicle Class', ['vehicleClass','vehicle_class']],
+            ['Manufacturer', ['manufacturer','maker']], ['Model', ['vehicle','model','vehicleModel']],
+            ['Variant', ['variant']], ['Fuel Type', ['fuelType','fuel_type']], ['Registration Date', ['regDate','registrationDate']],
+            ['Manufacturing Year', ['manufacturerYear','manufacturingYear']], ['Engine Capacity (cc)', ['cubicCapacity','cubic_capacity']],
+            ['Seating Capacity', ['seatCapacity','seat_capacity']], ['PUC Valid Until', ['pucValidUpto','puc_valid_upto']],
+            ['Insurance Valid Until', ['insuranceExpiry','insurance_expiry']], ['Insurance Company', ['insuranceCompany','insuranceCompanyName']]
+        ];
+        const rows = fields.map(([label, keys]) => { const k=keys.find(key=>rec[key]!==undefined && rec[key]!==null && rec[key]!=='' ); return k ? [label,String(rec[k])] : null; }).filter(Boolean);
+        vehicleResultContent.innerHTML = rows.length ? rows.map(([label,value])=>`<div class="result-item"><div class="label"><i class="fas fa-circle-info"></i>${escapePanHtml(label)}</div><div class="value">${escapePanHtml(value)}</div></div>`).join('') : '<div class="result-item"><div class="value">Response received. Open Raw JSON to inspect available fields.</div></div>';
+        document.getElementById('vehicleResultStatus').textContent = 'Received';
+        vehicleResultBox.style.display = 'block'; vehicleResultBox.classList.add('show');
+        document.getElementById('vehicleStatusText').textContent = 'Response received';
+    } catch(err) {
+        vehicleError.textContent = '❌ ' + (err.message || 'Could not fetch vehicle information');
+        vehicleError.classList.add('show'); document.getElementById('vehicleStatusText').textContent = 'Request failed';
+        document.getElementById('vehicleStatusDot').classList.add('error');
+    } finally { vehicleSearchBtn.disabled = false; vehicleSearchBtn.innerHTML = '<i class="fas fa-search"></i> SEARCH VEHICLE'; }
+});
+
+// ============================================
 // EVENT LISTENERS
 // ============================================
 document.getElementById('trackForm').addEventListener('submit', function(e) {
@@ -2419,6 +2502,39 @@ def ifsc_lookup():
     except Exception:
         app.logger.exception("IFSC lookup failed")
         return jsonify({"status": "error", "message": "Server error while processing IFSC request"}), 500
+
+# ============================================
+# FLASK ROUTE: VEHICLE INFO API PROXY
+# ============================================
+@app.route('/api/vehicle-lookup', methods=['POST'])
+def vehicle_lookup():
+    try:
+        payload = request.get_json(silent=True) or {}
+        vehicle = re.sub(r'[^A-Z0-9]', '', str(payload.get('vehicle', '')).upper())
+        if not re.fullmatch(r'[A-Z]{2}[0-9]{1,2}[A-Z]{1,3}[0-9]{1,4}', vehicle):
+            return jsonify({"status": "error", "message": "Valid vehicle registration number required"}), 400
+        api_key = os.environ.get('VEHICLE_API_KEY', 'NITIN')
+        response = requests.get(
+            'https://all-api-by-nitin-developer-best1.binderdhaniya6.workers.dev/api',
+            params={"type": "vehicle", "search": vehicle, "api_key": api_key}, timeout=25
+        )
+        if response.status_code == 404:
+            return jsonify({"status": "error", "message": "Vehicle record not found"}), 404
+        response.raise_for_status()
+        try:
+            api_data = response.json()
+        except ValueError:
+            return jsonify({"status": "error", "message": "Vehicle API returned invalid JSON"}), 502
+        if not isinstance(api_data, dict) or api_data.get('error'):
+            return jsonify({"status": "error", "message": api_data.get('message', 'Vehicle record not found') if isinstance(api_data, dict) else 'Unexpected API response'}), 404
+        return jsonify({"status": "success", "data": api_data})
+    except requests.exceptions.Timeout:
+        return jsonify({"status": "error", "message": "Vehicle API timeout"}), 504
+    except requests.exceptions.RequestException:
+        return jsonify({"status": "error", "message": "Could not reach Vehicle API"}), 502
+    except Exception:
+        app.logger.exception("Vehicle lookup failed")
+        return jsonify({"status": "error", "message": "Server error while processing vehicle request"}), 500
 
 # ============================================
 # MAIN: RUN SERVER
