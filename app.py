@@ -1715,31 +1715,6 @@ border-radius:50%;
                 </div>
             </section>
 
-            <!-- VEHICLE INFO Search -->
-            <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
-            <section aria-labelledby="vehicleSearchTitle" class="ifsc-search-section">
-                <div style="text-align:center;margin-bottom:18px;">
-                    <div class="badge-gov"><i class="fas fa-car-side"></i> VEHICLE INFO</div>
-                    <h2 id="vehicleSearchTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">VEHICLE INFORMATION</h2>
-                    <p style="color:#9ecfff;font-size:12px;margin-top:6px;">Search registration details by vehicle number.</p>
-                </div>
-                <form id="vehicleForm">
-                    <div class="form-group">
-                        <label class="form-label" for="vehicleInput"><i class="fas fa-car"></i> Vehicle Registration Number</label>
-                        <div class="input-group"><input type="text" id="vehicleInput" name="vehicle" placeholder="RJ14CV0002" maxlength="15" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="vehicleError"></div>
-                    </div>
-                    <div class="status-bar"><span class="dot" id="vehicleStatusDot"></span><span id="vehicleStatusText">Ready to search</span></div>
-                    <div class="error-text" id="vehicleError" role="alert"></div>
-                    <button type="submit" class="btn-search" id="vehicleSearchBtn"><i class="fas fa-search"></i> SEARCH VEHICLE</button>
-                </form>
-                <div class="result-box" id="vehicleResultBox" style="display:none;margin-top:20px;">
-                    <div class="result-header"><div class="title"><i class="fas fa-car-side"></i> VEHICLE DETAILS</div><div class="count"><i class="fas fa-check-circle"></i> <span id="vehicleResultStatus">Response</span></div></div>
-                    <div id="vehicleResultContent"></div>
-                    <button type="button" class="json-toggle" id="vehicleJsonToggle"><i class="fas fa-code"></i> View Raw JSON</button>
-                    <pre class="json-box" id="vehicleJsonBox" style="display:none;"></pre>
-                </div>
-            </section>
-
             <!-- Security Badge -->
             <div class="security-badge">
                 <div class="badge-item"><i class="fas fa-lock"></i> SSL Secure</div>
@@ -2163,64 +2138,6 @@ ifscForm.addEventListener('submit', async function (e) {
 });
 
 // ============================================
-// VEHICLE INFO SEARCH
-// ============================================
-const vehicleForm = document.getElementById('vehicleForm');
-const vehicleInput = document.getElementById('vehicleInput');
-const vehicleSearchBtn = document.getElementById('vehicleSearchBtn');
-const vehicleResultBox = document.getElementById('vehicleResultBox');
-const vehicleResultContent = document.getElementById('vehicleResultContent');
-const vehicleJsonBox = document.getElementById('vehicleJsonBox');
-const vehicleError = document.getElementById('vehicleError');
-vehicleInput.addEventListener('input', function () {
-    this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 15);
-});
-document.getElementById('vehicleJsonToggle').addEventListener('click', function () {
-    const visible = vehicleJsonBox.style.display !== 'block';
-    vehicleJsonBox.style.display = visible ? 'block' : 'none';
-    vehicleJsonBox.classList.toggle('show', visible);
-});
-vehicleForm.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const vehicle = vehicleInput.value.trim().toUpperCase();
-    vehicleError.classList.remove('show');
-    vehicleResultBox.classList.remove('show'); vehicleResultBox.style.display = 'none';
-    if (!/^[A-Z]{2}[0-9]{1,2}[A-Z]{1,3}[0-9]{1,4}$/.test(vehicle)) {
-        vehicleError.textContent = 'Enter a valid vehicle registration number (e.g. RJ14CV0002).';
-        vehicleError.classList.add('show'); vehicleInput.focus(); return;
-    }
-    vehicleSearchBtn.disabled = true;
-    vehicleSearchBtn.innerHTML = '<span class="loading-ring"></span> SEARCHING...';
-    document.getElementById('vehicleStatusText').textContent = 'Request in progress';
-    document.getElementById('vehicleStatusDot').classList.remove('error');
-    try {
-        const response = await fetch('/api/vehicle-lookup', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({vehicle})});
-        const data = await response.json(); vehicleJsonBox.textContent = JSON.stringify(data, null, 2);
-        if (!response.ok || data.status === 'error') throw new Error(data.message || 'Vehicle lookup failed');
-        const root = data.data || {};
-        const rec = root.response?.rtodata || root.rtodata || root.response || root.data || root;
-        const fields = [
-            ['Registration Number', ['regNo','regno','registrationNumber']], ['Registration Status', ['status','statusDesc']],
-            ['RTO Code', ['rtoCode','rto_code']], ['Vehicle Class', ['vehicleClass','vehicle_class']],
-            ['Manufacturer', ['manufacturer','maker']], ['Model', ['vehicle','model','vehicleModel']],
-            ['Variant', ['variant']], ['Fuel Type', ['fuelType','fuel_type']], ['Registration Date', ['regDate','registrationDate']],
-            ['Manufacturing Year', ['manufacturerYear','manufacturingYear']], ['Engine Capacity (cc)', ['cubicCapacity','cubic_capacity']],
-            ['Seating Capacity', ['seatCapacity','seat_capacity']], ['PUC Valid Until', ['pucValidUpto','puc_valid_upto']],
-            ['Insurance Valid Until', ['insuranceExpiry','insurance_expiry']], ['Insurance Company', ['insuranceCompany','insuranceCompanyName']]
-        ];
-        const rows = fields.map(([label, keys]) => { const k=keys.find(key=>rec[key]!==undefined && rec[key]!==null && rec[key]!=='' ); return k ? [label,String(rec[k])] : null; }).filter(Boolean);
-        vehicleResultContent.innerHTML = rows.length ? rows.map(([label,value])=>`<div class="result-item"><div class="label"><i class="fas fa-circle-info"></i>${escapePanHtml(label)}</div><div class="value">${escapePanHtml(value)}</div></div>`).join('') : '<div class="result-item"><div class="value">Response received. Open Raw JSON to inspect available fields.</div></div>';
-        document.getElementById('vehicleResultStatus').textContent = 'Received';
-        vehicleResultBox.style.display = 'block'; vehicleResultBox.classList.add('show');
-        document.getElementById('vehicleStatusText').textContent = 'Response received';
-    } catch(err) {
-        vehicleError.textContent = '❌ ' + (err.message || 'Could not fetch vehicle information');
-        vehicleError.classList.add('show'); document.getElementById('vehicleStatusText').textContent = 'Request failed';
-        document.getElementById('vehicleStatusDot').classList.add('error');
-    } finally { vehicleSearchBtn.disabled = false; vehicleSearchBtn.innerHTML = '<i class="fas fa-search"></i> SEARCH VEHICLE'; }
-});
-
-// ============================================
 // EVENT LISTENERS
 // ============================================
 document.getElementById('trackForm').addEventListener('submit', function(e) {
@@ -2369,6 +2286,92 @@ document.addEventListener("DOMContentLoaded",()=>{
 
 
 <div class="cyber-node"></div>
+
+<!-- WEATHER INFORMATION SEARCH -->
+<div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
+<section class="weather-search-section" aria-labelledby="weatherSearchTitle" style="max-width:900px;margin:24px auto;padding:22px;border:1px solid rgba(0,217,255,.25);border-radius:18px;background:rgba(10,20,35,.72);color:#eaf6ff;">
+  <div style="text-align:center;margin-bottom:18px;">
+    <div class="badge-gov"><i class="fas fa-cloud-sun"></i> WEATHER INFO</div>
+    <h2 id="weatherSearchTitle" style="margin:12px 0 6px;">Weather Information</h2>
+    <p style="opacity:.75;margin:0;">City ke naam se current weather aur forecast dekhein</p>
+  </div>
+  <form id="weatherSearchForm" style="display:flex;gap:10px;flex-wrap:wrap;">
+    <input id="weatherCityInput" type="text" maxlength="100" placeholder="City name (e.g. Delhi)" required
+      style="flex:1;min-width:180px;padding:13px 14px;border-radius:10px;border:1px solid rgba(0,217,255,.35);background:#101a28;color:#fff;">
+    <button type="submit" id="weatherSearchBtn" style="padding:12px 20px;border:0;border-radius:10px;background:#00b8d9;color:#06111c;font-weight:700;cursor:pointer;">
+      <i class="fas fa-search"></i> Search Weather
+    </button>
+  </form>
+  <p id="weatherStatus" role="status" style="margin:14px 0 0;opacity:.85;"></p>
+  <div id="weatherResult" style="display:none;margin-top:18px;"></div>
+  <details style="margin-top:14px;"><summary style="cursor:pointer;">Raw JSON Response</summary>
+    <pre id="weatherJsonBox" class="json-box" style="display:none;white-space:pre-wrap;overflow-wrap:anywhere;max-height:380px;overflow:auto;"></pre>
+  </details>
+</section>
+<script>
+(function(){
+  const form = document.getElementById('weatherSearchForm');
+  if (!form) return;
+  const input = document.getElementById('weatherCityInput');
+  const status = document.getElementById('weatherStatus');
+  const result = document.getElementById('weatherResult');
+  const raw = document.getElementById('weatherJsonBox');
+  const btn = document.getElementById('weatherSearchBtn');
+  const safe = v => (v === undefined || v === null || v === '') ? 'N/A' : String(v);
+  const card = (label, value) => `<div style="padding:13px;border:1px solid rgba(0,217,255,.18);border-radius:12px;background:rgba(255,255,255,.035);"><div style="font-size:12px;opacity:.7;margin-bottom:5px;">${label}</div><div style="font-weight:700;overflow-wrap:anywhere;">${safe(value)}</div></div>`;
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    const city = input.value.trim();
+    if (!city) return;
+    status.textContent = 'Weather data load ho raha hai…';
+    result.style.display = 'none'; raw.style.display = 'none'; btn.disabled = true;
+    try {
+      const response = await fetch('/api/weather-lookup', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({city})
+      });
+      const payload = await response.json();
+      raw.textContent = JSON.stringify(payload, null, 2);
+      raw.style.display = 'block';
+      if (!response.ok || payload.status === 'error') throw new Error(payload.message || 'Weather lookup failed');
+      const root = payload.data || {};
+      const d = root.data || root;
+      const loc = d.location || {};
+      const current = d.current || d.weather || {};
+      const temp = current.temperature || current.temp_c || current.temp || {};
+      const wind = current.wind || {};
+      const humidity = current.humidity ?? current.humidity_percent;
+      const tempVal = (typeof temp === 'object') ? (temp.actual_c ?? temp.current_c ?? temp.celsius ?? temp.value ?? temp.max_c) : temp;
+      const feels = (typeof temp === 'object') ? (temp.feels_like_c ?? temp.feels_like ?? temp.feels_like_c) : (current.feels_like_c ?? current.feels_like);
+      const forecast = Array.isArray(d.forecast) ? d.forecast : (d.forecast && Array.isArray(d.forecast.daily) ? d.forecast.daily : []);
+      const cards = [
+        card('Location', loc.name || d.city || d.searched || city),
+        card('Country / Region', [loc.country, loc.region || loc.state].filter(Boolean).join(' / ') || d.country),
+        card('Temperature (°C)', tempVal ?? current.actual_c ?? current.temperature_c),
+        card('Feels Like (°C)', feels),
+        card('Condition', current.condition?.text || current.condition || current.description || current.weather_description),
+        card('Humidity', humidity !== undefined ? `${humidity}%` : undefined),
+        card('Wind Speed (km/h)', wind.speed_kmh ?? wind.speed_kph ?? current.wind_speed_kmh),
+        card('Wind Direction', wind.direction_label || wind.direction || current.wind_direction),
+        card('UV Index', d.uv_index?.uv_index ?? d.uv_index?.value ?? d.uv_index),
+        card('Air Quality Index', d.air_quality?.us_aqi ?? d.air_quality?.aqi ?? d.air_quality?.index),
+        card('Sunrise', current.sunrise || d.sun?.sunrise),
+        card('Sunset', current.sunset || d.sun?.sunset)
+      ];
+      let forecastHtml = '';
+      if (forecast.length) {
+        forecastHtml = `<h3 style="margin:20px 0 10px;">Forecast</h3><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">` +
+          forecast.slice(0,7).map(day => card(day.date || 'Forecast', `${day.weather?.description || day.weather?.text || ''} · ${day.temperature?.max_c ?? day.temperature?.max ?? day.max_c ?? 'N/A'}° / ${day.temperature?.min_c ?? day.temperature?.min ?? day.min_c ?? 'N/A'}°C`)).join('') + '</div>';
+      }
+      result.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;">${cards.join('')}</div>${forecastHtml}`;
+      result.style.display = 'block';
+      status.textContent = 'Weather information loaded.';
+    } catch(err) {
+      status.textContent = err.message || 'Weather data fetch nahi ho saka.';
+    } finally { btn.disabled = false; }
+  });
+})();
+</script>
+
 </body>
 </html>
 '''
@@ -2503,38 +2506,37 @@ def ifsc_lookup():
         app.logger.exception("IFSC lookup failed")
         return jsonify({"status": "error", "message": "Server error while processing IFSC request"}), 500
 
+
 # ============================================
-# FLASK ROUTE: VEHICLE INFO API PROXY
+# FLASK ROUTE: WEATHER INFO API PROXY
 # ============================================
-@app.route('/api/vehicle-lookup', methods=['POST'])
-def vehicle_lookup():
+@app.route('/api/weather-lookup', methods=['POST'])
+def weather_lookup():
     try:
         payload = request.get_json(silent=True) or {}
-        vehicle = re.sub(r'[^A-Z0-9]', '', str(payload.get('vehicle', '')).upper())
-        if not re.fullmatch(r'[A-Z]{2}[0-9]{1,2}[A-Z]{1,3}[0-9]{1,4}', vehicle):
-            return jsonify({"status": "error", "message": "Valid vehicle registration number required"}), 400
-        api_key = os.environ.get('VEHICLE_API_KEY', 'NITIN')
+        city = str(payload.get('city', '')).strip()
+        if not city or len(city) > 100:
+            return jsonify({"status": "error", "message": "Enter a valid city name"}), 400
         response = requests.get(
-            'https://all-api-by-nitin-developer-best1.binderdhaniya6.workers.dev/api',
-            params={"type": "vehicle", "search": vehicle, "api_key": api_key}, timeout=25
+            "https://nitin-wather-check-api.vercel.app/api",
+            params={"type": "weather", "search": city},
+            timeout=20,
         )
-        if response.status_code == 404:
-            return jsonify({"status": "error", "message": "Vehicle record not found"}), 404
         response.raise_for_status()
         try:
             api_data = response.json()
         except ValueError:
-            return jsonify({"status": "error", "message": "Vehicle API returned invalid JSON"}), 502
-        if not isinstance(api_data, dict) or api_data.get('error'):
-            return jsonify({"status": "error", "message": api_data.get('message', 'Vehicle record not found') if isinstance(api_data, dict) else 'Unexpected API response'}), 404
+            return jsonify({"status": "error", "message": "Weather API returned invalid JSON"}), 502
+        if isinstance(api_data, dict) and api_data.get("success") is False:
+            return jsonify({"status": "error", "message": api_data.get("message", "Weather data not found")}), 404
         return jsonify({"status": "success", "data": api_data})
     except requests.exceptions.Timeout:
-        return jsonify({"status": "error", "message": "Vehicle API timeout"}), 504
+        return jsonify({"status": "error", "message": "Weather API timeout"}), 504
     except requests.exceptions.RequestException:
-        return jsonify({"status": "error", "message": "Could not reach Vehicle API"}), 502
+        return jsonify({"status": "error", "message": "Could not reach Weather API"}), 502
     except Exception:
-        app.logger.exception("Vehicle lookup failed")
-        return jsonify({"status": "error", "message": "Server error while processing vehicle request"}), 500
+        app.logger.exception("Weather lookup failed")
+        return jsonify({"status": "error", "message": "Server error while processing weather request"}), 500
 
 # ============================================
 # MAIN: RUN SERVER
