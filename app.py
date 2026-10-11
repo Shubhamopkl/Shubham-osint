@@ -1661,6 +1661,12 @@ border-radius:50%;
                 <div id="resultContent"></div>
             </div>
 
+            <!-- Number Info JSON directly under Number Info results -->
+            <button class="json-toggle" onclick="toggleJson()">
+                <i class="fas fa-code"></i> View Raw Data (JSON)
+            </button>
+            <div class="json-box" id="jsonBox"></div>
+
             <!-- PAN Search -->
             <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
             <section aria-labelledby="panSearchTitle" class="pan-search-section">
@@ -1743,11 +1749,6 @@ border-radius:50%;
             </div>
 
             <!-- JSON Toggle -->
-            <button class="json-toggle" onclick="toggleJson()">
-                <i class="fas fa-code"></i> View Raw Data (JSON)
-            </button>
-
-            <div class="json-box" id="jsonBox"></div>
 
         </div>
     </div>
