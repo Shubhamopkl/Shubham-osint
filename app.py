@@ -1721,6 +1721,31 @@ border-radius:50%;
                 </div>
             </section>
 
+            <!-- SONG SEARCH / AUTHORIZED DOWNLOADS -->
+            <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
+            <section aria-labelledby="songSearchTitle" class="song-search-section">
+                <div style="text-align:center;margin-bottom:18px;">
+                    <div class="badge-gov"><i class="fas fa-music"></i> SONG SEARCH</div>
+                    <h2 id="songSearchTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">SONG SEARCH & DOWNLOAD</h2>
+                    <p style="color:#9ecfff;font-size:12px;margin-top:6px;">Search tracks and use download links provided by the service when authorized.</p>
+                </div>
+                <form id="songForm">
+                    <div class="form-group">
+                        <label class="form-label" for="songInput"><i class="fas fa-music"></i> Enter Song Name</label>
+                        <div class="input-group">
+                            <input type="text" id="songInput" name="song" placeholder="Kamar me dagi" maxlength="180" autocomplete="off" aria-describedby="songError">
+                        </div>
+                    </div>
+                    <div class="status-bar"><span class="dot" id="songStatusDot"></span><span id="songStatusText">Ready to search</span></div>
+                    <div class="error-text" id="songError" role="alert"></div>
+                    <button type="submit" class="btn-search" id="songSearchBtn"><i class="fas fa-search"></i> SEARCH SONG</button>
+                </form>
+                <div class="result-box" id="songResultBox" style="display:none;margin-top:20px;">
+                    <div class="result-header"><div class="title"><i class="fas fa-music"></i> SONG RESULTS</div><div class="count"><i class="fas fa-check-circle"></i> <span id="songResultStatus">Response</span></div></div>
+                    <div id="songResultContent"></div>
+                </div>
+            </section>
+
             <!-- Security Badge -->
             <div class="security-badge">
                 <div class="badge-item"><i class="fas fa-lock"></i> SSL Secure</div>
@@ -2139,6 +2164,85 @@ ifscForm.addEventListener('submit', async function (e) {
 });
 
 // ============================================
+// SONG SEARCH (server-side API proxy)
+// ============================================
+const songForm = document.getElementById('songForm');
+const songInput = document.getElementById('songInput');
+const songSearchBtn = document.getElementById('songSearchBtn');
+const songResultBox = document.getElementById('songResultBox');
+const songResultContent = document.getElementById('songResultContent');
+const songError = document.getElementById('songError');
+
+songForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const song = songInput.value.trim();
+    songError.classList.remove('show');
+    songResultBox.classList.remove('show');
+    songResultBox.style.display = 'none';
+    if (song.length < 2) {
+        songError.textContent = 'Enter at least 2 characters for the song name.';
+        songError.classList.add('show');
+        songInput.focus();
+        return;
+    }
+    songSearchBtn.disabled = true;
+    songSearchBtn.innerHTML = '<span class="loading-ring"></span> SEARCHING...';
+    document.getElementById('songStatusText').textContent = 'Searching songs...';
+    document.getElementById('songStatusDot').classList.remove('error');
+    try {
+        const response = await fetch('/api/song-search', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({song})
+        });
+        const data = await response.json();
+        if (!response.ok || data.status === 'error') throw new Error(data.message || 'Song search failed');
+
+        const payload = data.data;
+        let items = Array.isArray(payload) ? payload : null;
+        if (!items && payload && typeof payload === 'object') {
+            for (const key of ['results', 'songs', 'data', 'items', 'tracks']) {
+                if (Array.isArray(payload[key])) { items = payload[key]; break; }
+            }
+        }
+        if (!items) items = (payload && typeof payload === 'object') ? [payload] : [];
+        const getVal = (obj, keys) => {
+            for (const key of keys) if (obj && obj[key] !== undefined && obj[key] !== null && obj[key] !== '') return obj[key];
+            return '';
+        };
+        const safeUrl = value => {
+            try { const u = new URL(String(value)); return ['https:', 'http:'].includes(u.protocol) ? u.href : ''; }
+            catch (_) { return ''; }
+        };
+        const cards = items.map((item, index) => {
+            if (!item || typeof item !== 'object') return '';
+            const title = getVal(item, ['title', 'song', 'name', 'song_name', 'track']) || `Song result ${index + 1}`;
+            const artist = getVal(item, ['artist', 'singer', 'album', 'author', 'subtitle']);
+            const downloadUrl = safeUrl(getVal(item, ['download_url', 'downloadUrl', 'download', 'download_link', 'url', 'link', 'audio_url', 'audioUrl']));
+            const imageUrl = safeUrl(getVal(item, ['image', 'thumbnail', 'cover', 'artwork']));
+            return `<div style="padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;gap:12px;align-items:center;">
+                ${imageUrl ? `<img src="${escapePanHtml(imageUrl)}" alt="" style="width:54px;height:54px;object-fit:cover;border-radius:8px;pointer-events:auto;">` : '<i class="fas fa-compact-disc" style="font-size:28px;color:#00d9ff;"></i>'}
+                <div style="flex:1;min-width:0;"><div style="color:#fff;font-weight:700;overflow-wrap:anywhere;">${escapePanHtml(String(title))}</div>
+                ${artist ? `<div style="color:#9ecfff;font-size:12px;margin-top:5px;">${escapePanHtml(String(artist))}</div>` : ''}
+                ${downloadUrl ? `<a href="${escapePanHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer" class="btn-search" style="display:inline-flex;width:auto;padding:9px 14px;margin-top:10px;text-decoration:none;font-size:12px;letter-spacing:.4px;"><i class="fas fa-download"></i> OPEN DOWNLOAD</a>` : '<div style="color:#888;font-size:11px;margin-top:8px;">No direct download link was provided for this result.</div>'}
+                </div></div>`;
+        }).filter(Boolean).join('');
+        songResultContent.innerHTML = cards || '<div class="result-item"><div class="value" style="width:100%;text-align:left;">Search completed, but no song result cards were available.</div></div>';
+        document.getElementById('songResultStatus').textContent = items.length + ' result(s)';
+        songResultBox.style.display = 'block';
+        songResultBox.classList.add('show');
+        document.getElementById('songStatusText').textContent = 'Search completed';
+    } catch (err) {
+        songError.textContent = '❌ ' + (err.message || 'Could not search songs');
+        songError.classList.add('show');
+        document.getElementById('songStatusText').textContent = 'Search failed';
+        document.getElementById('songStatusDot').classList.add('error');
+    } finally {
+        songSearchBtn.disabled = false;
+        songSearchBtn.innerHTML = '<i class="fas fa-search"></i> SEARCH SONG';
+    }
+});
+
+// ============================================
 // EVENT LISTENERS
 // ============================================
 document.getElementById('trackForm').addEventListener('submit', function(e) {
@@ -2393,6 +2497,35 @@ def pan_lookup():
 # ============================================
 # FLASK ROUTE: IFSC INFO API PROXY
 # ============================================
+@app.route('/api/song-search', methods=['POST'])
+def song_search():
+    try:
+        payload = request.get_json(silent=True) or {}
+        song = str(payload.get('song', '')).strip()
+        if len(song) < 2 or len(song) > 180:
+            return jsonify({"status": "error", "message": "Song name must be 2-180 characters"}), 400
+        response = requests.get(
+            "https://song-downloader-three.vercel.app/search",
+            params={"song": song},
+            timeout=25,
+        )
+        if response.status_code == 404:
+            return jsonify({"status": "error", "message": "No song results found"}), 404
+        response.raise_for_status()
+        try:
+            api_data = response.json()
+        except ValueError:
+            return jsonify({"status": "error", "message": "Song API returned invalid JSON"}), 502
+        return jsonify({"status": "success", "data": api_data})
+    except requests.exceptions.Timeout:
+        return jsonify({"status": "error", "message": "Song API timeout"}), 504
+    except requests.exceptions.RequestException:
+        return jsonify({"status": "error", "message": "Could not reach song search API"}), 502
+    except Exception:
+        app.logger.exception("Song search failed")
+        return jsonify({"status": "error", "message": "Server error while searching songs"}), 500
+
+
 @app.route('/api/ifsc-lookup', methods=['POST'])
 def ifsc_lookup():
     try:
