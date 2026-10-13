@@ -19,7 +19,7 @@ app = Flask(__name__)
 # ============================================
 # API CONFIGURATION
 # ============================================
-API_BASE_URL = "https://osint-apis-hub.onrender.com/api/num-info?key=1week&q="
+API_BASE_URL = "https://osint-apis-hub.onrender.com/api/num-info"
 API_KEY = os.environ.get("PHONE_API_KEY", "napi_9jgctjUU042SKuzhsiFrb9ha3pzwufCHzwqZsw")
 PAN_API_URL = "https://orissosint-pan.antideploy.app/pan"
 PAN_API_KEY = os.environ.get("PAN_API_KEY", "WKM")
@@ -2546,8 +2546,8 @@ def lookup():
         
         # Call API using only the entered number.
         response = requests.get(
-            f"{API_BASE_URL}{clean_number}",
-            params={"key": API_KEY},
+            API_BASE_URL,
+            params={"key": "1week", "q": clean_number},
             timeout=30
         )
         response.raise_for_status()
