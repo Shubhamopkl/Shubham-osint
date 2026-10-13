@@ -2534,59 +2534,102 @@ def home():
 # ============================================
 @app.route('/api/lookup', methods=['POST'])
 def lookup():
+    """Proxy the configured number-info API and normalize common JSON formats."""
     try:
-        data = request.get_json()
-        number = data.get('number', '').strip()
-        
-        if not number:
-            return jsonify({"status": "error", "message": "Phone number required"})
-        
-        # Clean number
-        clean_number = re.sub(r'[\+\s\-]', '', number)
-        
-        # Call API using only the entered number.
+        data = request.get_json(silent=True) or {}
+        number = str(data.get('number', '')).strip()
+        clean_number = re.sub(r'\D', '', number)
+
+        # This endpoint expects a 10-digit number in q and the subscription key in key.
+        if not re.fullmatch(r'\d{10}', clean_number):
+            return jsonify({"status": "error", "message": "Enter a valid 10-digit phone number.", "result": []}), 400
+
         response = requests.get(
             API_BASE_URL,
             params={"key": "1week", "q": clean_number},
-            timeout=30
+            headers={"Accept": "application/json"},
+            timeout=(5, 25)
         )
-        response.raise_for_status()
-        
-        api_data = response.json()
-        
-        # API returns: success=true and records inside `results`
-        if api_data.get('success') is True:
-            normalized_results = []
-            for item in api_data.get('results', []):
-                normalized_results.append({
-                    "num": item.get('mobile', ''),
-                    "name": item.get('name', ''),
-                    "fname": item.get('fname', ''),
-                    "address": item.get('address', ''),
-                    "circle": item.get('circle', ''),
-                    "alt": item.get('alt', ''),
-                    "email": item.get('email', ''),
-                    "id": str(item.get('id') or item.get('ID') or item.get('record_id') or item.get('aadhaar') or item.get('aadhaar_number') or '')
-                })
 
+        # Preserve a useful diagnostic without returning a large/non-JSON HTML page.
+        try:
+            api_data = response.json()
+        except ValueError:
             return jsonify({
-                "status": "success",
-                "result": normalized_results,
-                "count": len(normalized_results)
+                "status": "error",
+                "message": f"Number API returned non-JSON content (HTTP {response.status_code}). Check the API endpoint/service logs.",
+                "result": [],
+                "http_status": response.status_code
+            }), 502
+
+        if not response.ok:
+            message = api_data.get('message') if isinstance(api_data, dict) else None
+            return jsonify({
+                "status": "error",
+                "message": str(message or f"Number API HTTP {response.status_code}"),
+                "result": [],
+                "http_status": response.status_code
+            }), 502
+
+        # APIs commonly return rows under results, data, records, or result.
+        payload = api_data
+        if isinstance(api_data, dict):
+            for key in ('results', 'data', 'records', 'result', 'items'):
+                candidate = api_data.get(key)
+                if isinstance(candidate, (list, dict)):
+                    payload = candidate
+                    break
+
+        if isinstance(payload, dict):
+            # Some APIs wrap one record in an object instead of returning a list.
+            rows = [payload] if any(k in payload for k in ('mobile', 'phone', 'number', 'name', 'full_name')) else []
+        elif isinstance(payload, list):
+            rows = payload
+        else:
+            rows = []
+
+        normalized_results = []
+        for item in rows:
+            if not isinstance(item, dict):
+                continue
+            normalized_results.append({
+                "num": item.get('mobile') or item.get('phone') or item.get('number') or item.get('mobile_number') or '',
+                "name": item.get('name') or item.get('full_name') or item.get('customer_name') or '',
+                "fname": item.get('fname') or item.get('father_name') or item.get('fatherName') or '',
+                "address": item.get('address') or item.get('full_address') or '',
+                "circle": item.get('circle') or item.get('operator') or item.get('telecom_circle') or '',
+                "alt": item.get('alt') or item.get('alternate_number') or item.get('alternate_phone') or '',
+                "email": item.get('email') or '',
+                "id": str(item.get('id') or item.get('ID') or item.get('record_id') or '')
             })
 
-        return jsonify({
-            "status": "error",
-            "message": api_data.get('message', 'No data found'),
-            "result": []
-        })
-        
+        # Treat explicit API failure flags as errors even if a wrapper object exists.
+        if isinstance(api_data, dict):
+            api_status = str(api_data.get('status', '')).lower()
+            explicit_failure = api_data.get('success') is False or api_status in ('error', 'failed', 'failure')
+            if explicit_failure:
+                return jsonify({
+                    "status": "error",
+                    "message": str(api_data.get('message') or api_data.get('error') or 'Number API reported a failure.'),
+                    "result": []
+                })
+
+        if normalized_results:
+            return jsonify({"status": "success", "result": normalized_results, "count": len(normalized_results)})
+
+        message = 'API responded, but its JSON did not contain records in a recognized format.'
+        if isinstance(api_data, dict):
+            message = str(api_data.get('message') or api_data.get('error') or message)
+        return jsonify({"status": "error", "message": message, "result": [], "raw": api_data})
+
     except requests.exceptions.Timeout:
-        return jsonify({"status": "error", "message": "API timeout"})
+        return jsonify({"status": "error", "message": "Number API timed out. Try again shortly.", "result": []}), 504
     except requests.exceptions.RequestException as e:
-        return jsonify({"status": "error", "message": f"API error: {str(e)}"})
-    except Exception as e:
-        return jsonify({"status": "error", "message": f"Server error: {str(e)}"})
+        app.logger.warning("Number API request failed: %s", e)
+        return jsonify({"status": "error", "message": "Could not connect to the Number API. Check service availability and Render logs.", "result": []}), 502
+    except Exception:
+        app.logger.exception("Unexpected number lookup error")
+        return jsonify({"status": "error", "message": "Unexpected server error during number lookup.", "result": []}), 500
 
 # ============================================
 # FLASK ROUTE: PAN API PROXY
