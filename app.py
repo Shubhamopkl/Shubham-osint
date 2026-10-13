@@ -1721,6 +1721,33 @@ border-radius:50%;
                 </div>
             </section>
 
+            <!-- GST INFORMATION SEARCH -->
+            <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
+            <section aria-labelledby="gstSearchTitle" class="gst-search-section">
+                <div style="text-align:center;margin-bottom:18px;">
+                    <div class="badge-gov"><i class="fas fa-file-invoice"></i> GST INFORMATION</div>
+                    <h2 id="gstSearchTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">GST REGISTRATION DETAILS</h2>
+                    <p style="color:#9ecfff;font-size:12px;margin-top:6px;">Search GST registration details using a GSTIN.</p>
+                </div>
+                <form id="gstForm">
+                    <div class="form-group">
+                        <label class="form-label" for="gstInput"><i class="fas fa-file-invoice"></i> Enter 15-Character GSTIN</label>
+                        <div class="input-group">
+                            <input type="text" id="gstInput" name="gstin" placeholder="19BOKPS7056D1ZI" maxlength="15" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="gstError">
+                        </div>
+                    </div>
+                    <div class="status-bar"><span class="dot" id="gstStatusDot"></span><span id="gstStatusText">Ready to search</span></div>
+                    <div class="error-text" id="gstError" role="alert"></div>
+                    <button type="submit" class="btn-search" id="gstSearchBtn"><i class="fas fa-search"></i> SEARCH GST</button>
+                </form>
+                <div class="result-box" id="gstResultBox" style="display:none;margin-top:20px;">
+                    <div class="result-header"><div class="title"><i class="fas fa-file-invoice"></i> GST INFORMATION</div><div class="count"><i class="fas fa-check-circle"></i> <span id="gstResultStatus">Response</span></div></div>
+                    <div id="gstResultContent"></div>
+                    <button type="button" class="json-toggle" id="gstJsonToggle"><i class="fas fa-code"></i> View Raw JSON</button>
+                    <pre class="json-box" id="gstJsonBox" style="display:none;"></pre>
+                </div>
+            </section>
+
             <!-- SONG SEARCH / AUTHORIZED DOWNLOADS -->
             <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
             <section aria-labelledby="songSearchTitle" class="song-search-section">
@@ -2164,6 +2191,106 @@ ifscForm.addEventListener('submit', async function (e) {
 });
 
 // ============================================
+// GST INFORMATION SEARCH (server-side API proxy)
+// ============================================
+const gstForm = document.getElementById('gstForm');
+const gstInput = document.getElementById('gstInput');
+const gstSearchBtn = document.getElementById('gstSearchBtn');
+const gstResultBox = document.getElementById('gstResultBox');
+const gstResultContent = document.getElementById('gstResultContent');
+const gstJsonBox = document.getElementById('gstJsonBox');
+const gstError = document.getElementById('gstError');
+
+gstInput.addEventListener('input', function () {
+    this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 15);
+});
+document.getElementById('gstJsonToggle').addEventListener('click', function () {
+    const visible = gstJsonBox.style.display !== 'block';
+    gstJsonBox.style.display = visible ? 'block' : 'none';
+    gstJsonBox.classList.toggle('show', visible);
+});
+gstForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const gstin = gstInput.value.trim().toUpperCase();
+    gstError.classList.remove('show');
+    gstResultBox.classList.remove('show');
+    gstResultBox.style.display = 'none';
+    if (!/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(gstin)) {
+        gstError.textContent = 'Enter a valid 15-character GSTIN.';
+        gstError.classList.add('show');
+        gstInput.focus();
+        return;
+    }
+    gstSearchBtn.disabled = true;
+    gstSearchBtn.innerHTML = '<span class="loading-ring"></span> SEARCHING...';
+    document.getElementById('gstStatusText').textContent = 'Request in progress';
+    document.getElementById('gstStatusDot').classList.remove('error');
+    try {
+        const response = await fetch('/api/gst-lookup', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({gstin})
+        });
+        const data = await response.json();
+        gstJsonBox.textContent = JSON.stringify(data, null, 2);
+        if (!response.ok || data.status === 'error') throw new Error(data.message || 'GST request failed');
+
+        const payload = data.data || {};
+        const preferred = {
+            'GSTIN': ['gstin', 'gstinId', 'gst_number', 'gstNumber', 'GSTIN'],
+            'Legal Name': ['legalName', 'legal_name', 'lgnm', 'legal_name_of_business'],
+            'Trade Name': ['tradeName', 'trade_name', 'tradeNam', 'tradeNam'],
+            'Registration Status': ['status', 'sts', 'registrationStatus', 'registration_status'],
+            'Taxpayer Type': ['taxpayerType', 'taxpayer_type', 'dty'],
+            'Business Constitution': ['constitutionOfBusiness', 'constitution_of_business', 'ctb'],
+            'Date of Registration': ['dateOfRegistration', 'registrationDate', 'rgdt', 'registration_date'],
+            'Cancellation Date': ['cancellationDate', 'cxdt', 'cancellation_date'],
+            'Principal Address': ['principalAddress', 'principal_address', 'pradr', 'address'],
+            'State': ['state', 'stateName', 'state_name'],
+            'State Code': ['stateCode', 'state_code'],
+            'Nature of Business': ['natureOfBusiness', 'nature_of_business', 'nba'],
+            'Last Updated': ['lastUpdated', 'last_updated', 'updatedAt']
+        };
+        function gstFind(obj, keys) {
+            if (!obj || typeof obj !== 'object') return null;
+            for (const key of keys) {
+                if (Object.prototype.hasOwnProperty.call(obj, key) && obj[key] !== null && obj[key] !== '') return obj[key];
+            }
+            for (const value of Object.values(obj)) {
+                if (value && typeof value === 'object') {
+                    const found = gstFind(value, keys);
+                    if (found !== null) return found;
+                }
+            }
+            return null;
+        }
+        const fields = Object.entries(preferred).map(([label, keys]) => {
+            const value = gstFind(payload, keys);
+            return value !== null ? [label, value] : null;
+        }).filter(Boolean);
+        const renderValue = value => {
+            if (Array.isArray(value)) return value.map(v => typeof v === 'object' ? JSON.stringify(v) : String(v)).join(', ');
+            if (value && typeof value === 'object') return Object.entries(value).map(([k,v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : String(v)}`).join(' | ');
+            return String(value);
+        };
+        gstResultContent.innerHTML = fields.length ? fields.map(([label, value]) =>
+            `<div class="result-item"><div class="label"><i class="fas fa-circle-info"></i>${escapePanHtml(label)}</div><div class="value">${escapePanHtml(renderValue(value))}</div></div>`
+        ).join('') : '<div class="result-item"><div class="value" style="width:100%;text-align:left;">Response received. Open Raw JSON to inspect the available fields.</div></div>';
+        document.getElementById('gstResultStatus').textContent = 'Received';
+        gstResultBox.style.display = 'block';
+        gstResultBox.classList.add('show');
+        document.getElementById('gstStatusText').textContent = 'Response received';
+    } catch (err) {
+        gstError.textContent = '❌ ' + (err.message || 'Could not fetch GST response');
+        gstError.classList.add('show');
+        document.getElementById('gstStatusText').textContent = 'Request failed';
+        document.getElementById('gstStatusDot').classList.add('error');
+    } finally {
+        gstSearchBtn.disabled = false;
+        gstSearchBtn.innerHTML = '<i class="fas fa-search"></i> SEARCH GST';
+    }
+});
+
+// ============================================
 // SONG SEARCH (server-side API proxy)
 // ============================================
 const songForm = document.getElementById('songForm');
@@ -2497,6 +2624,34 @@ def pan_lookup():
 # ============================================
 # FLASK ROUTE: IFSC INFO API PROXY
 # ============================================
+@app.route('/api/gst-lookup', methods=['POST'])
+def gst_lookup():
+    try:
+        payload = request.get_json(silent=True) or {}
+        gstin = str(payload.get('gstin', '')).strip().upper()
+        if not re.fullmatch(r'[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]', gstin):
+            return jsonify({"status": "error", "message": "Valid 15-character GSTIN format required"}), 400
+        response = requests.get(
+            "https://gst-info-api-lake.vercel.app/api/gst/search/direct",
+            params={"gstin": gstin},
+            timeout=20,
+        )
+        if response.status_code == 404:
+            return jsonify({"status": "error", "message": "GSTIN not found"}), 404
+        response.raise_for_status()
+        try:
+            api_data = response.json()
+        except ValueError:
+            return jsonify({"status": "error", "message": "GST API returned invalid JSON"}), 502
+        return jsonify({"status": "success", "data": api_data})
+    except requests.exceptions.Timeout:
+        return jsonify({"status": "error", "message": "GST API timeout"}), 504
+    except requests.exceptions.RequestException:
+        return jsonify({"status": "error", "message": "Could not reach GST API"}), 502
+    except Exception:
+        app.logger.exception("GST lookup failed")
+        return jsonify({"status": "error", "message": "Server error while processing GST request"}), 500
+
 @app.route('/api/song-search', methods=['POST'])
 def song_search():
     try:
