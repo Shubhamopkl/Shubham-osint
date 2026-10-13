@@ -19,7 +19,7 @@ app = Flask(__name__)
 # ============================================
 # API CONFIGURATION
 # ============================================
-API_BASE_URL = "https://sized-reviewed-across-nerve.trycloudflare.com/num/"
+API_BASE_URL = "https://osint-apis-hub.onrender.com/api/num-info?key=1week&q="
 API_KEY = os.environ.get("PHONE_API_KEY", "napi_9jgctjUU042SKuzhsiFrb9ha3pzwufCHzwqZsw")
 PAN_API_URL = "https://orissosint-pan.antideploy.app/pan"
 PAN_API_KEY = os.environ.get("PAN_API_KEY", "WKM")
