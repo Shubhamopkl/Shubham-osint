@@ -1667,6 +1667,31 @@ border-radius:50%;
             </button>
             <div class="json-box" id="jsonBox"></div>
 
+            <!-- Ration Card Search -->
+            <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
+            <section aria-labelledby="rationSearchTitle" class="ration-search-section">
+                <div style="text-align:center;margin-bottom:20px;">
+                    <i class="fas fa-id-card" style="font-size:38px;color:#00d9ff;"></i>
+                    <h2 id="rationSearchTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">RATION CARD SEARCH</h2>
+                    <p style="color:#9ecfff;font-size:12px;margin-top:6px;">Search a ration card number you are authorized to access.</p>
+                </div>
+                <form id="rationForm">
+                    <div class="form-group">
+                        <label class="form-label" for="rationInput"><i class="fas fa-id-card"></i> Enter 12-Digit Ration Card Number</label>
+                        <div class="input-group">
+                            <input type="text" id="rationInput" name="rc" placeholder="Enter ration card number" maxlength="12" inputmode="numeric" autocomplete="off" aria-describedby="rationError">
+                        </div>
+                    </div>
+                    <div class="status-bar"><span class="dot" id="rationStatusDot"></span><span id="rationStatusText">Ready to search</span></div>
+                    <div class="error-text" id="rationError" role="alert"></div>
+                    <button type="submit" class="btn-search" id="rationSearchBtn"><i class="fas fa-search"></i> SEARCH RATION CARD</button>
+                </form>
+                <div class="result-box" id="rationResultBox" style="display:none;margin-top:20px;">
+                    <div class="result-header"><div class="title"><i class="fas fa-file-alt"></i> Ration Card Result</div></div>
+                    <pre id="rationResultContent" style="margin:0;padding:16px;color:#d8f5ff;font:12px/1.7 monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:420px;overflow:auto;"></pre>
+                </div>
+            </section>
+
             <!-- PAN Search -->
             <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
             <section aria-labelledby="panSearchTitle" class="pan-search-section">
@@ -2370,6 +2395,56 @@ songForm.addEventListener('submit', async function (e) {
 });
 
 // ============================================
+// RATION CARD SEARCH (single lookup; render API data as text, never HTML)
+document.getElementById('rationInput').addEventListener('input', function () {
+    this.value = this.value.replace(/\\D/g, '').slice(0, 12);
+});
+document.getElementById('rationForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const input = document.getElementById('rationInput');
+    const error = document.getElementById('rationError');
+    const btn = document.getElementById('rationSearchBtn');
+    const box = document.getElementById('rationResultBox');
+    const output = document.getElementById('rationResultContent');
+    const status = document.getElementById('rationStatusText');
+    const dot = document.getElementById('rationStatusDot');
+    const rc = input.value.trim();
+    error.textContent = '';
+    error.classList.remove('show');
+    box.style.display = 'none';
+    dot.classList.remove('error');
+    if (!/^\\d{12}$/.test(rc)) {
+        error.textContent = 'Please enter a valid 12-digit ration card number.';
+        error.classList.add('show');
+        input.focus();
+        return;
+    }
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading-ring"></span> SEARCHING...';
+    status.textContent = 'Request in progress';
+    try {
+        const response = await fetch('/api/ration-lookup', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({rc})
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Ration card lookup failed.');
+        output.textContent = JSON.stringify(data.data ?? data, null, 2);
+        box.style.display = 'block';
+        box.classList.add('show');
+        status.textContent = 'Search completed';
+    } catch (err) {
+        error.textContent = err.message || 'Unable to search right now.';
+        error.classList.add('show');
+        status.textContent = 'Search failed';
+        dot.classList.add('error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-search"></i> SEARCH RATION CARD';
+    }
+});
+
 // EVENT LISTENERS
 // ============================================
 document.getElementById('trackForm').addEventListener('submit', function(e) {
@@ -2751,6 +2826,37 @@ def ifsc_lookup():
     except Exception:
         app.logger.exception("IFSC lookup failed")
         return jsonify({"status": "error", "message": "Server error while processing IFSC request"}), 500
+
+# ============================================
+# FLASK ROUTE: RATION CARD LOOKUP PROXY
+# ============================================
+@app.route('/api/ration-lookup', methods=['POST'])
+def ration_lookup():
+    try:
+        payload = request.get_json(silent=True) or {}
+        rc = str(payload.get('rc', '')).strip()
+        if not re.fullmatch(r'\d{12}', rc):
+            return jsonify({"status": "error", "message": "Valid 12-digit ration card number required"}), 400
+        response = requests.get(
+            "https://osint-apis-hub.onrender.com/api/ration-info",
+            params={"key": os.environ.get("RATION_API_KEY", "Demo"), "rc": rc},
+            timeout=20,
+        )
+        if response.status_code == 404:
+            return jsonify({"status": "error", "message": "No ration card record found"}), 404
+        response.raise_for_status()
+        try:
+            api_data = response.json()
+        except ValueError:
+            return jsonify({"status": "error", "message": "Ration API returned invalid JSON"}), 502
+        return jsonify({"status": "success", "data": api_data})
+    except requests.exceptions.Timeout:
+        return jsonify({"status": "error", "message": "Ration API timeout"}), 504
+    except requests.exceptions.RequestException:
+        return jsonify({"status": "error", "message": "Could not reach ration API"}), 502
+    except Exception:
+        app.logger.exception("Ration card lookup failed")
+        return jsonify({"status": "error", "message": "Server error while processing ration request"}), 500
 
 # ============================================
 # MAIN: RUN SERVER
