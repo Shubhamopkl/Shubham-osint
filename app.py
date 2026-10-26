@@ -2533,7 +2533,7 @@ document.getElementById('rationForm').addEventListener('submit', async function 
 
 // LEAK EXPOSURE CHECK (status only; never render raw leaked records)
 document.getElementById('leakInput').addEventListener('input', function () {
-    this.value = this.value.replace(/\D/g, '').slice(0, 10);
+    this.value = this.value.replace(/\\D/g, '').slice(0, 10);
 });
 document.getElementById('leakForm').addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -2549,7 +2549,7 @@ document.getElementById('leakForm').addEventListener('submit', async function (e
     error.classList.remove('show');
     box.style.display = 'none';
     dot.classList.remove('error');
-    if (!/^\d{10}$/.test(q)) {
+    if (!/^\\d{10}$/.test(q)) {
         error.textContent = 'Please enter a valid 10-digit phone number.';
         error.classList.add('show'); return;
     }
@@ -2567,9 +2567,20 @@ document.getElementById('leakForm').addEventListener('submit', async function (e
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.message || 'Leak exposure check failed.');
-        output.textContent = data.exposed
-            ? 'Possible exposure indicator found. Avoid sharing sensitive details and change reused passwords. This check does not reveal or verify the contents of any leaked records.'
-            : 'No exposure indicator was detected by this service. This does not guarantee that the number has never appeared in a breach.';
+        const safeSummary = {
+            status: data.status,
+            exposed: data.exposed,
+            record_count: data.record_count ?? null,
+            sources: data.sources ?? [],
+            response: data.response ?? null,
+            note: 'Personal fields are masked for privacy. This is not a guarantee that no breach exists.'
+        };
+        output.textContent = JSON.stringify(safeSummary, null, 2);
+        output.style.whiteSpace = 'pre-wrap';
+        output.style.wordBreak = 'break-word';
+        output.style.fontFamily = 'monospace';
+        output.style.maxHeight = '360px';
+        output.style.overflow = 'auto';
         document.getElementById('leakResultStatus').textContent = data.exposed ? 'Possible exposure' : 'No indicator detected';
         box.style.display = 'block';
         box.classList.add('show');
@@ -3142,10 +3153,29 @@ def family_lookup():
         app.logger.exception("Family lookup failed")
         return jsonify({"status": "error", "message": "Server error while processing Family Search"}), 500
 
-# FLASK ROUTE: LEAK EXPOSURE STATUS (NO RAW RECORDS)
+# FLASK ROUTE: LEAK EXPOSURE SUMMARY (PERSONAL FIELDS MASKED)
 # ============================================
 @app.route('/api/leak-check', methods=['POST'])
 def leak_check():
+    def redact_private_fields(value):
+        sensitive_keys = (
+            'name', 'full_name', 'membername', 'father', 'mother', 'guardian',
+            'phone', 'mobile', 'email', 'address', 'city', 'document', 'aadhaar',
+            'aadhar', 'uid', 'dob', 'birth', 'pan', 'passport', 'gender'
+        )
+        if isinstance(value, dict):
+            cleaned = {}
+            for key, item in value.items():
+                normalized = re.sub(r'[^a-z0-9]', '', str(key).lower())
+                if any(token in normalized for token in sensitive_keys):
+                    cleaned[key] = '[REDACTED]'
+                else:
+                    cleaned[key] = redact_private_fields(item)
+            return cleaned
+        if isinstance(value, list):
+            return [redact_private_fields(item) for item in value]
+        return value
+
     try:
         payload = request.get_json(silent=True) or {}
         q = str(payload.get('q', '')).strip()
@@ -3158,25 +3188,40 @@ def leak_check():
             timeout=20,
         )
         if response.status_code == 404:
-            return jsonify({"status": "success", "exposed": False})
+            return jsonify({"status": "success", "exposed": False, "record_count": 0, "sources": []})
         response.raise_for_status()
         try:
             api_data = response.json()
         except ValueError:
             return jsonify({"status": "error", "message": "Leak API returned invalid JSON"}), 502
 
-        # Return only a coarse exposure indicator; never expose raw API records.
+        if not isinstance(api_data, (dict, list)):
+            return jsonify({"status": "error", "message": "Leak API returned an unexpected response"}), 502
         if isinstance(api_data, dict):
             status_value = str(api_data.get("status", "")).lower()
             if api_data.get("success") is False or status_value in ("error", "failed", "failure"):
                 return jsonify({"status": "error", "message": "Leak check service reported an error"}), 502
-            candidates = [api_data.get(k) for k in ("results", "data", "records", "result", "items")]
-            candidates = [v for v in candidates if isinstance(v, (list, dict))]
-            payload_data = candidates[0] if candidates else api_data
-        else:
-            payload_data = api_data
-        exposed = bool(payload_data) and payload_data not in ([], {})
-        return jsonify({"status": "success", "exposed": exposed})
+
+        # Preserve response structure and metadata, but mask personal identifiers.
+        safe_data = redact_private_fields(api_data)
+        records = api_data.get('data', []) if isinstance(api_data, dict) else []
+        record_count = api_data.get('record_count') if isinstance(api_data, dict) else None
+        if record_count is None:
+            if isinstance(records, list):
+                record_count = sum(len(item.get('records', [])) for item in records if isinstance(item, dict) and isinstance(item.get('records'), list))
+            else:
+                record_count = 0
+        sources = []
+        if isinstance(records, list):
+            sources = [str(item.get('source')) for item in records if isinstance(item, dict) and item.get('source')]
+        exposed = bool(record_count) or (isinstance(api_data, dict) and bool(api_data.get('data')))
+        return jsonify({
+            "status": "success",
+            "exposed": exposed,
+            "record_count": record_count,
+            "sources": sources,
+            "response": safe_data
+        })
     except requests.exceptions.Timeout:
         return jsonify({"status": "error", "message": "Leak API timeout"}), 504
     except requests.exceptions.RequestException:
@@ -3184,7 +3229,6 @@ def leak_check():
     except Exception:
         app.logger.exception("Leak exposure check failed")
         return jsonify({"status": "error", "message": "Server error while checking exposure"}), 500
-
 
 # ============================================
 # MAIN: RUN SERVER
