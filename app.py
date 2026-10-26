@@ -3104,7 +3104,8 @@ def ration_lookup():
 
 
 # ============================================
-# FLASK ROUTE: FAMILY SEARCH (PRIVACY-SAFE SUMMARY)
+# FLASK ROUTE: FAMILY SEARCH LOOKUP PROXY
+# Same response display pattern as Ration Card, with sensitive fields masked.
 # ============================================
 @app.route('/api/family-lookup', methods=['POST'])
 def family_lookup():
@@ -3127,39 +3128,31 @@ def family_lookup():
         except ValueError:
             return jsonify({"status": "error", "message": "Family API returned invalid JSON"}), 502
 
-        if not isinstance(api_data, dict) or str(api_data.get("status", "")).lower() not in ("success", "ok"):
-            return jsonify({"status": "error", "message": "Family API did not return a successful response"}), 502
+        if not isinstance(api_data, (dict, list)):
+            return jsonify({"status": "error", "message": "Family API returned an unexpected response"}), 502
 
-        # Actual API structure: data -> pd -> memberDetailsList.
-        # Return a minimal summary only; do not expose names, full addresses,
-        # Aadhaar values, member IDs, or other relatives' identifying details.
-        record = api_data.get("data") if isinstance(api_data.get("data"), dict) else {}
-        person_data = record.get("pd") if isinstance(record.get("pd"), dict) else {}
-        members = person_data.get("memberDetailsList")
-        if not isinstance(members, list):
-            # Fallbacks for older/alternate API response shapes.
-            members = record.get("memberDetailsList")
-        if not isinstance(members, list):
-            members = api_data.get("memberDetailsList")
-        if not isinstance(members, list):
-            nested = record.get("data") if isinstance(record.get("data"), dict) else {}
-            nested_person = nested.get("pd") if isinstance(nested.get("pd"), dict) else {}
-            members = nested_person.get("memberDetailsList", nested.get("memberDetailsList", []))
-        if not isinstance(members, list):
-            members = []
-        relations = []
-        for member in members:
-            if isinstance(member, dict):
-                relation = str(member.get("relationship_name") or member.get("relation") or "").strip()
-                if relation and relation not in relations:
-                    relations.append(relation[:40])
-        safe_summary = {
-            "status": "success",
-            "record_found": True,
-            "family_member_count": len(members),
-            "relationship_types": relations,
+        # Keep the API's original JSON shape for the same preformatted result
+        # view used by Ration Card, while masking direct personal identifiers.
+        sensitive_keys = {
+            "aadhaar", "aadhaar_number", "uid", "membername", "member_name",
+            "name", "address", "memberid", "member_id", "ration_card",
+            "rationcard", "fpsid", "fps_id"
         }
-        return jsonify({"status": "success", "data": safe_summary})
+        def mask_sensitive(value):
+            if isinstance(value, dict):
+                cleaned = {}
+                for key, item in value.items():
+                    normalized = re.sub(r'[^a-z0-9]', '', str(key).lower())
+                    if normalized in {re.sub(r'[^a-z0-9]', '', k.lower()) for k in sensitive_keys}:
+                        cleaned[key] = "[REDACTED]"
+                    else:
+                        cleaned[key] = mask_sensitive(item)
+                return cleaned
+            if isinstance(value, list):
+                return [mask_sensitive(item) for item in value]
+            return value
+
+        return jsonify({"status": "success", "data": mask_sensitive(api_data)})
     except requests.exceptions.Timeout:
         return jsonify({"status": "error", "message": "Family API timeout"}), 504
     except requests.exceptions.RequestException:
