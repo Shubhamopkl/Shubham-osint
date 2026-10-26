@@ -1519,6 +1519,22 @@ border-radius:50%;
 
 /* V2 PHASE43 */
 .cyber-node{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);width:18px;height:18px;border-radius:50%;background:#00d9ff;box-shadow:0 0 22px rgba(0,217,255,.9);pointer-events:none;z-index:10;animation:node43 2.4s ease-in-out infinite}.cyber-node:before,.cyber-node:after{content:"";position:absolute;left:50%;top:50%;border:1px solid rgba(0,217,255,.3);border-radius:50%;transform:translate(-50%,-50%)}.cyber-node:before{width:34px;height:34px}.cyber-node:after{width:54px;height:54px;opacity:.5}@keyframes node43{50%{transform:translateX(-50%) scale(1.25);opacity:.65}}
+
+/* ===== SEARCH MODULE SELECTOR (ADDED) ===== */
+.module-picker{margin:0 0 24px;padding:18px;background:rgba(0,217,255,.055);border:1px solid rgba(0,217,255,.22);border-radius:16px}
+.module-picker-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;color:#eaf8ff;font-weight:800;font-size:14px}
+.module-picker-head i{color:#00d9ff;font-size:18px}
+.module-picker-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.module-choice{display:flex;align-items:center;gap:10px;min-height:58px;padding:12px;background:rgba(5,15,30,.8);border:1px solid rgba(0,217,255,.18);border-radius:12px;color:#d9efff;text-align:left;font:600 13px 'Noto Sans Devanagari','Segoe UI',Arial,sans-serif;cursor:pointer;transition:.2s}
+.module-choice i{width:20px;text-align:center;color:#00d9ff;font-size:17px}
+.module-choice:hover,.module-choice.active{border-color:#00d9ff;background:linear-gradient(135deg,rgba(0,217,255,.16),rgba(37,99,235,.12));box-shadow:0 0 16px rgba(0,217,255,.12)}
+.module-choice.active{color:#fff}
+.module-choice .module-check{margin-left:auto;font-size:12px;color:#00ff99;display:none}
+.module-choice.active .module-check{display:inline}
+.module-picker-hint{font-size:11px;color:#8fb8d3;margin-top:12px}
+.module-hidden{display:none!important}
+@media(max-width:380px){.module-picker-grid{grid-template-columns:1fr}.module-picker{padding:13px}}
+
 </style>
 </head>
 <body>
@@ -1623,6 +1639,21 @@ border-radius:50%;
 
         <!-- Card Body -->
         <div class="card-body">
+
+            <!-- SEARCH MODULE SELECTOR: existing search modules are switched without changing their APIs -->
+            <div class="module-picker" id="modulePicker">
+                <div class="module-picker-head"><i class="fas fa-layer-group"></i><span>SELECT SEARCH MODULE</span></div>
+                <div class="module-picker-grid">
+                    <button type="button" class="module-choice active" data-module="phone"><i class="fas fa-mobile-screen-button"></i><span>Phone Number</span><i class="fas fa-check module-check"></i></button>
+                    <button type="button" class="module-choice" data-module="pan"><i class="fas fa-id-card"></i><span>PAN Search</span><i class="fas fa-check module-check"></i></button>
+                    <button type="button" class="module-choice" data-module="gst"><i class="fas fa-file-invoice"></i><span>GST Search</span><i class="fas fa-check module-check"></i></button>
+                    <button type="button" class="module-choice" data-module="ifsc"><i class="fas fa-building-columns"></i><span>IFSC Search</span><i class="fas fa-check module-check"></i></button>
+                    <button type="button" class="module-choice" data-module="song"><i class="fas fa-music"></i><span>Song Search</span><i class="fas fa-check module-check"></i></button>
+                    <button type="button" class="module-choice" data-module="ration"><i class="fas fa-id-card-clip"></i><span>Ration Card</span><i class="fas fa-check module-check"></i></button>
+                </div>
+                <div class="module-picker-hint">Choose a module to open its existing search form.</div>
+            </div>
+
 
             <!-- Form -->
             <form id="trackForm">
@@ -2593,6 +2624,57 @@ document.addEventListener("DOMContentLoaded",()=>{
 
 
 <div class="cyber-node"></div>
+
+<script>
+/* Search module selector - toggles existing sections only; API handlers remain unchanged. */
+(function () {
+    function setupSearchModulePicker() {
+        const picker = document.getElementById('modulePicker');
+        if (!picker) return;
+        const phoneNodes = [
+            document.getElementById('trackForm'),
+            document.getElementById('resultBox'),
+            document.querySelector('button[onclick="toggleJson()"]'),
+            document.getElementById('jsonBox')
+        ].filter(Boolean);
+        const sectionIds = {
+            ration: 'ration-search-section',
+            pan: 'pan-search-section',
+            ifsc: 'ifsc-search-section',
+            gst: 'gst-search-section',
+            song: 'song-search-section'
+        };
+        function showModule(name) {
+            phoneNodes.forEach(node => node.classList.toggle('module-hidden', name !== 'phone'));
+            Object.entries(sectionIds).forEach(([key, className]) => {
+                const section = document.querySelector('.' + className);
+                if (!section) return;
+                section.classList.toggle('module-hidden', key !== name);
+                const divider = section.previousElementSibling;
+                if (divider && divider.tagName === 'DIV' && (divider.getAttribute('style') || '').includes('background:rgba(0,217,255')) {
+                    divider.classList.toggle('module-hidden', key !== name);
+                }
+            });
+            picker.querySelectorAll('.module-choice').forEach(button => {
+                const active = button.dataset.module === name;
+                button.classList.toggle('active', active);
+                button.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
+        }
+        picker.addEventListener('click', event => {
+            const button = event.target.closest('.module-choice');
+            if (button) showModule(button.dataset.module);
+        });
+        showModule('phone');
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupSearchModulePicker);
+    } else {
+        setupSearchModulePicker();
+    }
+})();
+</script>
+
 </body>
 </html>
 '''
