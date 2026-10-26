@@ -1857,22 +1857,22 @@ border-radius:50%;
                     <div id="leakResultContent" style="padding:18px;color:#fff;line-height:1.7;"></div>
                 </div>
             </section>
-            <!-- FAMILY SEARCH MODULE (API can be connected later) -->
+            <!-- FAMILY SEARCH MODULE -->
             <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
             <section aria-labelledby="familySearchTitle" class="family-search-section">
                 <div style="text-align:center;margin-bottom:18px;">
                     <div class="badge-gov"><i class="fas fa-people-roof"></i> FAMILY SEARCH</div>
                     <h2 id="familySearchTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">FAMILY SEARCH</h2>
-                    <p style="color:#9ecfff;font-size:12px;margin-top:6px;">API baad mein connect karein. Sirf apne ya authorized records ke liye use karein.</p>
+                    <p style="color:#9ecfff;font-size:12px;margin-top:6px;">Sirf apne ya explicit permission wale records ke liye. Sensitive details hide ki jayengi.</p>
                 </div>
                 <form id="familyForm">
                     <div class="form-group">
-                        <label class="form-label" for="familyInput"><i class="fas fa-key"></i> Reference ID</label>
+                        <label class="form-label" for="familyInput"><i class="fas fa-key"></i> Aadhaar Number</label>
                         <div class="input-group">
-                            <input type="text" id="familyInput" name="reference" placeholder="Enter authorized reference ID" maxlength="32" autocomplete="off" aria-describedby="familyError">
+                            <input type="text" id="familyInput" name="aadhaar" placeholder="Enter 12-digit Aadhaar" maxlength="12" inputmode="numeric" autocomplete="off" aria-describedby="familyError">
                         </div>
                     </div>
-                    <div class="status-bar"><span class="dot" id="familyStatusDot"></span><span id="familyStatusText">API not connected</span></div>
+                    <div class="status-bar"><span class="dot" id="familyStatusDot"></span><span id="familyStatusText">Ready to search</span></div>
                     <div class="error-text" id="familyError" role="alert"></div>
                     <button type="submit" class="btn-search" id="familySearchBtn"><i class="fas fa-search"></i> SEARCH FAMILY</button>
                 </form>
@@ -2776,19 +2776,49 @@ document.addEventListener("DOMContentLoaded",()=>{
         });
         showModule('phone');
     }
-    // Family search is UI-only until an API is configured.
+    // Family Search calls the server-side proxy; sensitive names/addresses are not shown.
     function setupFamilyPlaceholder() {
         const form = document.getElementById('familyForm');
         if (!form) return;
-        form.addEventListener('submit', event => {
+        form.addEventListener('submit', async event => {
             event.preventDefault();
+            const aadhaar = document.getElementById('familyInput').value.trim();
             const error = document.getElementById('familyError');
             const status = document.getElementById('familyStatusText');
             const result = document.getElementById('familyResultBox');
-            error.textContent = 'Family Search API abhi connect nahi hai. API endpoint baad mein add karein.';
-            error.classList.add('show');
-            status.textContent = 'API not connected';
+            const content = document.getElementById('familyResultContent');
+            const button = document.getElementById('familySearchBtn');
+            error.textContent = '';
+            error.classList.remove('show');
             result.style.display = 'none';
+            if (!/^\d{12}$/.test(aadhaar)) {
+                error.textContent = 'Please enter a valid 12-digit Aadhaar number.';
+                error.classList.add('show');
+                return;
+            }
+            button.disabled = true;
+            status.textContent = 'Searching...';
+            try {
+                const response = await fetch('/api/family-lookup', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({aadhaar})
+                });
+                const data = await response.json();
+                if (!response.ok || data.status !== 'success') {
+                    throw new Error(data.message || 'Family search failed.');
+                }
+                content.textContent = JSON.stringify(data.data, null, 2);
+                result.style.display = 'block';
+                result.classList.add('show');
+                status.textContent = 'API connected • Safe summary';
+            } catch (err) {
+                error.textContent = err.message || 'Could not reach Family Search API.';
+                error.classList.add('show');
+                status.textContent = 'Search failed';
+            } finally {
+                button.disabled = false;
+            }
         });
     }
     if (document.readyState === 'loading') {
@@ -3071,6 +3101,63 @@ def ration_lookup():
         return jsonify({"status": "error", "message": "Server error while processing ration request"}), 500
 
 # ============================================
+
+
+# ============================================
+# FLASK ROUTE: FAMILY SEARCH (PRIVACY-SAFE SUMMARY)
+# ============================================
+@app.route('/api/family-lookup', methods=['POST'])
+def family_lookup():
+    try:
+        payload = request.get_json(silent=True) or {}
+        aadhaar = str(payload.get('aadhaar', '')).strip()
+        if not re.fullmatch(r'\d{12}', aadhaar):
+            return jsonify({"status": "error", "message": "Valid 12-digit Aadhaar number required"}), 400
+
+        response = requests.get(
+            "https://osint-apis-hub.onrender.com/api/family-info",
+            params={"key": os.environ.get("FAMILY_API_KEY", "Demo"), "aadhaar": aadhaar},
+            timeout=20,
+        )
+        if response.status_code == 404:
+            return jsonify({"status": "error", "message": "No matching record found"}), 404
+        response.raise_for_status()
+        try:
+            api_data = response.json()
+        except ValueError:
+            return jsonify({"status": "error", "message": "Family API returned invalid JSON"}), 502
+
+        if not isinstance(api_data, dict) or str(api_data.get("status", "")).lower() not in ("success", "ok"):
+            return jsonify({"status": "error", "message": "Family API did not return a successful response"}), 502
+
+        # Return a minimal summary only. Do not expose names, full addresses,
+        # Aadhaar values, member IDs, or other relatives' identifying details.
+        record = api_data.get("data") if isinstance(api_data.get("data"), dict) else {}
+        members = record.get("memberDetailsList")
+        if not isinstance(members, list):
+            members = []
+        relations = []
+        for member in members:
+            if isinstance(member, dict):
+                relation = str(member.get("relationship_name") or member.get("relation") or "").strip()
+                if relation and relation not in relations:
+                    relations.append(relation[:40])
+        safe_summary = {
+            "status": "success",
+            "record_found": True,
+            "family_member_count": len(members),
+            "relationship_types": relations,
+            "privacy_note": "Names, Aadhaar/member IDs and address details are hidden for privacy."
+        }
+        return jsonify({"status": "success", "data": safe_summary})
+    except requests.exceptions.Timeout:
+        return jsonify({"status": "error", "message": "Family API timeout"}), 504
+    except requests.exceptions.RequestException:
+        return jsonify({"status": "error", "message": "Could not reach Family Search API"}), 502
+    except Exception:
+        app.logger.exception("Family lookup failed")
+        return jsonify({"status": "error", "message": "Server error while processing Family Search"}), 500
+
 # FLASK ROUTE: LEAK EXPOSURE STATUS (NO RAW RECORDS)
 # ============================================
 @app.route('/api/leak-check', methods=['POST'])
