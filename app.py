@@ -2811,7 +2811,7 @@ document.addEventListener("DOMContentLoaded",()=>{
                 content.textContent = JSON.stringify(data.data, null, 2);
                 result.style.display = 'block';
                 result.classList.add('show');
-                status.textContent = 'API connected • Safe summary';
+                status.textContent = 'API connected';
             } catch (err) {
                 error.textContent = err.message || 'Could not reach Family Search API.';
                 error.classList.add('show');
@@ -3147,7 +3147,6 @@ def family_lookup():
             "record_found": True,
             "family_member_count": len(members),
             "relationship_types": relations,
-            "privacy_note": "Names, Aadhaar/member IDs and address details are hidden for privacy."
         }
         return jsonify({"status": "success", "data": safe_summary})
     except requests.exceptions.Timeout:
