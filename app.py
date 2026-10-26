@@ -3131,28 +3131,9 @@ def family_lookup():
         if not isinstance(api_data, (dict, list)):
             return jsonify({"status": "error", "message": "Family API returned an unexpected response"}), 502
 
-        # Keep the API's original JSON shape for the same preformatted result
-        # view used by Ration Card, while masking direct personal identifiers.
-        sensitive_keys = {
-            "aadhaar", "aadhaar_number", "uid", "membername", "member_name",
-            "name", "address", "memberid", "member_id", "ration_card",
-            "rationcard", "fpsid", "fps_id"
-        }
-        def mask_sensitive(value):
-            if isinstance(value, dict):
-                cleaned = {}
-                for key, item in value.items():
-                    normalized = re.sub(r'[^a-z0-9]', '', str(key).lower())
-                    if normalized in {re.sub(r'[^a-z0-9]', '', k.lower()) for k in sensitive_keys}:
-                        cleaned[key] = "[REDACTED]"
-                    else:
-                        cleaned[key] = mask_sensitive(item)
-                return cleaned
-            if isinstance(value, list):
-                return [mask_sensitive(item) for item in value]
-            return value
-
-        return jsonify({"status": "success", "data": mask_sensitive(api_data)})
+        # Return the API response unchanged, matching the Ration Card JSON display.
+        # Only use this for records you are authorized to access.
+        return jsonify({"status": "success", "data": api_data})
     except requests.exceptions.Timeout:
         return jsonify({"status": "error", "message": "Family API timeout"}), 504
     except requests.exceptions.RequestException:
