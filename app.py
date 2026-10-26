@@ -3130,10 +3130,17 @@ def family_lookup():
         if not isinstance(api_data, dict) or str(api_data.get("status", "")).lower() not in ("success", "ok"):
             return jsonify({"status": "error", "message": "Family API did not return a successful response"}), 502
 
-        # Return a minimal summary only. Do not expose names, full addresses,
+        # API variants place memberDetailsList either beside `data` or inside it.
+        # Return a minimal summary only; do not expose names, full addresses,
         # Aadhaar values, member IDs, or other relatives' identifying details.
         record = api_data.get("data") if isinstance(api_data.get("data"), dict) else {}
-        members = record.get("memberDetailsList")
+        members = api_data.get("memberDetailsList")
+        if not isinstance(members, list):
+            members = record.get("memberDetailsList")
+        if not isinstance(members, list):
+            # Some responses wrap the actual payload one level deeper.
+            nested = record.get("data") if isinstance(record.get("data"), dict) else {}
+            members = nested.get("memberDetailsList", [])
         if not isinstance(members, list):
             members = []
         relations = []
