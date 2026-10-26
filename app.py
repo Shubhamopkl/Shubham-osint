@@ -1650,7 +1650,6 @@ border-radius:50%;
                     <button type="button" class="module-choice" data-module="ifsc"><i class="fas fa-building-columns"></i><span>IFSC Search</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="song"><i class="fas fa-music"></i><span>Song Search</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="ration"><i class="fas fa-id-card-clip"></i><span>Ration Card</span><i class="fas fa-check module-check"></i></button>
-                    <button type="button" class="module-choice" data-module="leak"><i class="fas fa-shield-halved"></i><span>Leak Search</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="family"><i class="fas fa-people-roof"></i><span>Family Search</span><i class="fas fa-check module-check"></i></button>
                 </div>
                 <div class="module-picker-hint">Choose a module to open its existing search form.</div>
@@ -1831,32 +1830,6 @@ border-radius:50%;
                 </div>
             </section>
 
-            <!-- LEAK SEARCH: exposure status only; does not display leaked records -->
-            <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
-            <section aria-labelledby="leakSearchTitle" class="leak-search-section">
-                <div style="text-align:center;margin-bottom:18px;">
-                    <div class="badge-gov"><i class="fas fa-shield-halved"></i> LEAK SEARCH</div>
-                    <h2 id="leakSearchTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">LEAK EXPOSURE CHECK</h2>
-                    <p style="color:#9ecfff;font-size:12px;margin-top:6px;">Check only a phone number you own or are authorized to check. Results show exposure status only.</p>
-                </div>
-                <form id="leakForm">
-                    <div class="form-group">
-                        <label class="form-label" for="leakInput"><i class="fas fa-phone"></i> Phone Number</label>
-                        <div class="input-group"><input type="tel" id="leakInput" name="q" placeholder="Enter 10-digit phone number" maxlength="10" inputmode="numeric" autocomplete="off" aria-describedby="leakError"></div>
-                    </div>
-                    <label style="display:flex;gap:9px;align-items:flex-start;color:#9ecfff;font-size:12px;margin:12px 0 18px;line-height:1.5;">
-                        <input type="checkbox" id="leakConsent" style="margin-top:3px;">
-                        I own this number or have permission to check it.
-                    </label>
-                    <div class="status-bar"><span class="dot" id="leakStatusDot"></span><span id="leakStatusText">Ready to check</span></div>
-                    <div class="error-text" id="leakError" role="alert"></div>
-                    <button type="submit" class="btn-search" id="leakSearchBtn"><i class="fas fa-shield-halved"></i> CHECK EXPOSURE</button>
-                </form>
-                <div class="result-box" id="leakResultBox" style="display:none;margin-top:20px;">
-                    <div class="result-header"><div class="title"><i class="fas fa-shield-halved"></i> EXPOSURE STATUS</div><div class="count"><i class="fas fa-check-circle"></i> <span id="leakResultStatus">Response</span></div></div>
-                    <div id="leakResultContent" style="padding:18px;color:#fff;line-height:1.7;"></div>
-                </div>
-            </section>
             <!-- FAMILY SEARCH MODULE -->
             <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
             <section aria-labelledby="familySearchTitle" class="family-search-section">
@@ -2531,69 +2504,6 @@ document.getElementById('rationForm').addEventListener('submit', async function 
     }
 });
 
-// LEAK EXPOSURE CHECK (status only; never render raw leaked records)
-document.getElementById('leakInput').addEventListener('input', function () {
-    this.value = this.value.replace(/\\D/g, '').slice(0, 10);
-});
-document.getElementById('leakForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const q = document.getElementById('leakInput').value.trim();
-    const consent = document.getElementById('leakConsent').checked;
-    const error = document.getElementById('leakError');
-    const btn = document.getElementById('leakSearchBtn');
-    const box = document.getElementById('leakResultBox');
-    const output = document.getElementById('leakResultContent');
-    const status = document.getElementById('leakStatusText');
-    const dot = document.getElementById('leakStatusDot');
-    error.textContent = '';
-    error.classList.remove('show');
-    box.style.display = 'none';
-    dot.classList.remove('error');
-    if (!/^\\d{10}$/.test(q)) {
-        error.textContent = 'Please enter a valid 10-digit phone number.';
-        error.classList.add('show'); return;
-    }
-    if (!consent) {
-        error.textContent = 'Please confirm that you own this number or have permission to check it.';
-        error.classList.add('show'); return;
-    }
-    btn.disabled = true;
-    btn.innerHTML = '<span class="loading-ring"></span> CHECKING...';
-    status.textContent = 'Checking exposure status';
-    try {
-        const response = await fetch('/api/leak-check', {
-            method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({q})
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message || 'Leak exposure check failed.');
-        const safeSummary = {
-            status: data.status,
-            exposed: data.exposed,
-            record_count: data.record_count ?? null,
-            sources: data.sources ?? [],
-            response: data.response ?? null,
-            note: 'Personal fields are masked for privacy. This is not a guarantee that no breach exists.'
-        };
-        output.textContent = JSON.stringify(safeSummary, null, 2);
-        output.style.whiteSpace = 'pre-wrap';
-        output.style.wordBreak = 'break-word';
-        output.style.fontFamily = 'monospace';
-        output.style.maxHeight = '360px';
-        output.style.overflow = 'auto';
-        document.getElementById('leakResultStatus').textContent = data.exposed ? 'Possible exposure' : 'No indicator detected';
-        box.style.display = 'block';
-        box.classList.add('show');
-        status.textContent = 'Check completed';
-    } catch (err) {
-        error.textContent = err.message || 'Unable to check right now.';
-        error.classList.add('show'); status.textContent = 'Check failed'; dot.classList.add('error');
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-shield-halved"></i> CHECK EXPOSURE';
-    }
-});
-
 // EVENT LISTENERS
 // ============================================
 document.getElementById('trackForm').addEventListener('submit', function(e) {
@@ -2761,7 +2671,6 @@ document.addEventListener("DOMContentLoaded",()=>{
             ifsc: 'ifsc-search-section',
             gst: 'gst-search-section',
             song: 'song-search-section',
-            leak: 'leak-search-section',
             family: 'family-search-section'
         };
         function showModule(name) {
@@ -3152,83 +3061,6 @@ def family_lookup():
     except Exception:
         app.logger.exception("Family lookup failed")
         return jsonify({"status": "error", "message": "Server error while processing Family Search"}), 500
-
-# FLASK ROUTE: LEAK EXPOSURE SUMMARY (PERSONAL FIELDS MASKED)
-# ============================================
-@app.route('/api/leak-check', methods=['POST'])
-def leak_check():
-    def redact_private_fields(value):
-        sensitive_keys = (
-            'name', 'full_name', 'membername', 'father', 'mother', 'guardian',
-            'phone', 'mobile', 'email', 'address', 'city', 'document', 'aadhaar',
-            'aadhar', 'uid', 'dob', 'birth', 'pan', 'passport', 'gender'
-        )
-        if isinstance(value, dict):
-            cleaned = {}
-            for key, item in value.items():
-                normalized = re.sub(r'[^a-z0-9]', '', str(key).lower())
-                if any(token in normalized for token in sensitive_keys):
-                    cleaned[key] = '[REDACTED]'
-                else:
-                    cleaned[key] = redact_private_fields(item)
-            return cleaned
-        if isinstance(value, list):
-            return [redact_private_fields(item) for item in value]
-        return value
-
-    try:
-        payload = request.get_json(silent=True) or {}
-        q = str(payload.get('q', '')).strip()
-        if not re.fullmatch(r'\d{10}', q):
-            return jsonify({"status": "error", "message": "Valid 10-digit phone number required"}), 400
-
-        response = requests.get(
-            "https://osint-apis-hub.onrender.com/api/leak-v1",
-            params={"key": os.environ.get("LEAK_API_KEY", "Demo"), "q": q},
-            timeout=20,
-        )
-        if response.status_code == 404:
-            return jsonify({"status": "success", "exposed": False, "record_count": 0, "sources": []})
-        response.raise_for_status()
-        try:
-            api_data = response.json()
-        except ValueError:
-            return jsonify({"status": "error", "message": "Leak API returned invalid JSON"}), 502
-
-        if not isinstance(api_data, (dict, list)):
-            return jsonify({"status": "error", "message": "Leak API returned an unexpected response"}), 502
-        if isinstance(api_data, dict):
-            status_value = str(api_data.get("status", "")).lower()
-            if api_data.get("success") is False or status_value in ("error", "failed", "failure"):
-                return jsonify({"status": "error", "message": "Leak check service reported an error"}), 502
-
-        # Preserve response structure and metadata, but mask personal identifiers.
-        safe_data = redact_private_fields(api_data)
-        records = api_data.get('data', []) if isinstance(api_data, dict) else []
-        record_count = api_data.get('record_count') if isinstance(api_data, dict) else None
-        if record_count is None:
-            if isinstance(records, list):
-                record_count = sum(len(item.get('records', [])) for item in records if isinstance(item, dict) and isinstance(item.get('records'), list))
-            else:
-                record_count = 0
-        sources = []
-        if isinstance(records, list):
-            sources = [str(item.get('source')) for item in records if isinstance(item, dict) and item.get('source')]
-        exposed = bool(record_count) or (isinstance(api_data, dict) and bool(api_data.get('data')))
-        return jsonify({
-            "status": "success",
-            "exposed": exposed,
-            "record_count": record_count,
-            "sources": sources,
-            "response": safe_data
-        })
-    except requests.exceptions.Timeout:
-        return jsonify({"status": "error", "message": "Leak API timeout"}), 504
-    except requests.exceptions.RequestException:
-        return jsonify({"status": "error", "message": "Could not reach leak check service"}), 502
-    except Exception:
-        app.logger.exception("Leak exposure check failed")
-        return jsonify({"status": "error", "message": "Server error while checking exposure"}), 500
 
 # ============================================
 # MAIN: RUN SERVER
