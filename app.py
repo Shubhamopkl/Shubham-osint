@@ -2533,7 +2533,7 @@ document.getElementById('rationForm').addEventListener('submit', async function 
 
 // LEAK EXPOSURE CHECK (status only; never render raw leaked records)
 document.getElementById('leakInput').addEventListener('input', function () {
-    this.value = this.value.replace(/\\D/g, '').slice(0, 10);
+    this.value = this.value.replace(/\D/g, '').slice(0, 10);
 });
 document.getElementById('leakForm').addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -2549,7 +2549,7 @@ document.getElementById('leakForm').addEventListener('submit', async function (e
     error.classList.remove('show');
     box.style.display = 'none';
     dot.classList.remove('error');
-    if (!/^\\d{10}$/.test(q)) {
+    if (!/^\d{10}$/.test(q)) {
         error.textContent = 'Please enter a valid 10-digit phone number.';
         error.classList.add('show'); return;
     }
@@ -3149,7 +3149,7 @@ def leak_check():
     try:
         payload = request.get_json(silent=True) or {}
         q = str(payload.get('q', '')).strip()
-        if not re.fullmatch(r'\\d{10}', q):
+        if not re.fullmatch(r'\d{10}', q):
             return jsonify({"status": "error", "message": "Valid 10-digit phone number required"}), 400
 
         response = requests.get(
