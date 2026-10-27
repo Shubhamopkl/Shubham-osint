@@ -2011,9 +2011,10 @@ function displayResults(number, data) {
             <span class="value">${info.fname || 'N/A'}</span>
         </div>`;
         
+        const aadhaarNumber = info.aadhaar ?? info.aadhar ?? info.aadhaar_number ?? info.aadhar_number ?? info.uid ?? info.id ?? 'N/A';
         html += `<div class="result-item">
             <span class="label"><i class="fas fa-id-card"></i> Aadhaar Number</span>
-            <span class="value green">${info.id || 'N/A'}</span>
+            <span class="value green">${aadhaarNumber}</span>
         </div>`;
         html += `<div class="result-item">
             <span class="label"><i class="fas fa-map-pin"></i> Address</span>
