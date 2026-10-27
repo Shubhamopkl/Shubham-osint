@@ -1825,7 +1825,7 @@ border-radius:50%;
                 </form>
                 <div class="result-box" id="familyResultBox" style="display:none;margin-top:20px;">
                     <div class="result-header"><div class="title"><i class="fas fa-people-roof"></i> FAMILY SEARCH RESULT</div></div>
-                    <pre id="familyResultContent" style="margin:0;padding:16px;color:#d8f5ff;font:12px/1.7 monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:420px;overflow:auto;"></pre>
+                    <div id="familyResultContent" style="padding:14px;display:grid;gap:12px;"></div>
                 </div>
             </section>
 
@@ -2621,7 +2621,7 @@ document.addEventListener("DOMContentLoaded",()=>{
                 if (!response.ok || data.status !== 'success') {
                     throw new Error(data.message || 'Family search failed.');
                 }
-                content.textContent = JSON.stringify(data.data, null, 2);
+                renderFamilyResult(content, data.data);
                 result.style.display = 'block';
                 result.classList.add('show');
                 status.textContent = 'API connected';
@@ -2634,6 +2634,68 @@ document.addEventListener("DOMContentLoaded",()=>{
             }
         });
     }
+    function renderFamilyResult(container, payload) {
+        container.replaceChildren();
+        const root = payload && typeof payload === 'object' ? payload : {};
+        const family = root.data && typeof root.data === 'object' ? root.data : root;
+        const pd = family.pd && typeof family.pd === 'object' ? family.pd : family;
+        const members = Array.isArray(pd.memberDetailList) ? pd.memberDetailList :
+            (Array.isArray(family.memberDetailList) ? family.memberDetailList : []);
+
+        const card = document.createElement('section');
+        card.style.cssText = 'border:1px solid rgba(0,217,255,.24);border-radius:12px;overflow:hidden;background:rgba(3,18,34,.72);box-shadow:0 0 18px rgba(0,217,255,.12);';
+        const header = document.createElement('div');
+        header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px;background:rgba(0,217,255,.10);color:#e7f6ff;font-weight:700;font-size:12px;letter-spacing:.5px;';
+        header.textContent = '▣ FAMILY INFORMATION';
+        card.appendChild(header);
+        const body = document.createElement('div');
+        body.style.cssText = 'padding:4px 12px 10px;';
+        const row = (parent, label, value) => {
+            if (value === undefined || value === null || String(value).trim() === '') return;
+            const line = document.createElement('div');
+            line.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid rgba(120,180,220,.10);font-size:12px;';
+            const key = document.createElement('span');
+            key.style.cssText = 'color:#8fa9bd;flex:0 0 38%;text-transform:uppercase;font-size:10px;letter-spacing:.4px;';
+            key.textContent = label;
+            const val = document.createElement('span');
+            val.style.cssText = 'color:#ffad32;text-align:right;overflow-wrap:anywhere;max-width:62%;';
+            val.textContent = String(value);
+            line.append(key, val); parent.appendChild(line);
+        };
+        row(body, 'District', pd.homeDistName || pd.districtName || pd.district);
+        row(body, 'State', pd.homeStateName || pd.stateName || pd.state);
+        row(body, 'District Code', pd.districtCode);
+        row(body, 'Address', pd.address);
+        row(body, 'ONRC Allowed', pd.allowed_onorc);
+        row(body, 'UID Status', pd.dup_uid_status);
+        card.appendChild(body);
+        container.appendChild(card);
+
+        const memberSection = document.createElement('section');
+        memberSection.style.cssText = 'margin-top:12px;border:1px solid rgba(0,217,255,.24);border-radius:12px;overflow:hidden;background:rgba(3,18,34,.72);';
+        const memberHeader = document.createElement('div');
+        memberHeader.style.cssText = 'padding:12px;background:rgba(0,217,255,.10);color:#e7f6ff;font-weight:700;font-size:12px;letter-spacing:.5px;';
+        memberHeader.textContent = '♧ FAMILY MEMBERS (' + members.length + ')';
+        memberSection.appendChild(memberHeader);
+        const memberBody = document.createElement('div');
+        memberBody.style.cssText = 'padding:4px 12px 10px;';
+        members.forEach((member, index) => {
+            const sub = document.createElement('div');
+            sub.style.cssText = 'margin:10px 0;border:1px solid rgba(0,217,255,.14);border-radius:9px;background:rgba(0,217,255,.035);padding:0 10px;';
+            const title = document.createElement('div');
+            title.style.cssText = 'padding:9px 0;color:#00d9ff;font-weight:700;font-size:11px;border-bottom:1px solid rgba(120,180,220,.10);';
+            title.textContent = 'MEMBER ' + (index + 1);
+            sub.appendChild(title);
+            row(sub, 'Name', member.memberName || member.name);
+            row(sub, 'Relationship', member.relationship || member.relation || member.relationshipName || member.relationship_code);
+            row(sub, 'Member ID', member.memberId || member.memberID || member.id);
+            memberBody.appendChild(sub);
+        });
+        if (!members.length) row(memberBody, 'Members', 'No member list was provided by the API.');
+        memberSection.appendChild(memberBody);
+        container.appendChild(memberSection);
+    }
+
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', setupFamilyPlaceholder);
     } else {
