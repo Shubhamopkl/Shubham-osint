@@ -2604,14 +2604,19 @@ document.addEventListener("DOMContentLoaded",()=>{
         root.replaceChildren();
         const labelize = key => String(key).replace(/([a-z])([A-Z])/g, '$1 $2')
             .replace(/[_-]+/g, ' ').replace(/\\b\\w/g, ch => ch.toUpperCase());
+        const sensitiveKey = key => /aadhaar|aadhar|member.?id|identity.?number|uid|document.?number/i.test(String(key));
         const addressKey = key => /address|location/i.test(String(key));
         const safeValue = (key, value) => {
             if (value === null || value === undefined || value === '') return 'Not available';
-            
+            if (sensitiveKey(key)) {
+                const digits = String(value).replace(/\\D/g, '');
+                return digits.length >= 4 ? '••••••' + digits.slice(-4) : 'Hidden for privacy';
             }
             if (addressKey(key)) {
-                const text = String(value)
-                
+                const text = String(value);
+                return text.length > 24 ? text.slice(0, 24) + '… (details hidden)' : 'Address details hidden';
+            }
+            if (typeof value === 'object') return '';
             return String(value);
         };
         const card = (title, entries) => {
