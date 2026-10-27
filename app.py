@@ -1660,11 +1660,10 @@ border-radius:50%;
             <form id="trackForm">
                 <div class="form-group">
                     <label class="form-label">
-                        <i class="fas fa-phone"></i> Enter 10-Digit Mobile Number
+                        <i class="fas fa-phone"></i> Enter Mobile Number (up to 15 digits)
                     </label>
                     <div class="input-group">
-                        <span class="country-code">+91</span>
-                        <input type="tel" id="phoneInput" placeholder="Enter phone number" maxlength="10" inputmode="numeric" value="">
+                        <input type="tel" id="phoneInput" placeholder="Enter phone number (up to 15 digits)" maxlength="15" inputmode="numeric" value="">
                     </div>
                 </div>
 
@@ -2000,7 +1999,7 @@ function displayResults(number, data) {
         
         html += `<div class="result-item">
             <span class="label"><i class="fas fa-phone"></i> Phone</span>
-            <span class="value highlight">${info.num || '+91 ' + number}</span>
+            <span class="value highlight">${info.num || number}</span>
         </div>`;
         
         html += `<div class="result-item">
@@ -2075,8 +2074,8 @@ async function searchNumber() {
     const trackBtn = document.getElementById('trackBtn');
     const errorText = document.getElementById('errorText');
     
-    if (!number || number.length !== 10 || !/^[0-9]{10}$/.test(number)) {
-        errorText.textContent = '⚠️ Please enter a valid 10-digit phone number!';
+    if (!number || number.length > 15 || !/^[0-9]{1,15}$/.test(number)) {
+        errorText.textContent = '⚠️ Please enter a valid number containing 1–15 digits!';
         errorText.classList.add('show');
         return;
     }
@@ -2761,9 +2760,9 @@ def lookup():
         number = str(data.get('number', '')).strip()
         clean_number = re.sub(r'\D', '', number)
 
-        # This endpoint expects a 10-digit number in query and the API key in key.
-        if not re.fullmatch(r'\d{10}', clean_number):
-            return jsonify({"status": "error", "message": "Enter a valid 10-digit phone number.", "result": []}), 400
+        # This endpoint accepts up to 15 digits in query and the API key in key.
+        if not re.fullmatch(r'\d{1,15}', clean_number):
+            return jsonify({"status": "error", "message": "Enter a valid number containing 1–15 digits.", "result": []}), 400
 
         response = requests.get(
             API_BASE_URL,
