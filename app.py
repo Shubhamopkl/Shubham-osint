@@ -1650,7 +1650,7 @@ border-radius:50%;
                     <button type="button" class="module-choice" data-module="ifsc"><i class="fas fa-building-columns"></i><span>IFSC Search</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="ration"><i class="fas fa-id-card-clip"></i><span>Ration Card</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="family"><i class="fas fa-people-roof"></i><span>Family Search</span><i class="fas fa-check module-check"></i></button>
-                    <button type="button" class="module-choice" data-module="aadhar"><i class="fas fa-shield-halved"></i><span>Aadhaar Information</span><i class="fas fa-check module-check"></i></button>
+                    <button type="button" class="module-choice" data-module="aadhar"><i class="fas fa-shield-halved"></i><span>Aadhaar Validation</span><i class="fas fa-check module-check"></i></button>
                 </div>
                 <div class="module-picker-hint">Choose a module to open its existing search form.</div>
             </div>
@@ -1830,12 +1830,12 @@ border-radius:50%;
                 </div>
             </section>
 
-            <!-- AADHAAR INFORMATION MODULE -->
+            <!-- AADHAAR VALIDATION MODULE -->
             <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
             <section aria-labelledby="aadharTitle" class="aadhar-search-section module-hidden">
                 <div style="text-align:center;margin-bottom:18px;">
-                    <div class="badge-gov"><i class="fas fa-shield-halved"></i> AADHAAR INFORMATION</div>
-                    <h2 id="aadharTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">AADHAAR INFORMATION</h2>
+                    <div class="badge-gov"><i class="fas fa-shield-halved"></i> AADHAAR VALIDATION</div>
+                    <h2 id="aadharTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">AADHAAR VALIDATION</h2>
                     <p style="color:#9ecfff;font-size:12px;margin-top:6px;">Apne Aadhaar ko verify karein. Is form mein personal details lookup nahi hota.</p>
                 </div>
                 <form id="aadharVerifyForm">
@@ -1844,13 +1844,13 @@ border-radius:50%;
                         <div class="input-group"><input type="password" id="aadharVerifyInput" placeholder="Enter 12-digit Aadhaar" maxlength="12" inputmode="numeric" autocomplete="off" aria-describedby="aadharVerifyError"></div>
                     </div>
                     <div class="error-text" id="aadharVerifyError" role="alert"></div>
-                    <button type="submit" class="btn-search"><i class="fas fa-check-circle"></i> VALIDATE FORMAT</button>
+                    <button type="submit" class="btn-search"><i class="fas fa-check-circle"></i> VALIDATE AADHAAR</button>
                 </form>
                 <div class="result-box" id="aadharVerifyResult" style="display:none;margin-top:20px;">
                     <div class="result-header"><div class="title"><i class="fas fa-shield-halved"></i> VERIFICATION STATUS</div></div>
                     <div class="result-item"><span class="label"><i class="fas fa-id-card"></i> Aadhaar</span><span class="value" id="aadharMaskedValue">XXXX XXXX XXXX</span></div>
-                    <div class="result-item"><span class="label"><i class="fas fa-circle-check"></i> Format</span><span class="value green">12 digits valid</span></div>
-                    <div style="padding:14px 18px;color:#9ecfff;font-size:12px;line-height:1.6;">Format validation only. Identity verification requires an authorized, consent-based verification provider.</div>
+                    <div class="result-item"><span class="label"><i class="fas fa-circle-check"></i> Status</span><span class="value" id="aadharApiStatus">Checking...</span></div>
+                    <div style="padding:14px 18px;color:#9ecfff;font-size:12px;line-height:1.6;">Only validation status is displayed; the Aadhaar number is masked.</div>
                 </div>
             </section>
 
@@ -2615,15 +2615,16 @@ document.addEventListener("DOMContentLoaded",()=>{
         });
         showModule('phone');
     }
-    // Aadhaar format validation only; no personal-data lookup is performed.
+    // Aadhaar validation API: show only a validation status and keep the number masked.
     function setupAadhaarValidation() {
         const form = document.getElementById('aadharVerifyForm');
         if (!form) return;
-        form.addEventListener('submit', event => {
+        form.addEventListener('submit', async event => {
             event.preventDefault();
             const input = document.getElementById('aadharVerifyInput');
             const error = document.getElementById('aadharVerifyError');
             const result = document.getElementById('aadharVerifyResult');
+            const status = document.getElementById('aadharApiStatus');
             const value = input.value.trim();
             error.textContent = '';
             error.classList.remove('show');
@@ -2634,8 +2635,29 @@ document.addEventListener("DOMContentLoaded",()=>{
                 return;
             }
             document.getElementById('aadharMaskedValue').textContent = 'XXXX XXXX ' + value.slice(-4);
+            status.textContent = 'Checking...';
             result.style.display = 'block';
             result.classList.add('show');
+            try {
+                const response = await fetch('/api/aadhaar-validation', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({aadhaar: value})
+                });
+                const data = await response.json();
+                if (!response.ok || data.status !== 'success') {
+                    status.textContent = data.message || 'Validation unavailable';
+                    status.classList.remove('green');
+                    return;
+                }
+                status.textContent = data.validation_status || 'API response received';
+                status.classList.toggle('green', Boolean(data.is_valid));
+            } catch (err) {
+                status.textContent = 'Could not reach validation service';
+                status.classList.remove('green');
+            } finally {
+                input.value = '';
+            }
         });
     }
     if (document.readyState === 'loading') {
@@ -2980,6 +3002,55 @@ def family_lookup():
     except Exception:
         app.logger.exception("Family lookup failed")
         return jsonify({"status": "error", "message": "Server error while processing Family Search"}), 500
+
+
+# ============================================
+# FLASK ROUTE: AADHAAR VALIDATION API PROXY
+# Exposes only a validation status, never raw upstream fields.
+# ============================================
+@app.route('/api/aadhaar-validation', methods=['POST'])
+def aadhaar_validation():
+    try:
+        payload = request.get_json(silent=True) or {}
+        aadhaar = str(payload.get('aadhaar', '')).strip()
+        if not re.fullmatch(r'\d{12}', aadhaar):
+            return jsonify({"status": "error", "message": "Enter a valid 12-digit Aadhaar number"}), 400
+
+        response = requests.get(
+            "http://shuruuu-api.vercel.app/aadhar_info",
+            params={"key": os.environ.get("AADHAAR_API_KEY", "HUNTER"), "query": aadhaar},
+            timeout=20,
+        )
+        response.raise_for_status()
+        try:
+            api_data = response.json()
+        except ValueError:
+            return jsonify({"status": "error", "message": "Validation API returned invalid JSON"}), 502
+
+        # Do not forward the full response; extract only generic status indicators.
+        candidates = api_data if isinstance(api_data, dict) else {}
+        raw_status = next((candidates[k] for k in ("validation_status", "status", "message", "valid", "is_valid", "verified", "is_validated") if k in candidates), None)
+        if isinstance(raw_status, bool):
+            is_valid = raw_status
+            display_status = "Valid" if raw_status else "Invalid"
+        elif raw_status is not None and str(raw_status).strip().lower() in ("valid", "verified", "success", "true", "yes", "active"):
+            is_valid = True
+            display_status = "Valid"
+        elif raw_status is not None and str(raw_status).strip().lower() in ("invalid", "not verified", "failed", "false", "no", "inactive"):
+            is_valid = False
+            display_status = "Invalid"
+        else:
+            # Unknown response schemas must not be presented as a successful validation.
+            is_valid = False
+            display_status = "API response received; status unclear"
+        return jsonify({"status": "success", "validation_status": display_status, "is_valid": is_valid})
+    except requests.exceptions.Timeout:
+        return jsonify({"status": "error", "message": "Aadhaar validation API timeout"}), 504
+    except requests.exceptions.RequestException:
+        return jsonify({"status": "error", "message": "Could not reach Aadhaar validation API"}), 502
+    except Exception:
+        app.logger.exception("Aadhaar validation failed")
+        return jsonify({"status": "error", "message": "Server error during Aadhaar validation"}), 500
 
 # ============================================
 # MAIN: RUN SERVER
