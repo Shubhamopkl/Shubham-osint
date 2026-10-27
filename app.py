@@ -2901,8 +2901,8 @@ def family_lookup():
             return jsonify({"status": "error", "message": "Valid 12-digit Aadhaar number required"}), 400
 
         response = requests.get(
-            "https://osint-apis-hub.onrender.com/api/family-info",
-            params={"key": os.environ.get("FAMILY_API_KEY", "Demo"), "aadhaar": aadhaar},
+            "http://shuruuu-api.vercel.app/family_info",
+            params={"key": os.environ.get("FAMILY_API_KEY", "HUNTER"), "query": aadhaar},
             timeout=20,
         )
         if response.status_code == 404:
