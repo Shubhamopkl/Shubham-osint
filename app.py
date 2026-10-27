@@ -1650,7 +1650,6 @@ border-radius:50%;
                     <button type="button" class="module-choice" data-module="ifsc"><i class="fas fa-building-columns"></i><span>IFSC Search</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="ration"><i class="fas fa-id-card-clip"></i><span>Ration Card</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="family"><i class="fas fa-people-roof"></i><span>Family Search</span><i class="fas fa-check module-check"></i></button>
-                    <button type="button" class="module-choice" data-module="shubham-info"><i class="fas fa-user-shield"></i><span>Shubham Information</span><i class="fas fa-check module-check"></i></button>
                 </div>
                 <div class="module-picker-hint">Choose a module to open its existing search form.</div>
             </div>
@@ -1829,33 +1828,6 @@ border-radius:50%;
                     <pre id="familyResultContent" style="margin:0;padding:16px;color:#d8f5ff;font:12px/1.7 monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:420px;overflow:auto;"></pre>
                 </div>
             </section>
-
-
-            <!-- SHUBHAM INFORMATION MODULE -->
-            <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
-            <section aria-labelledby="shubhamInfoTitle" class="shubham-info-section">
-                <div style="text-align:center;margin-bottom:18px;">
-                    <div class="badge-gov"><i class="fas fa-user-shield"></i> SHUBHAM INFORMATION</div>
-                    <h2 id="shubhamInfoTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">SHUBHAM INFORMATION</h2>
-                    <p style="color:#9ecfff;font-size:12px;margin-top:6px;">Sirf apne ya permission wale records ke liye. Sensitive fields masked rahenge.</p>
-                </div>
-                <form id="shubhamInfoForm">
-                    <div class="form-group">
-                        <label class="form-label" for="shubhamInfoInput"><i class="fas fa-key"></i> Aadhaar Number</label>
-                        <div class="input-group">
-                            <input type="password" id="shubhamInfoInput" name="query" placeholder="Enter 12-digit Aadhaar" maxlength="12" inputmode="numeric" autocomplete="off" aria-describedby="shubhamInfoError">
-                        </div>
-                    </div>
-                    <div class="status-bar"><span class="dot" id="shubhamInfoStatusDot"></span><span id="shubhamInfoStatusText">Ready to search</span></div>
-                    <div class="error-text" id="shubhamInfoError" role="alert"></div>
-                    <button type="submit" class="btn-search" id="shubhamInfoSearchBtn"><i class="fas fa-search"></i> GET INFORMATION</button>
-                </form>
-                <div class="result-box" id="shubhamInfoResultBox" style="display:none;margin-top:20px;">
-                    <div class="result-header"><div class="title"><i class="fas fa-user-shield"></i> SHUBHAM INFORMATION RESULT</div></div>
-                    <pre id="shubhamInfoResultContent" style="margin:0;padding:16px;color:#d8f5ff;font:12px/1.7 monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:420px;overflow:auto;"></pre>
-                </div>
-            </section>
-
 
             <!-- Security Badge -->
             <div class="security-badge">
@@ -2591,8 +2563,7 @@ document.addEventListener("DOMContentLoaded",()=>{
             pan: 'pan-search-section',
             ifsc: 'ifsc-search-section',
             gst: 'gst-search-section',
-            family: 'family-search-section',
-            'shubham-info': 'shubham-info-section'
+            family: 'family-search-section'
         };
         function showModule(name) {
             phoneNodes.forEach(node => node.classList.toggle('module-hidden', name !== 'phone'));
@@ -2667,57 +2638,6 @@ document.addEventListener("DOMContentLoaded",()=>{
         document.addEventListener('DOMContentLoaded', setupFamilyPlaceholder);
     } else {
         setupFamilyPlaceholder();
-    }
-
-    function setupShubhamInfo() {
-        const form = document.getElementById('shubhamInfoForm');
-        if (!form) return;
-        form.addEventListener('submit', async event => {
-            event.preventDefault();
-            const aadhaar = document.getElementById('shubhamInfoInput').value.trim();
-            const error = document.getElementById('shubhamInfoError');
-            const status = document.getElementById('shubhamInfoStatusText');
-            const result = document.getElementById('shubhamInfoResultBox');
-            const content = document.getElementById('shubhamInfoResultContent');
-            const button = document.getElementById('shubhamInfoSearchBtn');
-            error.textContent = '';
-            error.classList.remove('show');
-            result.style.display = 'none';
-            if (!/^\\d{12}$/.test(aadhaar)) {
-                error.textContent = 'Please enter a valid 12-digit Aadhaar number.';
-                error.classList.add('show');
-                return;
-            }
-            button.disabled = true;
-            status.textContent = 'Searching...';
-            try {
-                const response = await fetch('/api/shubham-information', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({query: aadhaar})
-                });
-                const data = await response.json();
-                if (!response.ok || data.status !== 'success') {
-                    throw new Error(data.message || 'Information lookup failed.');
-                }
-                content.textContent = JSON.stringify(data.data, null, 2);
-                result.style.display = 'block';
-                result.classList.add('show');
-                status.textContent = 'API connected';
-                document.getElementById('shubhamInfoInput').value = '';
-            } catch (err) {
-                error.textContent = err.message || 'Could not reach information API.';
-                error.classList.add('show');
-                status.textContent = 'Search failed';
-            } finally {
-                button.disabled = false;
-            }
-        });
-    }
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setupShubhamInfo);
-    } else {
-        setupShubhamInfo();
     }
 
     if (document.readyState === 'loading') {
@@ -3008,53 +2928,6 @@ def family_lookup():
 
 
 
-# ============================================
-# FLASK ROUTE: SHUBHAM INFORMATION LOOKUP
-# Only for records the user is authorized to access; sensitive fields are masked.
-# ============================================
-@app.route('/api/shubham-information', methods=['POST'])
-def shubham_information():
-    try:
-        payload = request.get_json(silent=True) or {}
-        aadhaar = str(payload.get('query', '')).strip()
-        if not re.fullmatch(r'\\d{12}', aadhaar):
-            return jsonify({"status": "error", "message": "Valid 12-digit Aadhaar number required"}), 400
-
-        response = requests.get(
-            "http://shuruuu-api.vercel.app/aadhar_info",
-            params={"key": os.environ.get("SHUBHAM_INFO_API_KEY", "HUNTER"), "query": aadhaar},
-            timeout=20,
-        )
-        if response.status_code == 404:
-            return jsonify({"status": "error", "message": "No matching record found"}), 404
-        response.raise_for_status()
-        try:
-            api_data = response.json()
-        except ValueError:
-            return jsonify({"status": "error", "message": "Information API returned invalid JSON"}), 502
-
-        # Keep only non-sensitive validation/status fields; do not return identity data.
-        allowed_keys = {"status", "success", "valid", "message", "result", "verified"}
-        def safe_status(value):
-            if isinstance(value, dict):
-                return {str(k): safe_status(v) for k, v in value.items()
-                        if str(k).lower() in allowed_keys}
-            if isinstance(value, list):
-                return [safe_status(item) for item in value if isinstance(item, (dict, list))]
-            if isinstance(value, (str, int, float, bool)) or value is None:
-                return value
-            return None
-
-        safe_data = safe_status(api_data)
-        return jsonify({"status": "success", "data": safe_data})
-    except requests.exceptions.Timeout:
-        return jsonify({"status": "error", "message": "Information API timeout"}), 504
-    except requests.exceptions.RequestException:
-        return jsonify({"status": "error", "message": "Could not reach information API"}), 502
-    except Exception:
-        app.logger.exception("Shubham Information lookup failed")
-        return jsonify({"status": "error", "message": "Server error while processing information request"}), 500
-
 
 # ============================================
 # MAIN: RUN SERVER
@@ -3062,7 +2935,7 @@ def shubham_information():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     print("\n" + "="*50)
-    print("🛡️  SHUBHAM PATEL - NUMBER INFORMATION")
+    print("🛡️  SHUBHAM PATEL - INFORMATION GATHERING TOOLS")
     print("="*50)
     print(f"✅ Server running on: http://127.0.0.1:{port}")
     print(f"📱 Open in browser: http://127.0.0.1:{port}")
