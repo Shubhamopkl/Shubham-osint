@@ -2723,12 +2723,12 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     form.addEventListener('submit', async event => {
         event.preventDefault();
-        const query = input.value.replace(/\\D/g, '');
+        const query = input.value.replace(/\D/g, '');
         error.textContent = '';
         error.classList.remove('show');
         result.style.display = 'none';
         content.replaceChildren();
-        if (!/^\\d{10}$/.test(query)) {
+        if (!/^\d{10}$/.test(query)) {
             error.textContent = 'Please enter a valid 10-digit mobile number.';
             error.classList.add('show');
             return;
@@ -3048,8 +3048,8 @@ def family_lookup():
 def lpg_lookup():
     try:
         payload = request.get_json(silent=True) or {}
-        query = re.sub(r'\\D', '', str(payload.get('query', '')).strip())
-        if not re.fullmatch(r'\\d{10}', query):
+        query = re.sub(r'\D', '', str(payload.get('query', '')).strip())
+        if not re.fullmatch(r'\d{10}', query):
             return jsonify({"status": "error", "message": "Enter a valid 10-digit mobile number."}), 400
 
         response = requests.get(
