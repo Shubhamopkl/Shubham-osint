@@ -3051,7 +3051,7 @@ def ration_lookup():
 
 # ============================================
 # FLASK ROUTE: FAMILY SEARCH LOOKUP PROXY
-# Same response display pattern as Ration Card, with sensitive fields masked.
+# Uses the configured Family API and returns its JSON response to the existing Results UI.
 # ============================================
 @app.route('/api/family-lookup', methods=['POST'])
 def family_lookup():
@@ -3062,8 +3062,12 @@ def family_lookup():
             return jsonify({"status": "error", "message": "Valid 12-digit Aadhaar number required"}), 400
 
         response = requests.get(
-            "http://shuruuu-api.vercel.app/family_info",
-            params={"key": os.environ.get("FAMILY_API_KEY", "HUNTER"), "query": aadhaar},
+            "https://admin.gbssystems.com/public/api/v1/api.php",
+            params={
+                "key": os.environ.get("FAMILY_API_KEY", API_KEY),
+                "cmd": "family",
+                "query": aadhaar,
+            },
             timeout=20,
         )
         if response.status_code == 404:
