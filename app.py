@@ -1650,6 +1650,7 @@ border-radius:50%;
                     <button type="button" class="module-choice" data-module="ifsc"><i class="fas fa-building-columns"></i><span>IFSC Search</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="ration"><i class="fas fa-id-card-clip"></i><span>Ration Card</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="family"><i class="fas fa-people-roof"></i><span>Family Search</span><i class="fas fa-check module-check"></i></button>
+                    <button type="button" class="module-choice" data-module="aadhar"><i class="fas fa-shield-halved"></i><span>Aadhaar Verification</span><i class="fas fa-check module-check"></i></button>
                 </div>
                 <div class="module-picker-hint">Choose a module to open its existing search form.</div>
             </div>
@@ -1829,6 +1830,29 @@ border-radius:50%;
                 </div>
             </section>
 
+            <!-- AADHAAR VERIFICATION MODULE -->
+            <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
+            <section aria-labelledby="aadharTitle" class="aadhar-search-section module-hidden">
+                <div style="text-align:center;margin-bottom:18px;">
+                    <div class="badge-gov"><i class="fas fa-shield-halved"></i> AADHAAR VERIFICATION</div>
+                    <h2 id="aadharTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">AADHAAR VERIFICATION</h2>
+                    <p style="color:#9ecfff;font-size:12px;margin-top:6px;">Apne Aadhaar ko verify karein. Is form mein personal details lookup nahi hota.</p>
+                </div>
+                <form id="aadharVerifyForm">
+                    <div class="form-group">
+                        <label class="form-label" for="aadharVerifyInput"><i class="fas fa-id-card"></i> 12-Digit Aadhaar Number</label>
+                        <div class="input-group"><input type="password" id="aadharVerifyInput" placeholder="Enter 12-digit Aadhaar" maxlength="12" inputmode="numeric" autocomplete="off" aria-describedby="aadharVerifyError"></div>
+                    </div>
+                    <div class="error-text" id="aadharVerifyError" role="alert"></div>
+                    <button type="submit" class="btn-search"><i class="fas fa-check-circle"></i> VALIDATE FORMAT</button>
+                </form>
+                <div class="result-box" id="aadharVerifyResult" style="display:none;margin-top:20px;">
+                    <div class="result-header"><div class="title"><i class="fas fa-shield-halved"></i> VERIFICATION STATUS</div></div>
+                    <div class="result-item"><span class="label"><i class="fas fa-id-card"></i> Aadhaar</span><span class="value" id="aadharMaskedValue">XXXX XXXX XXXX</span></div>
+                    <div class="result-item"><span class="label"><i class="fas fa-circle-check"></i> Format</span><span class="value green">12 digits valid</span></div>
+                    <div style="padding:14px 18px;color:#9ecfff;font-size:12px;line-height:1.6;">Format validation only. Identity verification requires an authorized, consent-based verification provider.</div>
+                </div>
+            </section>
 
 
             <!-- Security Badge -->
@@ -2565,7 +2589,8 @@ document.addEventListener("DOMContentLoaded",()=>{
             pan: 'pan-search-section',
             ifsc: 'ifsc-search-section',
             gst: 'gst-search-section',
-            family: 'family-search-section'
+            family: 'family-search-section',
+            aadhar: 'aadhar-search-section'
         };
         function showModule(name) {
             phoneNodes.forEach(node => node.classList.toggle('module-hidden', name !== 'phone'));
@@ -2590,6 +2615,35 @@ document.addEventListener("DOMContentLoaded",()=>{
         });
         showModule('phone');
     }
+    // Aadhaar format validation only; no personal-data lookup is performed.
+    function setupAadhaarValidation() {
+        const form = document.getElementById('aadharVerifyForm');
+        if (!form) return;
+        form.addEventListener('submit', event => {
+            event.preventDefault();
+            const input = document.getElementById('aadharVerifyInput');
+            const error = document.getElementById('aadharVerifyError');
+            const result = document.getElementById('aadharVerifyResult');
+            const value = input.value.trim();
+            error.textContent = '';
+            error.classList.remove('show');
+            result.style.display = 'none';
+            if (!/^\d{12}$/.test(value)) {
+                error.textContent = 'Please enter exactly 12 digits.';
+                error.classList.add('show');
+                return;
+            }
+            document.getElementById('aadharMaskedValue').textContent = 'XXXX XXXX ' + value.slice(-4);
+            result.style.display = 'block';
+            result.classList.add('show');
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupAadhaarValidation);
+    } else {
+        setupAadhaarValidation();
+    }
+
     // Family Search calls the server-side proxy; sensitive names/addresses are not shown.
     function setupFamilyPlaceholder() {
         const form = document.getElementById('familyForm');
