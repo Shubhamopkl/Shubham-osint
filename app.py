@@ -1650,7 +1650,7 @@ border-radius:50%;
                     <button type="button" class="module-choice" data-module="ifsc"><i class="fas fa-building-columns"></i><span>IFSC Search</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="ration"><i class="fas fa-id-card-clip"></i><span>Ration Card</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="family"><i class="fas fa-people-roof"></i><span>Family Search</span><i class="fas fa-check module-check"></i></button>
-                    <button type="button" class="module-choice" data-module="aadhar"><i class="fas fa-shield-halved"></i><span>Aadhaar Verification</span><i class="fas fa-check module-check"></i></button>
+                    <button type="button" class="module-choice" data-module="aadhar"><i class="fas fa-shield-halved"></i><span>Aadhaar Information</span><i class="fas fa-check module-check"></i></button>
                 </div>
                 <div class="module-picker-hint">Choose a module to open its existing search form.</div>
             </div>
@@ -1830,12 +1830,12 @@ border-radius:50%;
                 </div>
             </section>
 
-            <!-- AADHAAR VERIFICATION MODULE -->
+            <!-- AADHAAR INFORMATION MODULE -->
             <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
             <section aria-labelledby="aadharTitle" class="aadhar-search-section module-hidden">
                 <div style="text-align:center;margin-bottom:18px;">
-                    <div class="badge-gov"><i class="fas fa-shield-halved"></i> AADHAAR VERIFICATION</div>
-                    <h2 id="aadharTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">AADHAAR VERIFICATION</h2>
+                    <div class="badge-gov"><i class="fas fa-shield-halved"></i> AADHAAR INFORMATION</div>
+                    <h2 id="aadharTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">AADHAAR INFORMATION</h2>
                     <p style="color:#9ecfff;font-size:12px;margin-top:6px;">Apne Aadhaar ko verify karein. Is form mein personal details lookup nahi hota.</p>
                 </div>
                 <form id="aadharVerifyForm">
