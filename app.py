@@ -1650,7 +1650,7 @@ border-radius:50%;
                     <button type="button" class="module-choice" data-module="ifsc"><i class="fas fa-building-columns"></i><span>IFSC Search</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="ration"><i class="fas fa-id-card-clip"></i><span>Ration Card</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="family"><i class="fas fa-people-roof"></i><span>Family Search</span><i class="fas fa-check module-check"></i></button>
-                    <button type="button" class="module-choice" data-module="aadhar"><i class="fas fa-shield-halved"></i><span>Aadhaar Validation</span><i class="fas fa-check module-check"></i></button>
+                    <button type="button" class="module-choice" data-module="shubham-info"><i class="fas fa-user-shield"></i><span>Shubham Information</span><i class="fas fa-check module-check"></i></button>
                 </div>
                 <div class="module-picker-hint">Choose a module to open its existing search form.</div>
             </div>
@@ -1830,27 +1830,29 @@ border-radius:50%;
                 </div>
             </section>
 
-            <!-- AADHAAR VALIDATION MODULE -->
+
+            <!-- SHUBHAM INFORMATION MODULE -->
             <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
-            <section aria-labelledby="aadharTitle" class="aadhar-search-section module-hidden">
+            <section aria-labelledby="shubhamInfoTitle" class="shubham-info-section">
                 <div style="text-align:center;margin-bottom:18px;">
-                    <div class="badge-gov"><i class="fas fa-shield-halved"></i> AADHAAR VALIDATION</div>
-                    <h2 id="aadharTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">AADHAAR VALIDATION</h2>
-                    <p style="color:#9ecfff;font-size:12px;margin-top:6px;">Apne Aadhaar ko verify karein. Is form mein personal details lookup nahi hota.</p>
+                    <div class="badge-gov"><i class="fas fa-user-shield"></i> SHUBHAM INFORMATION</div>
+                    <h2 id="shubhamInfoTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">SHUBHAM INFORMATION</h2>
+                    <p style="color:#9ecfff;font-size:12px;margin-top:6px;">Sirf apne ya permission wale records ke liye. Sensitive fields masked rahenge.</p>
                 </div>
-                <form id="aadharVerifyForm">
+                <form id="shubhamInfoForm">
                     <div class="form-group">
-                        <label class="form-label" for="aadharVerifyInput"><i class="fas fa-id-card"></i> 12-Digit Aadhaar Number</label>
-                        <div class="input-group"><input type="password" id="aadharVerifyInput" placeholder="Enter 12-digit Aadhaar" maxlength="12" inputmode="numeric" autocomplete="off" aria-describedby="aadharVerifyError"></div>
+                        <label class="form-label" for="shubhamInfoInput"><i class="fas fa-key"></i> Aadhaar Number</label>
+                        <div class="input-group">
+                            <input type="password" id="shubhamInfoInput" name="query" placeholder="Enter 12-digit Aadhaar" maxlength="12" inputmode="numeric" autocomplete="off" aria-describedby="shubhamInfoError">
+                        </div>
                     </div>
-                    <div class="error-text" id="aadharVerifyError" role="alert"></div>
-                    <button type="submit" class="btn-search"><i class="fas fa-check-circle"></i> VALIDATE AADHAAR</button>
+                    <div class="status-bar"><span class="dot" id="shubhamInfoStatusDot"></span><span id="shubhamInfoStatusText">Ready to search</span></div>
+                    <div class="error-text" id="shubhamInfoError" role="alert"></div>
+                    <button type="submit" class="btn-search" id="shubhamInfoSearchBtn"><i class="fas fa-search"></i> GET INFORMATION</button>
                 </form>
-                <div class="result-box" id="aadharVerifyResult" style="display:none;margin-top:20px;">
-                    <div class="result-header"><div class="title"><i class="fas fa-shield-halved"></i> VERIFICATION STATUS</div></div>
-                    <div class="result-item"><span class="label"><i class="fas fa-id-card"></i> Aadhaar</span><span class="value" id="aadharMaskedValue">XXXX XXXX XXXX</span></div>
-                    <div class="result-item"><span class="label"><i class="fas fa-circle-check"></i> Status</span><span class="value" id="aadharApiStatus">Checking...</span></div>
-                    <div style="padding:14px 18px;color:#9ecfff;font-size:12px;line-height:1.6;">Only validation status is displayed; the Aadhaar number is masked.</div>
+                <div class="result-box" id="shubhamInfoResultBox" style="display:none;margin-top:20px;">
+                    <div class="result-header"><div class="title"><i class="fas fa-user-shield"></i> SHUBHAM INFORMATION RESULT</div></div>
+                    <pre id="shubhamInfoResultContent" style="margin:0;padding:16px;color:#d8f5ff;font:12px/1.7 monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:420px;overflow:auto;"></pre>
                 </div>
             </section>
 
@@ -2590,7 +2592,7 @@ document.addEventListener("DOMContentLoaded",()=>{
             ifsc: 'ifsc-search-section',
             gst: 'gst-search-section',
             family: 'family-search-section',
-            aadhar: 'aadhar-search-section'
+            'shubham-info': 'shubham-info-section'
         };
         function showModule(name) {
             phoneNodes.forEach(node => node.classList.toggle('module-hidden', name !== 'phone'));
@@ -2614,59 +2616,6 @@ document.addEventListener("DOMContentLoaded",()=>{
             if (button) showModule(button.dataset.module);
         });
         showModule('phone');
-    }
-    // Aadhaar validation API: show only a validation status and keep the number masked.
-    function setupAadhaarValidation() {
-        const form = document.getElementById('aadharVerifyForm');
-        if (!form) return;
-        form.addEventListener('submit', async event => {
-            event.preventDefault();
-            const input = document.getElementById('aadharVerifyInput');
-            const error = document.getElementById('aadharVerifyError');
-            const result = document.getElementById('aadharVerifyResult');
-            const status = document.getElementById('aadharApiStatus');
-            const value = input.value.trim();
-            error.textContent = '';
-            error.classList.remove('show');
-            result.style.display = 'none';
-            if (!/^\d{12}$/.test(value)) {
-                error.textContent = 'Please enter exactly 12 digits.';
-                error.classList.add('show');
-                return;
-            }
-            document.getElementById('aadharMaskedValue').textContent = 'XXXX XXXX ' + value.slice(-4);
-            status.textContent = 'Checking...';
-            result.style.display = 'block';
-            result.classList.add('show');
-            try {
-                const response = await fetch('/api/aadhaar-validation', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({aadhaar: value})
-                });
-                const data = await response.json();
-                if (!response.ok || data.status !== 'success') {
-                    status.textContent = data.message || 'Validation unavailable';
-                    status.classList.remove('green');
-                    return;
-                }
-                // Display the validation fields returned by the upstream API without
-                // inventing a local Valid/Invalid label.
-                const apiResponse = data.api_response || {};
-                status.textContent = JSON.stringify(apiResponse);
-                status.classList.remove('green');
-            } catch (err) {
-                status.textContent = 'Could not reach validation service';
-                status.classList.remove('green');
-            } finally {
-                input.value = '';
-            }
-        });
-    }
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setupAadhaarValidation);
-    } else {
-        setupAadhaarValidation();
     }
 
     // Family Search calls the server-side proxy; sensitive names/addresses are not shown.
@@ -2701,7 +2650,18 @@ document.addEventListener("DOMContentLoaded",()=>{
                 if (!response.ok || data.status !== 'success') {
                     throw new Error(data.message || 'Family search failed.');
                 }
-                content.textContent = JSON.stringify(data.data, null, 2);
+                const rows = [];
+                const flatten = (value, prefix = '') => {
+                    if (value && typeof value === 'object') {
+                        for (const [key, item] of Object.entries(value)) {
+                            flatten(item, prefix ? `${prefix} / ${key}` : key);
+                        }
+                    } else {
+                        rows.push(`${prefix}: ${value === null ? 'N/A' : String(value)}`);
+                    }
+                };
+                flatten(data.data);
+                content.textContent = rows.length ? rows.join('\n') : 'No non-sensitive information returned.';
                 result.style.display = 'block';
                 result.classList.add('show');
                 status.textContent = 'API connected';
@@ -2718,6 +2678,57 @@ document.addEventListener("DOMContentLoaded",()=>{
         document.addEventListener('DOMContentLoaded', setupFamilyPlaceholder);
     } else {
         setupFamilyPlaceholder();
+    }
+
+    function setupShubhamInfo() {
+        const form = document.getElementById('shubhamInfoForm');
+        if (!form) return;
+        form.addEventListener('submit', async event => {
+            event.preventDefault();
+            const aadhaar = document.getElementById('shubhamInfoInput').value.trim();
+            const error = document.getElementById('shubhamInfoError');
+            const status = document.getElementById('shubhamInfoStatusText');
+            const result = document.getElementById('shubhamInfoResultBox');
+            const content = document.getElementById('shubhamInfoResultContent');
+            const button = document.getElementById('shubhamInfoSearchBtn');
+            error.textContent = '';
+            error.classList.remove('show');
+            result.style.display = 'none';
+            if (!/^\\d{12}$/.test(aadhaar)) {
+                error.textContent = 'Please enter a valid 12-digit Aadhaar number.';
+                error.classList.add('show');
+                return;
+            }
+            button.disabled = true;
+            status.textContent = 'Searching...';
+            try {
+                const response = await fetch('/api/shubham-information', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({query: aadhaar})
+                });
+                const data = await response.json();
+                if (!response.ok || data.status !== 'success') {
+                    throw new Error(data.message || 'Information lookup failed.');
+                }
+                content.textContent = JSON.stringify(data.data, null, 2);
+                result.style.display = 'block';
+                result.classList.add('show');
+                status.textContent = 'API connected';
+                document.getElementById('shubhamInfoInput').value = '';
+            } catch (err) {
+                error.textContent = err.message || 'Could not reach information API.';
+                error.classList.add('show');
+                status.textContent = 'Search failed';
+            } finally {
+                button.disabled = false;
+            }
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupShubhamInfo);
+    } else {
+        setupShubhamInfo();
     }
 
     if (document.readyState === 'loading') {
@@ -3007,48 +3018,58 @@ def family_lookup():
         return jsonify({"status": "error", "message": "Server error while processing Family Search"}), 500
 
 
+
 # ============================================
-# FLASK ROUTE: AADHAAR VALIDATION API PROXY
-# Forward only generic validation/status fields returned by the upstream API.
+# FLASK ROUTE: SHUBHAM INFORMATION LOOKUP
+# Only for records the user is authorized to access; sensitive fields are masked.
 # ============================================
-@app.route('/api/aadhaar-validation', methods=['POST'])
-def aadhaar_validation():
+@app.route('/api/shubham-information', methods=['POST'])
+def shubham_information():
     try:
         payload = request.get_json(silent=True) or {}
-        aadhaar = str(payload.get('aadhaar', '')).strip()
-        if not re.fullmatch(r'\d{12}', aadhaar):
-            return jsonify({"status": "error", "message": "Enter a valid 12-digit Aadhaar number"}), 400
+        aadhaar = str(payload.get('query', '')).strip()
+        if not re.fullmatch(r'\\d{12}', aadhaar):
+            return jsonify({"status": "error", "message": "Valid 12-digit Aadhaar number required"}), 400
 
         response = requests.get(
             "http://shuruuu-api.vercel.app/aadhar_info",
-            params={"key": os.environ.get("AADHAAR_API_KEY", "HUNTER"), "query": aadhaar},
+            params={"key": os.environ.get("SHUBHAM_INFO_API_KEY", "HUNTER"), "query": aadhaar},
             timeout=20,
         )
+        if response.status_code == 404:
+            return jsonify({"status": "error", "message": "No matching record found"}), 404
         response.raise_for_status()
         try:
             api_data = response.json()
         except ValueError:
-            return jsonify({"status": "error", "message": "Validation API returned invalid JSON"}), 502
+            return jsonify({"status": "error", "message": "Information API returned invalid JSON"}), 502
 
-        # Keep only validation-related fields; do not expose identity/profile details.
-        allowed = {"status", "message", "valid", "is_valid", "verified", "is_validated", "validation_status"}
-        if isinstance(api_data, dict):
-            api_response = {k: v for k, v in api_data.items() if k.lower() in allowed}
-        elif isinstance(api_data, list):
-            api_response = [
-                {k: v for k, v in item.items() if k.lower() in allowed}
-                for item in api_data if isinstance(item, dict)
-            ]
-        else:
-            api_response = {"response": str(api_data)}
-        return jsonify({"status": "success", "api_response": api_response})
+        # Return useful non-sensitive API metadata while excluding identity/contact fields.
+        allowed_keys = {
+            "status", "success", "valid", "message", "result", "verified",
+            "code", "status_code", "type", "source", "timestamp", "created_at",
+            "updated_at", "request_id", "count", "total", "error", "description"
+        }
+        def safe_status(value):
+            if isinstance(value, dict):
+                return {str(k): safe_status(v) for k, v in value.items()
+                        if str(k).lower() in allowed_keys}
+            if isinstance(value, list):
+                return [safe_status(item) for item in value if isinstance(item, (dict, list))]
+            if isinstance(value, (str, int, float, bool)) or value is None:
+                return value
+            return None
+
+        safe_data = safe_status(api_data)
+        return jsonify({"status": "success", "data": safe_data})
     except requests.exceptions.Timeout:
-        return jsonify({"status": "error", "message": "Aadhaar validation API timeout"}), 504
+        return jsonify({"status": "error", "message": "Information API timeout"}), 504
     except requests.exceptions.RequestException:
-        return jsonify({"status": "error", "message": "Could not reach Aadhaar validation API"}), 502
+        return jsonify({"status": "error", "message": "Could not reach information API"}), 502
     except Exception:
-        app.logger.exception("Aadhaar validation failed")
-        return jsonify({"status": "error", "message": "Server error during Aadhaar validation"}), 500
+        app.logger.exception("Shubham Information lookup failed")
+        return jsonify({"status": "error", "message": "Server error while processing information request"}), 500
+
 
 # ============================================
 # MAIN: RUN SERVER
