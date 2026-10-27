@@ -836,6 +836,16 @@ box-shadow:0 0 20px rgba(0,217,255,.45);
 transform:translateY(-2px);
 }
 
+/* ===== FAMILY SEARCH READABLE CARDS ===== */
+.family-readable-result{padding:12px;display:grid;gap:12px;max-height:560px;overflow:auto}
+.family-info-card{background:rgba(5,18,34,.92);border:1px solid rgba(0,217,255,.2);border-radius:12px;overflow:hidden;min-width:0}
+.family-info-title{padding:10px 12px;background:linear-gradient(135deg,#081528,#12345a);color:#dff8ff;font-size:12px;font-weight:800;letter-spacing:.5px}
+.family-info-row{display:grid;grid-template-columns:minmax(95px,38%) minmax(0,1fr);gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.06);align-items:start}
+.family-info-row:last-child{border-bottom:0}
+.family-info-label{font-size:11px;color:#8ca6bb;font-weight:700;overflow-wrap:anywhere}
+.family-info-value{font-size:13px;color:#f3f8ff;overflow-wrap:anywhere;word-break:break-word;white-space:pre-wrap}
+.family-info-empty{padding:16px;color:#9ecfff;font-size:13px;text-align:center}
+@media(max-width:480px){.family-readable-result{padding:8px}.family-info-row{grid-template-columns:1fr;gap:4px;padding:10px}.family-info-value{font-size:13px}}
 /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .main-header .title-section h1 { font-size: 18px; }
@@ -1825,7 +1835,7 @@ border-radius:50%;
                 </form>
                 <div class="result-box" id="familyResultBox" style="display:none;margin-top:20px;">
                     <div class="result-header"><div class="title"><i class="fas fa-people-roof"></i> FAMILY SEARCH RESULT</div></div>
-                    <div id="familyResultContent" style="padding:14px;display:grid;gap:12px;"></div>
+                    <div id="familyResultContent" class="family-readable-result" aria-live="polite"></div>
                 </div>
             </section>
 
@@ -2590,6 +2600,83 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
 
     // Family Search calls the server-side proxy; sensitive names/addresses are not shown.
+    function renderFamilyReadable(payload, root) {
+        root.replaceChildren();
+        const labelize = key => String(key).replace(/([a-z])([A-Z])/g, '$1 $2')
+            .replace(/[_-]+/g, ' ').replace(/\\b\\w/g, ch => ch.toUpperCase());
+        const sensitiveKey = key => /aadhaar|aadhar|member.?id|identity.?number|uid|document.?number/i.test(String(key));
+        const addressKey = key => /address|location/i.test(String(key));
+        const safeValue = (key, value) => {
+            if (value === null || value === undefined || value === '') return 'Not available';
+            if (sensitiveKey(key)) {
+                const digits = String(value).replace(/\\D/g, '');
+                return digits.length >= 4 ? '••••••' + digits.slice(-4) : 'Hidden for privacy';
+            }
+            if (addressKey(key)) {
+                const text = String(value);
+                return text.length > 24 ? text.slice(0, 24) + '… (details hidden)' : 'Address details hidden';
+            }
+            if (typeof value === 'object') return '';
+            return String(value);
+        };
+        const card = (title, entries) => {
+            const section = document.createElement('section');
+            section.className = 'family-info-card';
+            const heading = document.createElement('div');
+            heading.className = 'family-info-title';
+            heading.textContent = title;
+            section.appendChild(heading);
+            entries.forEach(([key, value]) => {
+                const row = document.createElement('div');
+                row.className = 'family-info-row';
+                const label = document.createElement('div');
+                label.className = 'family-info-label';
+                label.textContent = labelize(key);
+                const val = document.createElement('div');
+                val.className = 'family-info-value';
+                val.textContent = safeValue(key, value) || 'Details';
+                row.append(label, val);
+                section.appendChild(row);
+            });
+            root.appendChild(section);
+        };
+        const renderObject = (obj, title, depth = 0) => {
+            if (Array.isArray(obj)) {
+                obj.forEach((item, index) => renderObject(item, `${title} ${index + 1}`, depth + 1));
+                return;
+            }
+            if (!obj || typeof obj !== 'object') {
+                card(title, [['Details', obj]]);
+                return;
+            }
+            const scalar = [];
+            const nested = [];
+            Object.entries(obj).forEach(([key, value]) => {
+                if (value && typeof value === 'object') nested.push([key, value]);
+                else scalar.push([key, value]);
+            });
+            if (scalar.length) card(title, scalar);
+            nested.forEach(([key, value]) => {
+                const nestedTitle = /memberDetailList|members|familyMembers/i.test(key)
+                    ? 'Family Members' : labelize(key);
+                renderObject(value, nestedTitle, depth + 1);
+            });
+        };
+        if (payload && typeof payload === 'object') renderObject(payload, 'Family Details');
+        else {
+            const empty = document.createElement('div');
+            empty.className = 'family-info-empty';
+            empty.textContent = 'No readable family details were returned.';
+            root.appendChild(empty);
+        }
+        if (!root.childElementCount) {
+            const empty = document.createElement('div');
+            empty.className = 'family-info-empty';
+            empty.textContent = 'No family details available.';
+            root.appendChild(empty);
+        }
+    }
+
     function setupFamilyPlaceholder() {
         const form = document.getElementById('familyForm');
         if (!form) return;
@@ -2621,7 +2708,7 @@ document.addEventListener("DOMContentLoaded",()=>{
                 if (!response.ok || data.status !== 'success') {
                     throw new Error(data.message || 'Family search failed.');
                 }
-                renderFamilyResult(content, data.data);
+                renderFamilyReadable(data.data, content);
                 result.style.display = 'block';
                 result.classList.add('show');
                 status.textContent = 'API connected';
@@ -2634,68 +2721,6 @@ document.addEventListener("DOMContentLoaded",()=>{
             }
         });
     }
-    function renderFamilyResult(container, payload) {
-        container.replaceChildren();
-        const root = payload && typeof payload === 'object' ? payload : {};
-        const family = root.data && typeof root.data === 'object' ? root.data : root;
-        const pd = family.pd && typeof family.pd === 'object' ? family.pd : family;
-        const members = Array.isArray(pd.memberDetailList) ? pd.memberDetailList :
-            (Array.isArray(family.memberDetailList) ? family.memberDetailList : []);
-
-        const card = document.createElement('section');
-        card.style.cssText = 'border:1px solid rgba(0,217,255,.24);border-radius:12px;overflow:hidden;background:rgba(3,18,34,.72);box-shadow:0 0 18px rgba(0,217,255,.12);';
-        const header = document.createElement('div');
-        header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px;background:rgba(0,217,255,.10);color:#e7f6ff;font-weight:700;font-size:12px;letter-spacing:.5px;';
-        header.textContent = '▣ FAMILY INFORMATION';
-        card.appendChild(header);
-        const body = document.createElement('div');
-        body.style.cssText = 'padding:4px 12px 10px;';
-        const row = (parent, label, value) => {
-            if (value === undefined || value === null || String(value).trim() === '') return;
-            const line = document.createElement('div');
-            line.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid rgba(120,180,220,.10);font-size:12px;';
-            const key = document.createElement('span');
-            key.style.cssText = 'color:#8fa9bd;flex:0 0 38%;text-transform:uppercase;font-size:10px;letter-spacing:.4px;';
-            key.textContent = label;
-            const val = document.createElement('span');
-            val.style.cssText = 'color:#ffad32;text-align:right;overflow-wrap:anywhere;max-width:62%;';
-            val.textContent = String(value);
-            line.append(key, val); parent.appendChild(line);
-        };
-        row(body, 'District', pd.homeDistName || pd.districtName || pd.district);
-        row(body, 'State', pd.homeStateName || pd.stateName || pd.state);
-        row(body, 'District Code', pd.districtCode);
-        row(body, 'Address', pd.address);
-        row(body, 'ONRC Allowed', pd.allowed_onorc);
-        row(body, 'UID Status', pd.dup_uid_status);
-        card.appendChild(body);
-        container.appendChild(card);
-
-        const memberSection = document.createElement('section');
-        memberSection.style.cssText = 'margin-top:12px;border:1px solid rgba(0,217,255,.24);border-radius:12px;overflow:hidden;background:rgba(3,18,34,.72);';
-        const memberHeader = document.createElement('div');
-        memberHeader.style.cssText = 'padding:12px;background:rgba(0,217,255,.10);color:#e7f6ff;font-weight:700;font-size:12px;letter-spacing:.5px;';
-        memberHeader.textContent = '♧ FAMILY MEMBERS (' + members.length + ')';
-        memberSection.appendChild(memberHeader);
-        const memberBody = document.createElement('div');
-        memberBody.style.cssText = 'padding:4px 12px 10px;';
-        members.forEach((member, index) => {
-            const sub = document.createElement('div');
-            sub.style.cssText = 'margin:10px 0;border:1px solid rgba(0,217,255,.14);border-radius:9px;background:rgba(0,217,255,.035);padding:0 10px;';
-            const title = document.createElement('div');
-            title.style.cssText = 'padding:9px 0;color:#00d9ff;font-weight:700;font-size:11px;border-bottom:1px solid rgba(120,180,220,.10);';
-            title.textContent = 'MEMBER ' + (index + 1);
-            sub.appendChild(title);
-            row(sub, 'Name', member.memberName || member.name);
-            row(sub, 'Relationship', member.relationship || member.relation || member.relationshipName || member.relationship_code);
-            row(sub, 'Member ID', member.memberId || member.memberID || member.id);
-            memberBody.appendChild(sub);
-        });
-        if (!members.length) row(memberBody, 'Members', 'No member list was provided by the API.');
-        memberSection.appendChild(memberBody);
-        container.appendChild(memberSection);
-    }
-
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', setupFamilyPlaceholder);
     } else {
