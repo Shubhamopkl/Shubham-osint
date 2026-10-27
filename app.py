@@ -1533,64 +1533,6 @@ border-radius:50%;
 .module-choice.active .module-check{display:inline}
 .module-picker-hint{font-size:11px;color:#8fb8d3;margin-top:12px}
 .module-hidden{display:none!important}
-
-/* Keep only the selected search module visible */
-body[data-active-module="phone"] .ration-search-section,
-body[data-active-module="phone"] .pan-search-section,
-body[data-active-module="phone"] .ifsc-search-section,
-body[data-active-module="phone"] .gst-search-section,
-body[data-active-module="phone"] .family-search-section,
-body[data-active-module="phone"] .shubham-info-section { display:none !important; }
-body[data-active-module="ration"] #trackForm,
-body[data-active-module="ration"] #resultBox,
-body[data-active-module="ration"] #jsonBox,
-body[data-active-module="ration"] .ration-search-section ~ .pan-search-section,
-body[data-active-module="ration"] .pan-search-section,
-body[data-active-module="ration"] .ifsc-search-section,
-body[data-active-module="ration"] .gst-search-section,
-body[data-active-module="ration"] .family-search-section,
-body[data-active-module="ration"] .shubham-info-section { display:none !important; }
-body[data-active-module="pan"] #trackForm,
-body[data-active-module="pan"] #resultBox,
-body[data-active-module="pan"] #jsonBox,
-body[data-active-module="pan"] .ration-search-section,
-body[data-active-module="pan"] .ifsc-search-section,
-body[data-active-module="pan"] .gst-search-section,
-body[data-active-module="pan"] .family-search-section,
-body[data-active-module="pan"] .shubham-info-section { display:none !important; }
-body[data-active-module="ifsc"] #trackForm,
-body[data-active-module="ifsc"] #resultBox,
-body[data-active-module="ifsc"] #jsonBox,
-body[data-active-module="ifsc"] .ration-search-section,
-body[data-active-module="ifsc"] .pan-search-section,
-body[data-active-module="ifsc"] .gst-search-section,
-body[data-active-module="ifsc"] .family-search-section,
-body[data-active-module="ifsc"] .shubham-info-section { display:none !important; }
-body[data-active-module="gst"] #trackForm,
-body[data-active-module="gst"] #resultBox,
-body[data-active-module="gst"] #jsonBox,
-body[data-active-module="gst"] .ration-search-section,
-body[data-active-module="gst"] .pan-search-section,
-body[data-active-module="gst"] .ifsc-search-section,
-body[data-active-module="gst"] .family-search-section,
-body[data-active-module="gst"] .shubham-info-section { display:none !important; }
-body[data-active-module="family"] #trackForm,
-body[data-active-module="family"] #resultBox,
-body[data-active-module="family"] #jsonBox,
-body[data-active-module="family"] .ration-search-section,
-body[data-active-module="family"] .pan-search-section,
-body[data-active-module="family"] .ifsc-search-section,
-body[data-active-module="family"] .gst-search-section,
-body[data-active-module="family"] .shubham-info-section { display:none !important; }
-body[data-active-module="shubham-info"] #trackForm,
-body[data-active-module="shubham-info"] #resultBox,
-body[data-active-module="shubham-info"] #jsonBox,
-body[data-active-module="shubham-info"] .ration-search-section,
-body[data-active-module="shubham-info"] .pan-search-section,
-body[data-active-module="shubham-info"] .ifsc-search-section,
-body[data-active-module="shubham-info"] .gst-search-section,
-body[data-active-module="shubham-info"] .family-search-section { display:none !important; }
-
 @media(max-width:380px){.module-picker-grid{grid-template-columns:1fr}.module-picker{padding:13px}}
 
 </style>
@@ -1718,10 +1660,11 @@ body[data-active-module="shubham-info"] .family-search-section { display:none !i
             <form id="trackForm">
                 <div class="form-group">
                     <label class="form-label">
-                        <i class="fas fa-phone"></i> Enter Mobile Number (up to 15 digits)
+                        <i class="fas fa-phone"></i> Enter 10-Digit Mobile Number
                     </label>
                     <div class="input-group">
-                        <input type="tel" id="phoneInput" placeholder="Enter phone number (up to 15 digits)" maxlength="15" inputmode="numeric" value="">
+                        <span class="country-code">+91</span>
+                        <input type="tel" id="phoneInput" placeholder="Enter phone number" maxlength="10" inputmode="numeric" value="">
                     </div>
                 </div>
 
@@ -2057,7 +2000,7 @@ function displayResults(number, data) {
         
         html += `<div class="result-item">
             <span class="label"><i class="fas fa-phone"></i> Phone</span>
-            <span class="value highlight">${info.num || number}</span>
+            <span class="value highlight">${info.num || '+91 ' + number}</span>
         </div>`;
         
         html += `<div class="result-item">
@@ -2132,8 +2075,8 @@ async function searchNumber() {
     const trackBtn = document.getElementById('trackBtn');
     const errorText = document.getElementById('errorText');
     
-    if (!number || number.length > 15 || !/^[0-9]{1,15}$/.test(number)) {
-        errorText.textContent = '⚠️ Please enter a valid number containing 1–15 digits!';
+    if (!number || number.length !== 10 || !/^[0-9]{10}$/.test(number)) {
+        errorText.textContent = '⚠️ Please enter a valid 10-digit phone number!';
         errorText.classList.add('show');
         return;
     }
@@ -2652,7 +2595,6 @@ document.addEventListener("DOMContentLoaded",()=>{
             'shubham-info': 'shubham-info-section'
         };
         function showModule(name) {
-            document.body.setAttribute('data-active-module', name);
             phoneNodes.forEach(node => node.classList.toggle('module-hidden', name !== 'phone'));
             Object.entries(sectionIds).forEach(([key, className]) => {
                 const section = document.querySelector('.' + className);
@@ -2708,18 +2650,7 @@ document.addEventListener("DOMContentLoaded",()=>{
                 if (!response.ok || data.status !== 'success') {
                     throw new Error(data.message || 'Family search failed.');
                 }
-                const rows = [];
-                const flatten = (value, prefix = '') => {
-                    if (value && typeof value === 'object') {
-                        for (const [key, item] of Object.entries(value)) {
-                            flatten(item, prefix ? `${prefix} / ${key}` : key);
-                        }
-                    } else {
-                        rows.push(`${prefix}: ${value === null ? 'N/A' : String(value)}`);
-                    }
-                };
-                flatten(data.data);
-                content.textContent = rows.length ? rows.join('\n') : 'No non-sensitive information returned.';
+                content.textContent = JSON.stringify(data.data, null, 2);
                 result.style.display = 'block';
                 result.classList.add('show');
                 status.textContent = 'API connected';
@@ -2819,9 +2750,9 @@ def lookup():
         number = str(data.get('number', '')).strip()
         clean_number = re.sub(r'\D', '', number)
 
-        # This endpoint accepts up to 15 digits in query and the API key in key.
-        if not re.fullmatch(r'\d{1,15}', clean_number):
-            return jsonify({"status": "error", "message": "Enter a valid number containing 1–15 digits.", "result": []}), 400
+        # This endpoint expects a 10-digit number in query and the API key in key.
+        if not re.fullmatch(r'\d{10}', clean_number):
+            return jsonify({"status": "error", "message": "Enter a valid 10-digit phone number.", "result": []}), 400
 
         response = requests.get(
             API_BASE_URL,
@@ -3102,12 +3033,8 @@ def shubham_information():
         except ValueError:
             return jsonify({"status": "error", "message": "Information API returned invalid JSON"}), 502
 
-        # Return useful non-sensitive API metadata while excluding identity/contact fields.
-        allowed_keys = {
-            "status", "success", "valid", "message", "result", "verified",
-            "code", "status_code", "type", "source", "timestamp", "created_at",
-            "updated_at", "request_id", "count", "total", "error", "description"
-        }
+        # Keep only non-sensitive validation/status fields; do not return identity data.
+        allowed_keys = {"status", "success", "valid", "message", "result", "verified"}
         def safe_status(value):
             if isinstance(value, dict):
                 return {str(k): safe_status(v) for k, v in value.items()
