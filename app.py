@@ -836,16 +836,6 @@ box-shadow:0 0 20px rgba(0,217,255,.45);
 transform:translateY(-2px);
 }
 
-/* ===== FAMILY SEARCH READABLE CARDS ===== */
-.family-readable-result{padding:12px;display:grid;gap:12px;max-height:560px;overflow:auto}
-.family-info-card{background:rgba(5,18,34,.92);border:1px solid rgba(0,217,255,.2);border-radius:12px;overflow:hidden;min-width:0}
-.family-info-title{padding:10px 12px;background:linear-gradient(135deg,#081528,#12345a);color:#dff8ff;font-size:12px;font-weight:800;letter-spacing:.5px}
-.family-info-row{display:grid;grid-template-columns:minmax(95px,38%) minmax(0,1fr);gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.06);align-items:start}
-.family-info-row:last-child{border-bottom:0}
-.family-info-label{font-size:11px;color:#8ca6bb;font-weight:700;overflow-wrap:anywhere}
-.family-info-value{font-size:13px;color:#f3f8ff;overflow-wrap:anywhere;word-break:break-word;white-space:pre-wrap}
-.family-info-empty{padding:16px;color:#9ecfff;font-size:13px;text-align:center}
-@media(max-width:480px){.family-readable-result{padding:8px}.family-info-row{grid-template-columns:1fr;gap:4px;padding:10px}.family-info-value{font-size:13px}}
 /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .main-header .title-section h1 { font-size: 18px; }
@@ -1660,6 +1650,7 @@ border-radius:50%;
                     <button type="button" class="module-choice" data-module="ifsc"><i class="fas fa-building-columns"></i><span>IFSC Search</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="ration"><i class="fas fa-id-card-clip"></i><span>Ration Card</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="family"><i class="fas fa-people-roof"></i><span>Family Search</span><i class="fas fa-check module-check"></i></button>
+                    <button type="button" class="module-choice" data-module="lpg"><i class="fas fa-fire-flame-simple"></i><span>LPG Information</span><i class="fas fa-check module-check"></i></button>
                 </div>
                 <div class="module-picker-hint">Choose a module to open its existing search form.</div>
             </div>
@@ -1835,7 +1826,32 @@ border-radius:50%;
                 </form>
                 <div class="result-box" id="familyResultBox" style="display:none;margin-top:20px;">
                     <div class="result-header"><div class="title"><i class="fas fa-people-roof"></i> FAMILY SEARCH RESULT</div></div>
-                    <div id="familyResultContent" class="family-readable-result" aria-live="polite"></div>
+                    <pre id="familyResultContent" style="margin:0;padding:16px;color:#d8f5ff;font:12px/1.7 monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:420px;overflow:auto;"></pre>
+                </div>
+            </section>
+
+            <!-- LPG INFORMATION -->
+            <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
+            <section aria-labelledby="lpgSearchTitle" class="lpg-search-section module-hidden">
+                <div style="text-align:center;margin-bottom:18px;">
+                    <div class="badge-gov"><i class="fas fa-fire-flame-simple"></i> LPG INFORMATION</div>
+                    <h2 id="lpgSearchTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">LPG INFORMATION</h2>
+                </div>
+                <form id="lpgForm">
+                    <div class="form-group">
+                        <label class="form-label" for="lpgInput"><i class="fas fa-mobile-screen"></i> Enter 10-Digit Mobile Number</label>
+                        <div class="input-group">
+                            <span class="country-code">+91</span>
+                            <input type="tel" id="lpgInput" name="query" placeholder="Enter mobile number" maxlength="10" inputmode="numeric" autocomplete="off" aria-describedby="lpgError">
+                        </div>
+                    </div>
+                    <div class="status-bar"><span class="dot" id="lpgStatusDot"></span><span id="lpgStatusText">Ready to search</span></div>
+                    <div class="error-text" id="lpgError" role="alert"></div>
+                    <button type="submit" class="btn-search" id="lpgSearchBtn"><i class="fas fa-search"></i> GET LPG INFORMATION</button>
+                </form>
+                <div class="result-box" id="lpgResultBox" style="display:none;margin-top:20px;">
+                    <div class="result-header"><div class="title"><i class="fas fa-fire-flame-simple"></i> LPG INFORMATION RESULT</div></div>
+                    <div id="lpgResultContent"></div>
                 </div>
             </section>
 
@@ -2573,7 +2589,8 @@ document.addEventListener("DOMContentLoaded",()=>{
             pan: 'pan-search-section',
             ifsc: 'ifsc-search-section',
             gst: 'gst-search-section',
-            family: 'family-search-section'
+            family: 'family-search-section',
+            lpg: 'lpg-search-section'
         };
         function showModule(name) {
             phoneNodes.forEach(node => node.classList.toggle('module-hidden', name !== 'phone'));
@@ -2600,83 +2617,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
 
     // Family Search calls the server-side proxy; sensitive names/addresses are not shown.
-    function renderFamilyReadable(payload, root) {
-        root.replaceChildren();
-        const labelize = key => String(key).replace(/([a-z])([A-Z])/g, '$1 $2')
-            .replace(/[_-]+/g, ' ').replace(/\\b\\w/g, ch => ch.toUpperCase());
-        const sensitiveKey = key => /aadhaar|aadhar|member.?id|identity.?number|uid|document.?number/i.test(String(key));
-        const addressKey = key => /address|location/i.test(String(key));
-        const safeValue = (key, value) => {
-            if (value === null || value === undefined || value === '') return 'Not available';
-            if (sensitiveKey(key)) {
-                const digits = String(value).replace(/\\D/g, '');
-                return digits.length >= 4 ? '••••••' + digits.slice(-4) : 'Hidden for privacy';
-            }
-            if (addressKey(key)) {
-                const text = String(value);
-                return text.length > 24 ? text.slice(0, 24) + '… (details hidden)' : 'Address details hidden';
-            }
-            if (typeof value === 'object') return '';
-            return String(value);
-        };
-        const card = (title, entries) => {
-            const section = document.createElement('section');
-            section.className = 'family-info-card';
-            const heading = document.createElement('div');
-            heading.className = 'family-info-title';
-            heading.textContent = title;
-            section.appendChild(heading);
-            entries.forEach(([key, value]) => {
-                const row = document.createElement('div');
-                row.className = 'family-info-row';
-                const label = document.createElement('div');
-                label.className = 'family-info-label';
-                label.textContent = labelize(key);
-                const val = document.createElement('div');
-                val.className = 'family-info-value';
-                val.textContent = safeValue(key, value) || 'Details';
-                row.append(label, val);
-                section.appendChild(row);
-            });
-            root.appendChild(section);
-        };
-        const renderObject = (obj, title, depth = 0) => {
-            if (Array.isArray(obj)) {
-                obj.forEach((item, index) => renderObject(item, `${title} ${index + 1}`, depth + 1));
-                return;
-            }
-            if (!obj || typeof obj !== 'object') {
-                card(title, [['Details', obj]]);
-                return;
-            }
-            const scalar = [];
-            const nested = [];
-            Object.entries(obj).forEach(([key, value]) => {
-                if (value && typeof value === 'object') nested.push([key, value]);
-                else scalar.push([key, value]);
-            });
-            if (scalar.length) card(title, scalar);
-            nested.forEach(([key, value]) => {
-                const nestedTitle = /memberDetailList|members|familyMembers/i.test(key)
-                    ? 'Family Members' : labelize(key);
-                renderObject(value, nestedTitle, depth + 1);
-            });
-        };
-        if (payload && typeof payload === 'object') renderObject(payload, 'Family Details');
-        else {
-            const empty = document.createElement('div');
-            empty.className = 'family-info-empty';
-            empty.textContent = 'No readable family details were returned.';
-            root.appendChild(empty);
-        }
-        if (!root.childElementCount) {
-            const empty = document.createElement('div');
-            empty.className = 'family-info-empty';
-            empty.textContent = 'No family details available.';
-            root.appendChild(empty);
-        }
-    }
-
     function setupFamilyPlaceholder() {
         const form = document.getElementById('familyForm');
         if (!form) return;
@@ -2708,7 +2648,7 @@ document.addEventListener("DOMContentLoaded",()=>{
                 if (!response.ok || data.status !== 'success') {
                     throw new Error(data.message || 'Family search failed.');
                 }
-                renderFamilyReadable(data.data, content);
+                content.textContent = JSON.stringify(data.data, null, 2);
                 result.style.display = 'block';
                 result.classList.add('show');
                 status.textContent = 'API connected';
@@ -2732,6 +2672,91 @@ document.addEventListener("DOMContentLoaded",()=>{
     } else {
         setupSearchModulePicker();
     }
+})();
+
+
+// LPG Information form handler
+(function setupLpgSearch() {
+    const form = document.getElementById('lpgForm');
+    if (!form) return;
+    const input = document.getElementById('lpgInput');
+    const error = document.getElementById('lpgError');
+    const status = document.getElementById('lpgStatusText');
+    const result = document.getElementById('lpgResultBox');
+    const content = document.getElementById('lpgResultContent');
+    const button = document.getElementById('lpgSearchBtn');
+
+    function readableLabel(key) {
+        return String(key).replace(/([a-z])([A-Z])/g, '$1 $2')
+            .replace(/[_-]+/g, ' ').replace(/\\s+/g, ' ')
+            .replace(/\\b\\w/g, ch => ch.toUpperCase());
+    }
+    function addRows(value, prefix) {
+        if (value && typeof value === 'object') {
+            if (Array.isArray(value)) {
+                value.forEach((item, index) => addRows(item, prefix ? prefix + ' ' + (index + 1) : 'Record ' + (index + 1)));
+                return;
+            }
+            Object.entries(value).forEach(([key, val]) => {
+                const label = prefix ? prefix + ' · ' + readableLabel(key) : readableLabel(key);
+                if (val !== null && typeof val === 'object') addRows(val, label);
+                else {
+                    const row = document.createElement('div');
+                    row.className = 'result-item';
+                    const name = document.createElement('div');
+                    name.className = 'label';
+                    name.textContent = label;
+                    const text = document.createElement('div');
+                    text.className = 'value';
+                    text.textContent = val === null || val === '' ? '—' : String(val);
+                    row.append(name, text);
+                    content.appendChild(row);
+                }
+            });
+        } else {
+            const row = document.createElement('div');
+            row.className = 'result-item';
+            row.textContent = prefix ? prefix + ': ' + String(value) : String(value);
+            content.appendChild(row);
+        }
+    }
+
+    form.addEventListener('submit', async event => {
+        event.preventDefault();
+        const query = input.value.replace(/\\D/g, '');
+        error.textContent = '';
+        error.classList.remove('show');
+        result.style.display = 'none';
+        content.replaceChildren();
+        if (!/^\\d{10}$/.test(query)) {
+            error.textContent = 'Please enter a valid 10-digit mobile number.';
+            error.classList.add('show');
+            return;
+        }
+        button.disabled = true;
+        status.textContent = 'Searching...';
+        try {
+            const response = await fetch('/api/lpg-lookup', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({query})
+            });
+            const data = await response.json();
+            if (!response.ok || data.status !== 'success') throw new Error(data.message || 'LPG lookup failed.');
+            const payload = data.data;
+            const record = payload && typeof payload === 'object' && !Array.isArray(payload) ? (payload.data ?? payload.result ?? payload.results ?? payload) : payload;
+            addRows(record, '');
+            if (!content.children.length) throw new Error('API returned no readable information.');
+            result.style.display = 'block';
+            status.textContent = 'Information received';
+        } catch (err) {
+            error.textContent = err.message || 'Could not retrieve LPG information.';
+            error.classList.add('show');
+            status.textContent = 'Search failed';
+        } finally {
+            button.disabled = false;
+        }
+    });
 })();
 </script>
 
@@ -3019,6 +3044,39 @@ def family_lookup():
 # ============================================
 # MAIN: RUN SERVER
 # ============================================
+@app.route('/api/lpg-lookup', methods=['POST'])
+def lpg_lookup():
+    try:
+        payload = request.get_json(silent=True) or {}
+        query = re.sub(r'\\D', '', str(payload.get('query', '')).strip())
+        if not re.fullmatch(r'\\d{10}', query):
+            return jsonify({"status": "error", "message": "Enter a valid 10-digit mobile number."}), 400
+
+        response = requests.get(
+            "http://shuruuu-api.vercel.app/lpg_info",
+            params={"key": os.environ.get("LPG_API_KEY", "HUNTER"), "query": query},
+            headers={"Accept": "application/json"},
+            timeout=(5, 25)
+        )
+        try:
+            api_data = response.json()
+        except ValueError:
+            return jsonify({"status": "error", "message": f"LPG API returned non-JSON content (HTTP {response.status_code})."}), 502
+        if not response.ok:
+            message = api_data.get("message") if isinstance(api_data, dict) else None
+            return jsonify({"status": "error", "message": str(message or f"LPG API HTTP {response.status_code}")}), 502
+        if isinstance(api_data, dict) and (api_data.get("success") is False or str(api_data.get("status", "")).lower() in ("error", "failed", "failure")):
+            return jsonify({"status": "error", "message": str(api_data.get("message") or api_data.get("error") or "LPG API reported a failure.")}), 502
+        return jsonify({"status": "success", "data": api_data})
+    except requests.exceptions.Timeout:
+        return jsonify({"status": "error", "message": "LPG API timed out. Try again shortly."}), 504
+    except requests.exceptions.RequestException:
+        app.logger.warning("LPG API request failed", exc_info=True)
+        return jsonify({"status": "error", "message": "Could not connect to LPG API."}), 502
+    except Exception:
+        app.logger.exception("Unexpected LPG lookup error")
+        return jsonify({"status": "error", "message": "Unexpected server error during LPG lookup."}), 500
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     print("\n" + "="*50)
