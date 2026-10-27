@@ -1533,6 +1533,64 @@ border-radius:50%;
 .module-choice.active .module-check{display:inline}
 .module-picker-hint{font-size:11px;color:#8fb8d3;margin-top:12px}
 .module-hidden{display:none!important}
+
+/* Keep only the selected search module visible */
+body[data-active-module="phone"] .ration-search-section,
+body[data-active-module="phone"] .pan-search-section,
+body[data-active-module="phone"] .ifsc-search-section,
+body[data-active-module="phone"] .gst-search-section,
+body[data-active-module="phone"] .family-search-section,
+body[data-active-module="phone"] .shubham-info-section { display:none !important; }
+body[data-active-module="ration"] #trackForm,
+body[data-active-module="ration"] #resultBox,
+body[data-active-module="ration"] #jsonBox,
+body[data-active-module="ration"] .ration-search-section ~ .pan-search-section,
+body[data-active-module="ration"] .pan-search-section,
+body[data-active-module="ration"] .ifsc-search-section,
+body[data-active-module="ration"] .gst-search-section,
+body[data-active-module="ration"] .family-search-section,
+body[data-active-module="ration"] .shubham-info-section { display:none !important; }
+body[data-active-module="pan"] #trackForm,
+body[data-active-module="pan"] #resultBox,
+body[data-active-module="pan"] #jsonBox,
+body[data-active-module="pan"] .ration-search-section,
+body[data-active-module="pan"] .ifsc-search-section,
+body[data-active-module="pan"] .gst-search-section,
+body[data-active-module="pan"] .family-search-section,
+body[data-active-module="pan"] .shubham-info-section { display:none !important; }
+body[data-active-module="ifsc"] #trackForm,
+body[data-active-module="ifsc"] #resultBox,
+body[data-active-module="ifsc"] #jsonBox,
+body[data-active-module="ifsc"] .ration-search-section,
+body[data-active-module="ifsc"] .pan-search-section,
+body[data-active-module="ifsc"] .gst-search-section,
+body[data-active-module="ifsc"] .family-search-section,
+body[data-active-module="ifsc"] .shubham-info-section { display:none !important; }
+body[data-active-module="gst"] #trackForm,
+body[data-active-module="gst"] #resultBox,
+body[data-active-module="gst"] #jsonBox,
+body[data-active-module="gst"] .ration-search-section,
+body[data-active-module="gst"] .pan-search-section,
+body[data-active-module="gst"] .ifsc-search-section,
+body[data-active-module="gst"] .family-search-section,
+body[data-active-module="gst"] .shubham-info-section { display:none !important; }
+body[data-active-module="family"] #trackForm,
+body[data-active-module="family"] #resultBox,
+body[data-active-module="family"] #jsonBox,
+body[data-active-module="family"] .ration-search-section,
+body[data-active-module="family"] .pan-search-section,
+body[data-active-module="family"] .ifsc-search-section,
+body[data-active-module="family"] .gst-search-section,
+body[data-active-module="family"] .shubham-info-section { display:none !important; }
+body[data-active-module="shubham-info"] #trackForm,
+body[data-active-module="shubham-info"] #resultBox,
+body[data-active-module="shubham-info"] #jsonBox,
+body[data-active-module="shubham-info"] .ration-search-section,
+body[data-active-module="shubham-info"] .pan-search-section,
+body[data-active-module="shubham-info"] .ifsc-search-section,
+body[data-active-module="shubham-info"] .gst-search-section,
+body[data-active-module="shubham-info"] .family-search-section { display:none !important; }
+
 @media(max-width:380px){.module-picker-grid{grid-template-columns:1fr}.module-picker{padding:13px}}
 
 </style>
@@ -2594,6 +2652,7 @@ document.addEventListener("DOMContentLoaded",()=>{
             'shubham-info': 'shubham-info-section'
         };
         function showModule(name) {
+            document.body.setAttribute('data-active-module', name);
             phoneNodes.forEach(node => node.classList.toggle('module-hidden', name !== 'phone'));
             Object.entries(sectionIds).forEach(([key, className]) => {
                 const section = document.querySelector('.' + className);
