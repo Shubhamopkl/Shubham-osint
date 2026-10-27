@@ -836,16 +836,6 @@ box-shadow:0 0 20px rgba(0,217,255,.45);
 transform:translateY(-2px);
 }
 
-/* ===== FAMILY SEARCH READABLE CARDS ===== */
-.family-readable-result{padding:12px;display:grid;gap:12px;max-height:560px;overflow:auto}
-.family-info-card{background:rgba(5,18,34,.92);border:1px solid rgba(0,217,255,.2);border-radius:12px;overflow:hidden;min-width:0}
-.family-info-title{padding:10px 12px;background:linear-gradient(135deg,#081528,#12345a);color:#dff8ff;font-size:12px;font-weight:800;letter-spacing:.5px}
-.family-info-row{display:grid;grid-template-columns:minmax(95px,38%) minmax(0,1fr);gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.06);align-items:start}
-.family-info-row:last-child{border-bottom:0}
-.family-info-label{font-size:11px;color:#8ca6bb;font-weight:700;overflow-wrap:anywhere}
-.family-info-value{font-size:13px;color:#f3f8ff;overflow-wrap:anywhere;word-break:break-word;white-space:pre-wrap}
-.family-info-empty{padding:16px;color:#9ecfff;font-size:13px;text-align:center}
-@media(max-width:480px){.family-readable-result{padding:8px}.family-info-row{grid-template-columns:1fr;gap:4px;padding:10px}.family-info-value{font-size:13px}}
 /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .main-header .title-section h1 { font-size: 18px; }
@@ -1835,7 +1825,7 @@ border-radius:50%;
                 </form>
                 <div class="result-box" id="familyResultBox" style="display:none;margin-top:20px;">
                     <div class="result-header"><div class="title"><i class="fas fa-people-roof"></i> FAMILY SEARCH RESULT</div></div>
-                    <div id="familyResultContent" class="family-readable-result" aria-live="polite"></div>
+                    <pre id="familyResultContent" style="margin:0;padding:16px;color:#d8f5ff;font:12px/1.7 monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:420px;overflow:auto;"></pre>
                 </div>
             </section>
 
@@ -2600,83 +2590,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
 
     // Family Search calls the server-side proxy; sensitive names/addresses are not shown.
-    function renderFamilyReadable(payload, root) {
-        root.replaceChildren();
-        const labelize = key => String(key).replace(/([a-z])([A-Z])/g, '$1 $2')
-            .replace(/[_-]+/g, ' ').replace(/\\b\\w/g, ch => ch.toUpperCase());
-        const sensitiveKey = key => /aadhaar|aadhar|member.?id|identity.?number|uid|document.?number/i.test(String(key));
-        const addressKey = key => /address|location/i.test(String(key));
-        const safeValue = (key, value) => {
-            if (value === null || value === undefined || value === '') return 'Not available';
-            if (sensitiveKey(key)) {
-                const digits = String(value).replace(/\\D/g, '');
-                return digits.length >= 4 ? '••••••' + digits.slice(-4) : 'Hidden for privacy';
-            }
-            if (addressKey(key)) {
-                const text = String(value);
-                return text.length > 24 ? text.slice(0, 24) + '… (details hidden)' : 'Address details hidden';
-            }
-            if (typeof value === 'object') return '';
-            return String(value);
-        };
-        const card = (title, entries) => {
-            const section = document.createElement('section');
-            section.className = 'family-info-card';
-            const heading = document.createElement('div');
-            heading.className = 'family-info-title';
-            heading.textContent = title;
-            section.appendChild(heading);
-            entries.forEach(([key, value]) => {
-                const row = document.createElement('div');
-                row.className = 'family-info-row';
-                const label = document.createElement('div');
-                label.className = 'family-info-label';
-                label.textContent = labelize(key);
-                const val = document.createElement('div');
-                val.className = 'family-info-value';
-                val.textContent = safeValue(key, value) || 'Details';
-                row.append(label, val);
-                section.appendChild(row);
-            });
-            root.appendChild(section);
-        };
-        const renderObject = (obj, title, depth = 0) => {
-            if (Array.isArray(obj)) {
-                obj.forEach((item, index) => renderObject(item, `${title} ${index + 1}`, depth + 1));
-                return;
-            }
-            if (!obj || typeof obj !== 'object') {
-                card(title, [['Details', obj]]);
-                return;
-            }
-            const scalar = [];
-            const nested = [];
-            Object.entries(obj).forEach(([key, value]) => {
-                if (value && typeof value === 'object') nested.push([key, value]);
-                else scalar.push([key, value]);
-            });
-            if (scalar.length) card(title, scalar);
-            nested.forEach(([key, value]) => {
-                const nestedTitle = /memberDetailList|members|familyMembers/i.test(key)
-                    ? 'Family Members' : labelize(key);
-                renderObject(value, nestedTitle, depth + 1);
-            });
-        };
-        if (payload && typeof payload === 'object') renderObject(payload, 'Family Details');
-        else {
-            const empty = document.createElement('div');
-            empty.className = 'family-info-empty';
-            empty.textContent = 'No readable family details were returned.';
-            root.appendChild(empty);
-        }
-        if (!root.childElementCount) {
-            const empty = document.createElement('div');
-            empty.className = 'family-info-empty';
-            empty.textContent = 'No family details available.';
-            root.appendChild(empty);
-        }
-    }
-
     function setupFamilyPlaceholder() {
         const form = document.getElementById('familyForm');
         if (!form) return;
@@ -2687,28 +2600,15 @@ document.addEventListener("DOMContentLoaded",()=>{
             const status = document.getElementById('familyStatusText');
             const result = document.getElementById('familyResultBox');
             const content = document.getElementById('familyResultContent');
-            const button = document.getElementById('familySearchBtn');
             error.textContent = '';
             error.classList.remove('show');
             result.style.display = 'none';
-            if (!/^\d{12}$/.test(aadhaar)) {
-                error.textContent = 'Please enter a valid 12-digit Aadhaar number.';
-                error.classList.add('show');
-                return;
-            }
-            button.disabled = true;
-            status.textContent = 'Searching...';
-            try {
-                const response = await fetch('/api/family-lookup', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({aadhaar})
                 });
                 const data = await response.json();
                 if (!response.ok || data.status !== 'success') {
                     throw new Error(data.message || 'Family search failed.');
                 }
-                renderFamilyReadable(data.data, content);
+                content.textContent = JSON.stringify(data.data, null, 2);
                 result.style.display = 'block';
                 result.classList.add('show');
                 status.textContent = 'API connected';
@@ -2721,7 +2621,6 @@ document.addEventListener("DOMContentLoaded",()=>{
             }
         });
     }
-    if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', setupFamilyPlaceholder);
     } else {
         setupFamilyPlaceholder();
@@ -2795,7 +2694,6 @@ def lookup():
                 candidate = api_data.get(key)
                 if isinstance(candidate, (list, dict)):
                     payload = candidate
-                    break
 
         if isinstance(payload, dict):
             # Some APIs wrap one record in an object instead of returning a list.
