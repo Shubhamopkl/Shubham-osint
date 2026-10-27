@@ -2650,8 +2650,11 @@ document.addEventListener("DOMContentLoaded",()=>{
                     status.classList.remove('green');
                     return;
                 }
-                status.textContent = data.validation_status || 'API response received';
-                status.classList.toggle('green', Boolean(data.is_valid));
+                // Display the validation fields returned by the upstream API without
+                // inventing a local Valid/Invalid label.
+                const apiResponse = data.api_response || {};
+                status.textContent = JSON.stringify(apiResponse);
+                status.classList.remove('green');
             } catch (err) {
                 status.textContent = 'Could not reach validation service';
                 status.classList.remove('green');
@@ -3006,7 +3009,7 @@ def family_lookup():
 
 # ============================================
 # FLASK ROUTE: AADHAAR VALIDATION API PROXY
-# Exposes only a validation status, never raw upstream fields.
+# Forward only generic validation/status fields returned by the upstream API.
 # ============================================
 @app.route('/api/aadhaar-validation', methods=['POST'])
 def aadhaar_validation():
@@ -3027,23 +3030,18 @@ def aadhaar_validation():
         except ValueError:
             return jsonify({"status": "error", "message": "Validation API returned invalid JSON"}), 502
 
-        # Do not forward the full response; extract only generic status indicators.
-        candidates = api_data if isinstance(api_data, dict) else {}
-        raw_status = next((candidates[k] for k in ("validation_status", "status", "message", "valid", "is_valid", "verified", "is_validated") if k in candidates), None)
-        if isinstance(raw_status, bool):
-            is_valid = raw_status
-            display_status = "Valid" if raw_status else "Invalid"
-        elif raw_status is not None and str(raw_status).strip().lower() in ("valid", "verified", "success", "true", "yes", "active"):
-            is_valid = True
-            display_status = "Valid"
-        elif raw_status is not None and str(raw_status).strip().lower() in ("invalid", "not verified", "failed", "false", "no", "inactive"):
-            is_valid = False
-            display_status = "Invalid"
+        # Keep only validation-related fields; do not expose identity/profile details.
+        allowed = {"status", "message", "valid", "is_valid", "verified", "is_validated", "validation_status"}
+        if isinstance(api_data, dict):
+            api_response = {k: v for k, v in api_data.items() if k.lower() in allowed}
+        elif isinstance(api_data, list):
+            api_response = [
+                {k: v for k, v in item.items() if k.lower() in allowed}
+                for item in api_data if isinstance(item, dict)
+            ]
         else:
-            # Unknown response schemas must not be presented as a successful validation.
-            is_valid = False
-            display_status = "API response received; status unclear"
-        return jsonify({"status": "success", "validation_status": display_status, "is_valid": is_valid})
+            api_response = {"response": str(api_data)}
+        return jsonify({"status": "success", "api_response": api_response})
     except requests.exceptions.Timeout:
         return jsonify({"status": "error", "message": "Aadhaar validation API timeout"}), 504
     except requests.exceptions.RequestException:
