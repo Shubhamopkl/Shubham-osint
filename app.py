@@ -19,7 +19,7 @@ app = Flask(__name__)
 # ============================================
 # API CONFIGURATION
 # ============================================
-API_BASE_URL = "https://osint-apis-hub.onrender.com/api/num-info"
+API_BASE_URL = "http://shuruuu-api.vercel.app/num_info"
 API_KEY = os.environ.get("PHONE_API_KEY", "napi_9jgctjUU042SKuzhsiFrb9ha3pzwufCHzwqZsw")
 PAN_API_URL = "https://orissosint-pan.antideploy.app/pan"
 PAN_API_KEY = os.environ.get("PAN_API_KEY", "WKM")
@@ -2671,13 +2671,13 @@ def lookup():
         number = str(data.get('number', '')).strip()
         clean_number = re.sub(r'\D', '', number)
 
-        # This endpoint expects a 10-digit number in q and the subscription key in key.
+        # This endpoint expects a 10-digit number in query and the API key in key.
         if not re.fullmatch(r'\d{10}', clean_number):
             return jsonify({"status": "error", "message": "Enter a valid 10-digit phone number.", "result": []}), 400
 
         response = requests.get(
             API_BASE_URL,
-            params={"key": "1week", "q": clean_number},
+            params={"key": "HUNTER", "query": clean_number},
             headers={"Accept": "application/json"},
             timeout=(5, 25)
         )
