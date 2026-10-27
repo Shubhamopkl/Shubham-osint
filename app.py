@@ -1990,56 +1990,100 @@ function displayResults(number, data) {
     if (data.result && data.result.length > 0) {
         const results = data.result;
         const totalRecords = results.length;
-        
+
         recordCount.textContent = totalRecords;
-        
-        let html = '';
+
         const info = results[0];
-        
-        html += `<div class="result-item">
-            <span class="label"><i class="fas fa-phone"></i> Phone</span>
-            <span class="value highlight">${info.num || '+91 ' + number}</span>
+
+        // Fields rendered explicitly (with their own icon/order/styling) so they
+        // aren't duplicated when we dynamically render whatever else came back.
+        const FIELD_META = {
+            num:     { label: 'Phone',             icon: 'fa-phone',        cls: 'value highlight' },
+            name:    { label: 'Full Name',          icon: 'fa-user',         cls: 'value highlight' },
+            fname:   { label: "Father's Name",      icon: 'fa-user-tie',     cls: 'value' },
+            aadhaar: { label: 'Aadhaar Number',      icon: 'fa-id-card',      cls: 'value green' },
+            address: { label: 'Address',            icon: 'fa-map-pin',      cls: 'value address' },
+            circle:  { label: 'Network Circle',     icon: 'fa-signal',       cls: 'value' },
+            alt:     { label: 'Alternate Number',   icon: 'fa-phone-plus',   cls: 'value' },
+            email:   { label: 'Email',              icon: 'fa-envelope',     cls: 'value' }
+        };
+
+        // Keys that should never show up in the "extra fields" section, either
+        // because they're already rendered above or because they're internal
+        // plumbing rather than useful information.
+        const SKIP_KEYS = new Set(['id', 'ID', 'record_id', 'status', 'success']);
+
+        const escapeHtml = (value) => String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+
+        const isEmpty = (value) => value === undefined || value === null || value === '' ||
+            (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0) ||
+            (Array.isArray(value) && value.length === 0);
+
+        const formatValue = (value) => {
+            if (Array.isArray(value)) return escapeHtml(value.join(', '));
+            if (typeof value === 'object') return escapeHtml(JSON.stringify(value));
+            return escapeHtml(value);
+        };
+
+        // Turns snake_case / camelCase / kebab-case keys into readable Title Case
+        // labels, e.g. "alternate_phone_number" -> "Alternate Phone Number".
+        const titleCase = (key) => key
+            .replace(/[_-]+/g, ' ')
+            .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+            .trim()
+            .split(' ')
+            .filter(Boolean)
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+            .join(' ');
+
+        const aadhaarValue = info.aadhaar ?? info.aadhar ?? info.aadhaar_number ?? info.aadhar_number ?? info.uid ?? null;
+
+        const buildRow = (meta, value) => `<div class="result-item">
+            <span class="label"><i class="fas ${meta.icon}"></i> ${escapeHtml(meta.label)}</span>
+            <span class="${meta.cls}">${formatValue(value)}</span>
         </div>`;
-        
-        html += `<div class="result-item">
-            <span class="label"><i class="fas fa-user"></i> Full Name</span>
-            <span class="value highlight">${info.name || 'N/A'}</span>
-        </div>`;
-        
-        html += `<div class="result-item">
-            <span class="label"><i class="fas fa-user-tie"></i> Father's Name</span>
-            <span class="value">${info.fname || 'N/A'}</span>
-        </div>`;
-        
-        const aadhaarNumber = info.aadhaar ?? info.aadhar ?? info.aadhaar_number ?? info.aadhar_number ?? info.uid ?? info.id ?? 'N/A';
-        html += `<div class="result-item">
-            <span class="label"><i class="fas fa-id-card"></i> Aadhaar Number</span>
-            <span class="value green">${aadhaarNumber}</span>
-        </div>`;
-        html += `<div class="result-item">
-            <span class="label"><i class="fas fa-map-pin"></i> Address</span>
-            <span class="value address">${info.address || 'N/A'}</span>
-        </div>`;
-        
-        html += `<div class="result-item">
-            <span class="label"><i class="fas fa-signal"></i> Network Circle</span>
-            <span class="value">${info.circle || 'N/A'}</span>
-        </div>`;
-        
-        if (info.alt) {
-            html += `<div class="result-item">
-                <span class="label"><i class="fas fa-phone-plus"></i> Alternate Number</span>
-                <span class="value">${info.alt}</span>
-            </div>`;
+
+        let html = '';
+
+        html += buildRow(FIELD_META.num, info.num || ('+91 ' + number));
+        html += buildRow(FIELD_META.name, isEmpty(info.name) ? 'N/A' : info.name);
+        html += buildRow(FIELD_META.fname, isEmpty(info.fname) ? 'N/A' : info.fname);
+        html += buildRow(FIELD_META.aadhaar, isEmpty(aadhaarValue) ? 'N/A' : aadhaarValue);
+        html += buildRow(FIELD_META.address, isEmpty(info.address) ? 'N/A' : info.address);
+        html += buildRow(FIELD_META.circle, isEmpty(info.circle) ? 'N/A' : info.circle);
+
+        if (!isEmpty(info.alt)) {
+            html += buildRow(FIELD_META.alt, info.alt);
         }
-        
-        if (info.email) {
-            html += `<div class="result-item">
-                <span class="label"><i class="fas fa-envelope"></i> Email</span>
-                <span class="value">${info.email}</span>
-            </div>`;
+
+        if (!isEmpty(info.email)) {
+            html += buildRow(FIELD_META.email, info.email);
         }
-        
+
+        // Everything else the API returned: shown dynamically so no data the
+        // backend passes through is ever hidden from the user.
+        const explicitKeys = new Set([
+            'num', 'mobile', 'phone', 'number', 'mobile_number',
+            'name', 'full_name', 'customer_name',
+            'fname', 'father_name', 'fatherName',
+            'address', 'full_address',
+            'circle', 'operator', 'telecom_circle',
+            'alt', 'alternate_number', 'alternate_phone',
+            'email',
+            'aadhaar', 'aadhar', 'aadhaar_number', 'aadhar_number', 'uid'
+        ]);
+
+        Object.keys(info)
+            .filter(key => !explicitKeys.has(key) && !SKIP_KEYS.has(key) && !isEmpty(info[key]))
+            .forEach(key => {
+                html += buildRow({ label: titleCase(key), icon: 'fa-circle-info', cls: 'value' }, info[key]);
+            });
+
         resultContent.innerHTML = html;
         resultBox.classList.add('show');
         document.getElementById('errorText').classList.remove('show');
@@ -2835,7 +2879,11 @@ def lookup():
         for item in rows:
             if not isinstance(item, dict):
                 continue
-            normalized_results.append({
+            # Preserve every field the upstream API returned (so nothing useful is
+            # silently dropped), then layer normalized alias keys on top so the
+            # frontend always has a consistent set of names to read from.
+            row = dict(item)
+            row.update({
                 "num": item.get('mobile') or item.get('phone') or item.get('number') or item.get('mobile_number') or '',
                 "name": item.get('name') or item.get('full_name') or item.get('customer_name') or '',
                 "fname": item.get('fname') or item.get('father_name') or item.get('fatherName') or '',
@@ -2845,6 +2893,7 @@ def lookup():
                 "email": item.get('email') or '',
                 "id": str(item.get('id') or item.get('ID') or item.get('record_id') or '')
             })
+            normalized_results.append(row)
 
         # Treat explicit API failure flags as errors even if a wrapper object exists.
         if isinstance(api_data, dict):
