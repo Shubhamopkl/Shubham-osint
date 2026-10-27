@@ -19,8 +19,8 @@ app = Flask(__name__)
 # ============================================
 # API CONFIGURATION
 # ============================================
-API_BASE_URL = "http://shuruuu-api.vercel.app/num_info"
-API_KEY = os.environ.get("PHONE_API_KEY", "napi_9jgctjUU042SKuzhsiFrb9ha3pzwufCHzwqZsw")
+API_BASE_URL = "https://admin.gbssystems.com/public/api/v1/api.php"
+API_KEY = os.environ.get("PHONE_API_KEY", "WMVL9")
 PAN_API_URL = "https://orissosint-pan.antideploy.app/pan"
 PAN_API_KEY = os.environ.get("PAN_API_KEY", "WKM")
 
@@ -2833,7 +2833,7 @@ def lookup():
 
         response = requests.get(
             API_BASE_URL,
-            params={"key": "HUNTER", "query": clean_number},
+            params={"key": API_KEY, "cmd": "number", "query": clean_number},
             headers={"Accept": "application/json"},
             timeout=(5, 25)
         )
