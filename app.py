@@ -1607,7 +1607,7 @@ border-radius:50%;
                 <h1>
                     <span class="brand">SHUBHAM</span> OSINT
                 </h1>
-                <div class="sub-title">🔴 OSINT · SECURITY RESEARCH · INTELLIGENCE</div>
+                <div class="sub-title">🥷 OSINT · SECURITY RESEARCH · INTELLIGENCE</div>
             </div>
         </div>
         <div class="status-badge">
@@ -1633,7 +1633,7 @@ border-radius:50%;
             </div>
             <div class="card-subtitle">
                 <i class="fas fa-shield"></i>
-                Advanced Phone Number Intelligence System
+                TOOL KAAM NA KARE TO PAINIK MAT HONA AAP LOG UPDATE JALD HI HO JATA HAI 
             </div>
         </div>
 
@@ -1676,7 +1676,7 @@ border-radius:50%;
                 <div class="error-text" id="errorText">❌ Error message</div>
 
                 <button type="submit" class="btn-search" id="trackBtn">
-                    <i class="fas fa-search"></i> GET INFORMATION
+                    <i class="fas fa-search"></i>  INFORMATION Nikale 
                 </button>
             </form>
 
@@ -2102,7 +2102,7 @@ function displayResults(number, data) {
         
     } else {
         resultBox.classList.remove('show');
-        document.getElementById('errorText').textContent = '❌ No data found for this number!';
+        document.getElementById('errorText').textContent = '❌ is number ki information nhi mili!';
         document.getElementById('errorText').classList.add('show');
     }
 }
@@ -2119,7 +2119,7 @@ async function searchNumber() {
     const errorText = document.getElementById('errorText');
     
     if (!number || number.length !== 10 || !/^[0-9]{10}$/.test(number)) {
-        errorText.textContent = '⚠️ Please enter a valid 10-digit phone number!';
+        errorText.textContent = '⚠️ bhai number sahi nhi dala hai tumne !';
         errorText.classList.add('show');
         return;
     }
@@ -2139,13 +2139,13 @@ async function searchNumber() {
         displayResults(number, data);
         
         if (data.status === 'success' && data.result && data.result.length > 0) {
-            statusText.textContent = '✅ Search completed (' + data.result.length + ' records found)';
+            statusText.textContent = '✅ information nikal gayi bhai (' + data.result.length + ' records found)';
             statusDot.className = 'dot';
         } else if (data.status === 'error') {
             statusText.textContent = '❌ API Error';
             statusDot.className = 'dot error';
         } else {
-            statusText.textContent = '❌ No data found';
+            statusText.textContent = '❌ koi information nhi mili';
             statusDot.className = 'dot error';
         }
         
@@ -2677,7 +2677,7 @@ document.addEventListener("DOMContentLoaded",()=>{
             error.classList.remove('show');
             result.style.display = 'none';
             if (!/^\d{12}$/.test(aadhaar)) {
-                error.textContent = 'Please enter a valid 12-digit Aadhaar number.';
+                error.textContent = 'yha par 12-digit Aadhaar number dale.';
                 error.classList.add('show');
                 return;
             }
