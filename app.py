@@ -2307,7 +2307,7 @@ ifscForm.addEventListener('submit', async function (e) {
         ifscResultBox.classList.add('show');
         document.getElementById('ifscStatusText').textContent = 'Response received';
     } catch (err) {
-        ifscError.textContent = '❌ ' + (err.message || 'Could not fetch IFSC response');
+        ifscError.textContent = '❌ ' + (err.message || 'YE WALI IFSC KA DETAILS NHI NIKLA KOI DUSRA TRY KARIYE ');
         ifscError.classList.add('show');
         document.getElementById('ifscStatusText').textContent = 'Request failed';
         document.getElementById('ifscStatusDot').classList.add('error');
