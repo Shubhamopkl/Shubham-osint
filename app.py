@@ -2915,7 +2915,7 @@ font-size:16px;cursor:pointer}
   <span>play song</span>
 </div>
 <audio id="siteBackgroundMusic" loop preload="auto">
-  <source src="/static/khuda-aur-mohabbat.m4a" type="audio/mp4">
+  <source src="/static/hacksong.m4a" type="audio/mp4">
 </audio>
 <script>
 (() => {
