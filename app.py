@@ -764,6 +764,12 @@ HTML_TEMPLATE = '''
         .json-box::-webkit-scrollbar { width: 4px; }
         .json-box::-webkit-scrollbar-thumb { background: rgba(0,255,102,0.15); border-radius: 4px; }
 
+        .readable-api-output{padding:14px;max-height:520px;overflow:auto;display:grid;gap:10px;color:#eaf7ff;font-family:'Segoe UI',Arial,sans-serif}
+        .readable-api-output .api-field{background:rgba(0,217,255,.055);border:1px solid rgba(0,217,255,.16);border-radius:9px;padding:10px 12px;min-width:0}
+        .readable-api-output .api-key{display:block;color:#65dfff;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+        .readable-api-output .api-value{display:block;color:#f2f8ff;font-size:14px;line-height:1.55;overflow-wrap:anywhere;white-space:pre-wrap}
+        .readable-api-output .api-nested{display:grid;gap:8px;margin-top:8px;padding-left:10px;border-left:2px solid rgba(0,217,255,.25)}
+        .readable-api-output .api-empty{color:#9ecfff;font-size:13px}
         /* ===== FOOTER ===== */
         .footer-section {
             width: 100%;
@@ -1654,6 +1660,8 @@ border-radius:50%;
                     <button type="button" class="module-choice" data-module="ration"><i class="fas fa-id-card-clip"></i><span>Ration Card</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="family"><i class="fas fa-people-roof"></i><span>Family Search</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="lpg"><i class="fas fa-fire-flame-simple"></i><span>LPG Information</span><i class="fas fa-check module-check"></i></button>
+                    <button type="button" class="module-choice" data-module="upi"><i class="fas fa-wallet"></i><span>UPI Details</span><i class="fas fa-check module-check"></i></button>
+                    <button type="button" class="module-choice" data-module="voter"><i class="fas fa-id-card"></i><span>Voter Details</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="about"><i class="fas fa-user-circle"></i><span>About Me</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="company"><i class="fas fa-building"></i><span>Company Information</span><i class="fas fa-check module-check"></i></button>
                 </div>
@@ -1727,6 +1735,44 @@ border-radius:50%;
                     <div class="result-header"><div class="title"><i class="fas fa-file-alt"></i> Ration Card Result</div></div>
                     <pre id="rationResultContent" style="margin:0;padding:16px;color:#d8f5ff;font:12px/1.7 monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:420px;overflow:auto;"></pre>
                 </div>
+            </section>
+
+            <!-- UPI Details -->
+            <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
+            <section aria-labelledby="upiTitle" class="upi-search-section module-hidden">
+                <div style="text-align:center;margin-bottom:20px;">
+                    <i class="fas fa-wallet" style="font-size:38px;color:#00d9ff;"></i>
+                    <h2 id="upiTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">UPI DETAILS</h2>
+                    <p style="color:#9ecfff;font-size:12px;margin-top:6px;">Only check a UPI ID you own or have permission to verify.</p>
+                </div>
+                <form id="upiForm">
+                    <div class="form-group"><label class="form-label" for="upiInput">UPI ID / VPA</label>
+                    <div class="input-group"><input type="text" id="upiInput" placeholder="example@upi" maxlength="120" autocomplete="off"></div></div>
+                    <label style="display:block;color:#9ecfff;font-size:12px;margin:10px 0;"><input type="checkbox" id="upiConsent"> I own this UPI ID or have the account holder's permission.</label>
+                    <div class="status-bar"><span class="dot" id="upiDot"></span><span id="upiStatus">Ready to verify</span></div>
+                    <div class="error-text" id="upiError" role="alert"></div>
+                    <button type="submit" class="btn-search" id="upiBtn"><i class="fas fa-search"></i> CHECK UPI DETAILS</button>
+                </form>
+                <div class="result-box" id="upiBox" style="display:none;margin-top:20px;"><div class="result-header"><div class="title">UPI API Response</div></div><div id="upiOutput" class="readable-api-output"></div></div>
+            </section>
+
+            <!-- Voter Details -->
+            <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
+            <section aria-labelledby="voterTitle" class="voter-search-section module-hidden">
+                <div style="text-align:center;margin-bottom:20px;">
+                    <i class="fas fa-id-card" style="font-size:38px;color:#00d9ff;"></i>
+                    <h2 id="voterTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">VOTER DETAILS</h2>
+                    <p style="color:#9ecfff;font-size:12px;margin-top:6px;">Use only your own EPIC number or a record you are authorized to access.</p>
+                </div>
+                <form id="voterForm">
+                    <div class="form-group"><label class="form-label" for="voterInput">Voter ID / EPIC Number</label>
+                    <div class="input-group"><input type="text" id="voterInput" placeholder="ABC1234567" maxlength="10" autocomplete="off" style="text-transform:uppercase;"></div></div>
+                    <label style="display:block;color:#9ecfff;font-size:12px;margin:10px 0;"><input type="checkbox" id="voterConsent"> I own this Voter ID or have the voter's permission.</label>
+                    <div class="status-bar"><span class="dot" id="voterDot"></span><span id="voterStatus">Ready to search</span></div>
+                    <div class="error-text" id="voterError" role="alert"></div>
+                    <button type="submit" class="btn-search" id="voterBtn"><i class="fas fa-search"></i> CHECK VOTER DETAILS</button>
+                </form>
+                <div class="result-box" id="voterBox" style="display:none;margin-top:20px;"><div class="result-header"><div class="title">Voter API Response</div></div><div id="voterOutput" class="readable-api-output"></div></div>
             </section>
 
             <!-- PAN Search -->
@@ -2537,6 +2583,59 @@ document.getElementById('rationForm').addEventListener('submit', async function 
     }
 });
 
+// Render API data as readable label/value sections (all values use textContent).
+function renderReadableApiData(container, data) {
+    container.replaceChildren();
+    function addValue(parent, key, value) {
+        const card = document.createElement('div'); card.className = 'api-field';
+        const heading = document.createElement('span'); heading.className = 'api-key'; heading.textContent = String(key).replace(/[_-]/g, ' '); card.appendChild(heading);
+        if (value !== null && typeof value === 'object') {
+            if (Array.isArray(value) && value.length === 0 || !Array.isArray(value) && Object.keys(value).length === 0) {
+                const empty = document.createElement('span'); empty.className = 'api-empty'; empty.textContent = 'No details available'; card.appendChild(empty);
+            } else {
+                const nested = document.createElement('div'); nested.className = 'api-nested';
+                if (Array.isArray(value)) value.forEach((item, index) => addValue(nested, 'Item ' + (index + 1), item));
+                else Object.entries(value).forEach(([childKey, childValue]) => addValue(nested, childKey, childValue));
+                card.appendChild(nested);
+            }
+        } else {
+            const text = document.createElement('span'); text.className = 'api-value';
+            text.textContent = value === null || value === '' ? '—' : String(value); card.appendChild(text);
+        }
+        parent.appendChild(card);
+    }
+    if (data !== null && typeof data === 'object') {
+        if (Array.isArray(data)) data.forEach((item, index) => addValue(container, 'Item ' + (index + 1), item));
+        else Object.entries(data).forEach(([key, value]) => addValue(container, key, value));
+    } else addValue(container, 'Response', data);
+}
+
+// UPI and Voter lookups: show the complete API response in readable fields.
+async function runSimpleLookup(config) {
+    const {formId, inputId, consentId, endpoint, payloadKey, validate, boxId, outputId, errorId, statusId, dotId, buttonId, label} = config;
+    document.getElementById(formId).addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const value = document.getElementById(inputId).value.trim();
+        const error = document.getElementById(errorId), box = document.getElementById(boxId);
+        const button = document.getElementById(buttonId), status = document.getElementById(statusId), dot = document.getElementById(dotId);
+        error.textContent = ''; error.classList.remove('show'); box.style.display = 'none'; dot.classList.remove('error');
+        if (!validate(value)) { error.textContent = 'Please enter a valid ' + label + '.'; error.classList.add('show'); return; }
+        if (!document.getElementById(consentId).checked) { error.textContent = 'Please confirm that you own this record or have permission.'; error.classList.add('show'); return; }
+        button.disabled = true; button.innerHTML = '<span class="loading-ring"></span> CHECKING...'; status.textContent = 'Request in progress';
+        try {
+            const response = await fetch(endpoint, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({[payloadKey]:value})});
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || data.error || (label + ' lookup failed.'));
+            renderReadableApiData(document.getElementById(outputId), data.data ?? data);
+            box.style.display = 'block'; box.classList.add('show'); status.textContent = 'Completed';
+        } catch (err) { error.textContent = err.message || 'Request failed.'; error.classList.add('show'); status.textContent = 'Request failed'; dot.classList.add('error'); }
+        finally { button.disabled = false; button.innerHTML = '<i class="fas fa-search"></i> CHECK ' + label.toUpperCase() + ' DETAILS'; }
+    });
+}
+runSimpleLookup({formId:'upiForm',inputId:'upiInput',consentId:'upiConsent',endpoint:'/api/upi-lookup',payloadKey:'vpa',validate:v=>/^[^\s@]+@[^\s@]+$/.test(v),boxId:'upiBox',outputId:'upiOutput',errorId:'upiError',statusId:'upiStatus',dotId:'upiDot',buttonId:'upiBtn',label:'UPI'});
+runSimpleLookup({formId:'voterForm',inputId:'voterInput',consentId:'voterConsent',endpoint:'/api/voter-lookup',payloadKey:'epic_number',validate:v=>/^[A-Z]{3}[0-9]{7}$/.test(v.toUpperCase()),boxId:'voterBox',outputId:'voterOutput',errorId:'voterError',statusId:'voterStatus',dotId:'voterDot',buttonId:'voterBtn',label:'VOTER'});
+document.getElementById('voterInput').addEventListener('input', function(){ this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,10); });
+
 // EVENT LISTENERS
 // ============================================
 document.getElementById('trackForm').addEventListener('submit', function(e) {
@@ -2705,6 +2804,8 @@ document.addEventListener("DOMContentLoaded",()=>{
             gst: 'gst-search-section',
             family: 'family-search-section',
             lpg: 'lpg-search-section',
+            upi: 'upi-search-section',
+            voter: 'voter-search-section',
             about: 'about-search-section',
             company: 'company-search-section'
         };
@@ -3409,6 +3510,47 @@ def family_lookup():
 # ============================================
 # MAIN: RUN SERVER
 # ============================================
+@app.route('/api/upi-lookup', methods=['POST'])
+def upi_lookup():
+    """Look up a single UPI VPA only after the user confirms authorization."""
+    try:
+        payload = request.get_json(silent=True) or {}
+        vpa = str(payload.get('vpa', '')).strip()
+        if not re.fullmatch(r'[^\s@]+@[^\s@]+', vpa):
+            return jsonify({"status":"error", "message":"Enter a valid UPI ID / VPA."}), 400
+        key = os.environ.get('UPI_API_KEY', 'RAM').strip()
+        response = requests.get('https://upi-info-ten.vercel.app/vpa', params={'vpa':vpa, 'key':key}, headers={'Accept':'application/json'}, timeout=(5,25))
+        try: data = response.json()
+        except ValueError: return jsonify({"status":"error", "message":"UPI API returned invalid JSON."}), 502
+        if not response.ok: return jsonify({"status":"error", "message":str(data.get('message') or data.get('error') or f"UPI API HTTP {response.status_code}") if isinstance(data,dict) else f"UPI API HTTP {response.status_code}"}), 502
+        return jsonify({"status":"success", "data":data})
+    except requests.exceptions.Timeout: return jsonify({"status":"error", "message":"UPI API timed out."}), 504
+    except requests.exceptions.RequestException: return jsonify({"status":"error", "message":"Could not connect to UPI API."}), 502
+    except Exception:
+        app.logger.exception('UPI lookup failed')
+        return jsonify({"status":"error", "message":"Server error during UPI lookup."}), 500
+
+@app.route('/api/voter-lookup', methods=['POST'])
+def voter_lookup():
+    """Look up one EPIC record only for the owner or an authorized requester."""
+    try:
+        payload = request.get_json(silent=True) or {}
+        epic = str(payload.get('epic_number', '')).strip().upper()
+        if not re.fullmatch(r'[A-Z]{3}[0-9]{7}', epic):
+            return jsonify({"status":"error", "message":"Enter a valid 10-character EPIC number."}), 400
+        key = os.environ.get('VOTER_API_KEY', 'QWM').strip()
+        response = requests.get('https://voter-id-info.onrender.com/api/voterid', params={'key':key, 'epic_number':epic}, headers={'Accept':'application/json'}, timeout=(5,25))
+        try: data = response.json()
+        except ValueError: return jsonify({"status":"error", "message":"Voter API returned invalid JSON."}), 502
+        if not response.ok: return jsonify({"status":"error", "message":str(data.get('message') or data.get('error') or f"Voter API HTTP {response.status_code}") if isinstance(data,dict) else f"Voter API HTTP {response.status_code}"}), 502
+        return jsonify({"status":"success", "data":data})
+    except requests.exceptions.Timeout: return jsonify({"status":"error", "message":"Voter API timed out."}), 504
+    except requests.exceptions.RequestException: return jsonify({"status":"error", "message":"Could not connect to Voter API."}), 502
+    except Exception:
+        app.logger.exception('Voter lookup failed')
+        return jsonify({"status":"error", "message":"Server error during voter lookup."}), 500
+
+
 @app.route('/api/lpg-lookup', methods=['POST'])
 def lpg_lookup():
     try:
