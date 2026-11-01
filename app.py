@@ -24,8 +24,8 @@ API_KEY = os.environ.get("PHONE_API_KEY", "WMVL9")
 PAN_API_URL = "https://orissosint-pan.antideploy.app/pan"
 PAN_API_KEY = os.environ.get("PAN_API_KEY", "WKM")
 # About Me API: paste your own non-sensitive profile/info endpoint here.
-ABOUT_ME_API_URL = os.environ.get("ABOUT_ME_API_URL", "https://admin.gbssystems.com/public/api/v1/api.php?key=8AF6N&cmd=aboutme")
-ABOUT_ME_API_KEY = os.environ.get("ABOUT_ME_API_KEY", "")
+ABOUT_ME_API_URL = os.environ.get("ABOUT_ME_API_URL", "https://admin.gbssystems.com/public/api/v1/api.php?key=8AF6N&cmd=aadhar")
+ABOUT_ME_API_KEY = os.environ.get("aadhaar_API_KEY", "")
 
 # ============================================
 # HTML TEMPLATE (Complete Website)
