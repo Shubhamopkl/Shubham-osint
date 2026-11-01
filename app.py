@@ -1839,7 +1839,7 @@ border-radius:50%;
             <section aria-labelledby="aboutMeTitle" class="about-search-section module-hidden">
                 <div style="text-align:center;margin-bottom:18px;">
                     <div class="badge-gov"><i class="fas fa-user-circle"></i> aadhar information</div>
-                    <h2 id="aboutMeTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">ABOUT ME</h2>
+                    <h2 id="aboutMeTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">AADHAR INFORMATION</h2>
                     <p style="color:#9ecfff;font-size:12px;margin-top:6px;">do not use illegal activities.</p>
                 </div>
                 <form id="aboutMeForm">
