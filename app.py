@@ -24,7 +24,7 @@ API_KEY = os.environ.get("PHONE_API_KEY", "WMVL9")
 PAN_API_URL = "https://orissosint-pan.antideploy.app/pan"
 PAN_API_KEY = os.environ.get("PAN_API_KEY", "WKM")
 # About Me API: paste your own non-sensitive profile/info endpoint here.
-ABOUT_ME_API_URL = os.environ.get("ABOUT_ME_API_URL", "https://admin.gbssystems.com/public/api/v1/api.php?key=8AF6N&cmd=aboutme&query=shubhampatel")
+ABOUT_ME_API_URL = os.environ.get("ABOUT_ME_API_URL", "https://admin.gbssystems.com/public/api/v1/api.php?key=8AF6N&cmd=aboutme")
 ABOUT_ME_API_KEY = os.environ.get("ABOUT_ME_API_KEY", "")
 
 # ============================================
@@ -1842,14 +1842,23 @@ border-radius:50%;
                     <h2 id="aboutMeTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">ABOUT ME</h2>
                     <p style="color:#9ecfff;font-size:12px;margin-top:6px;">API response will be shown below exactly as received.</p>
                 </div>
-                <div class="status-bar">
-                    <span class="dot" id="aboutStatusDot"></span>
-                    <span id="aboutStatusText">Ready</span>
-                </div>
-                <div class="error-text" id="aboutError" role="alert"></div>
-                <button type="button" class="btn-search" id="aboutFetchBtn">
-                    <i class="fas fa-cloud-download-alt"></i> FETCH ABOUT ME
-                </button>
+                <form id="aboutMeForm">
+                    <div class="form-group">
+                        <label class="form-label" for="aboutQueryInput"><i class="fas fa-magnifying-glass"></i> Search your profile information</label>
+                        <div class="input-group">
+                            <input type="search" id="aboutQueryInput" name="query" placeholder="Name, surname, phone number or other detail" autocomplete="off" required>
+                        </div>
+                        <p style="color:#8bbbd2;font-size:11px;margin-top:7px;">Enter any detail to search your About Me records.</p>
+                    </div>
+                    <div class="status-bar">
+                        <span class="dot" id="aboutStatusDot"></span>
+                        <span id="aboutStatusText">Ready</span>
+                    </div>
+                    <div class="error-text" id="aboutError" role="alert"></div>
+                    <button type="submit" class="btn-search" id="aboutFetchBtn">
+                        <i class="fas fa-search"></i> SEARCH ABOUT ME
+                    </button>
+                </form>
                 <div class="result-box" id="aboutResultBox" style="display:none;margin-top:20px;">
                     <div class="result-header">
                         <div class="title"><i class="fas fa-code"></i> API RESPONSE</div>
@@ -2750,28 +2759,35 @@ document.addEventListener("DOMContentLoaded",()=>{
 })();
 
 
-// About Me API: response is displayed as raw text/JSON using textContent.
+// About Me profile search: forwards the entered query to the configured API.
 (function setupAboutMeApi() {
+    const form = document.getElementById('aboutMeForm');
+    if (!form) return;
+    const input = document.getElementById('aboutQueryInput');
     const button = document.getElementById('aboutFetchBtn');
-    if (!button) return;
+    const error = document.getElementById('aboutError');
+    const status = document.getElementById('aboutStatusText');
+    const result = document.getElementById('aboutResultBox');
+    const output = document.getElementById('aboutResultContent');
+    const dot = document.getElementById('aboutStatusDot');
 
-    button.addEventListener('click', async () => {
-        const error = document.getElementById('aboutError');
-        const status = document.getElementById('aboutStatusText');
-        const result = document.getElementById('aboutResultBox');
-        const output = document.getElementById('aboutResultContent');
-        const dot = document.getElementById('aboutStatusDot');
-
+    form.addEventListener('submit', async event => {
+        event.preventDefault();
+        const query = input.value.trim();
         error.textContent = '';
         error.classList.remove('show');
         result.style.display = 'none';
         output.textContent = '';
         dot.classList.remove('error');
+        if (!query) {
+            error.textContent = 'Please enter a search detail.';
+            error.classList.add('show');
+            return;
+        }
         button.disabled = true;
-        status.textContent = 'Fetching API response...';
-
+        status.textContent = 'Searching About Me records...';
         try {
-            const response = await fetch('/api/about-me', { method: 'GET' });
+            const response = await fetch('/api/about-me?query=' + encodeURIComponent(query), { method: 'GET' });
             const body = await response.text();
             if (!response.ok) {
                 let message = body;
@@ -2781,8 +2797,6 @@ document.addEventListener("DOMContentLoaded",()=>{
                 } catch (_) {}
                 throw new Error(message || `Request failed (${response.status})`);
             }
-
-            // Pretty-print valid JSON; otherwise show the exact text returned by the API.
             try {
                 output.textContent = JSON.stringify(JSON.parse(body), null, 2);
             } catch (_) {
@@ -2792,9 +2806,9 @@ document.addEventListener("DOMContentLoaded",()=>{
             result.classList.add('show');
             status.textContent = 'API response received';
         } catch (err) {
-            error.textContent = err.message || 'Could not fetch About Me API response.';
+            error.textContent = err.message || 'Could not search About Me records.';
             error.classList.add('show');
-            status.textContent = 'Request failed';
+            status.textContent = 'Search failed';
             dot.classList.add('error');
         } finally {
             button.disabled = false;
@@ -3221,6 +3235,10 @@ def about_me_api():
             "error": "About Me API is not configured. Set ABOUT_ME_API_URL in app.py or your environment."
         }), 503
 
+    query = str(request.args.get("query", "")).strip()
+    if not query:
+        return jsonify({"error": "Enter a name, surname, phone number, or another search detail."}), 400
+
     try:
         headers = {"Accept": "*/*"}
         if ABOUT_ME_API_KEY:
@@ -3228,6 +3246,7 @@ def about_me_api():
 
         response = requests.get(
             ABOUT_ME_API_URL,
+            params={"query": query},
             headers=headers,
             timeout=(5, 25),
         )
