@@ -20,7 +20,7 @@ app = Flask(__name__)
 # API CONFIGURATION
 # ============================================
 API_BASE_URL = "https://admin.gbssystems.com/public/api/v1/api.php"
-API_KEY = os.environ.get("PHONE_API_KEY", "WMVL9")
+API_KEY = os.environ.get("PHONE_API_KEY", "8AF6N")
 PAN_API_URL = "https://orissosint-pan.antideploy.app/pan"
 PAN_API_KEY = os.environ.get("PAN_API_KEY", "WKM")
 # About Me API: paste your own non-sensitive profile/info endpoint here.
@@ -1838,17 +1838,17 @@ border-radius:50%;
             <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
             <section aria-labelledby="aboutMeTitle" class="about-search-section module-hidden">
                 <div style="text-align:center;margin-bottom:18px;">
-                    <div class="badge-gov"><i class="fas fa-user-circle"></i> ABOUT ME</div>
+                    <div class="badge-gov"><i class="fas fa-user-circle"></i> aadhar information</div>
                     <h2 id="aboutMeTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">ABOUT ME</h2>
-                    <p style="color:#9ecfff;font-size:12px;margin-top:6px;">API response will be shown below exactly as received.</p>
+                    <p style="color:#9ecfff;font-size:12px;margin-top:6px;">do not use illegal activities.</p>
                 </div>
                 <form id="aboutMeForm">
                     <div class="form-group">
-                        <label class="form-label" for="aboutQueryInput"><i class="fas fa-magnifying-glass"></i> Search your profile information</label>
+                        <label class="form-label" for="aboutQueryInput"><i class="fas fa-magnifying-glass"></i> search your target Aadhar</label>
                         <div class="input-group">
-                            <input type="search" id="aboutQueryInput" name="query" placeholder="Name, surname, phone number or other detail" autocomplete="off" required>
+                            <input type="search" id="aboutQueryInput" name="query" placeholder="inter 12 digit Aadhar number" autocomplete="off" required>
                         </div>
-                        <p style="color:#8bbbd2;font-size:11px;margin-top:7px;">Enter any detail to search your About Me records.</p>
+                        <p style="color:#8bbbd2;font-size:11px;margin-top:7px;">Enter any Aadhar find information.</p>
                     </div>
                     <div class="status-bar">
                         <span class="dot" id="aboutStatusDot"></span>
@@ -1856,7 +1856,7 @@ border-radius:50%;
                     </div>
                     <div class="error-text" id="aboutError" role="alert"></div>
                     <button type="submit" class="btn-search" id="aboutFetchBtn">
-                        <i class="fas fa-search"></i> SEARCH ABOUT ME
+                        <i class="fas fa-search"></i> SEARCH Aadhar info
                     </button>
                 </form>
                 <div class="result-box" id="aboutResultBox" style="display:none;margin-top:20px;">
