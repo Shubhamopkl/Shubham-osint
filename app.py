@@ -1654,7 +1654,7 @@ border-radius:50%;
                     <button type="button" class="module-choice" data-module="ration"><i class="fas fa-id-card-clip"></i><span>Ration Card</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="family"><i class="fas fa-people-roof"></i><span>Family Search</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="lpg"><i class="fas fa-fire-flame-simple"></i><span>LPG Information</span><i class="fas fa-check module-check"></i></button>
-                    <button type="button" class="module-choice" data-module="about"><i class="fas fa-user-circle"></i><span>About Me</span><i class="fas fa-check module-check"></i></button>
+                    <button type="button" class="module-choice" data-module="about"><i class="fas fa-user-circle"></i><span>Aadhaar information</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="company"><i class="fas fa-building"></i><span>Company Information</span><i class="fas fa-check module-check"></i></button>
                 </div>
                 <div class="module-picker-hint">Choose a module to open its existing search form.</div>
