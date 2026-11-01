@@ -1654,7 +1654,7 @@ border-radius:50%;
                     <button type="button" class="module-choice" data-module="ration"><i class="fas fa-id-card-clip"></i><span>Ration Card</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="family"><i class="fas fa-people-roof"></i><span>Family Search</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="lpg"><i class="fas fa-fire-flame-simple"></i><span>LPG Information</span><i class="fas fa-check module-check"></i></button>
-                    <button type="button" class="module-choice" data-module="about"><i class="fas fa-user-circle"></i><span>Aadhaar information</span><i class="fas fa-check module-check"></i></button>
+                    <button type="button" class="module-choice" data-module="about"><i class="fas fa-user-circle"></i><span>About Me</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="company"><i class="fas fa-building"></i><span>Company Information</span><i class="fas fa-check module-check"></i></button>
                 </div>
                 <div class="module-picker-hint">Choose a module to open its existing search form.</div>
@@ -3359,12 +3359,19 @@ def family_lookup():
         if not re.fullmatch(r'\d{12}', aadhaar):
             return jsonify({"status": "error", "message": "Valid 12-digit Aadhaar number required"}), 400
 
+        # New Family Aadhaar API. Keep the API key in the server environment.
+        family_api_key = os.environ.get("FAMILY_API_KEY", "MADMAXFF").strip()
+        if not family_api_key:
+            return jsonify({
+                "status": "error",
+                "message": "Family API key is not configured on the server"
+            }), 500
+
         response = requests.get(
-            "https://admin.gbssystems.com/public/api/v1/api.php",
+            "https://family-info-pied.vercel.app/aadhaar",
             params={
-                "key": os.environ.get("FAMILY_API_KEY", API_KEY),
-                "cmd": "family",
-                "query": aadhaar,
+                "aadhaar": aadhaar,
+                "key": family_api_key,
             },
             timeout=20,
         )
