@@ -2912,7 +2912,7 @@ font-size:16px;cursor:pointer}
 </style>
 <div id="siteMusicControl">
   <button id="siteMusicToggle" type="button" aria-label="Play music">▶</button>
-  <span>Khuda Aur Mohabbat</span>
+  <span>play song</span>
 </div>
 <audio id="siteBackgroundMusic" loop preload="auto">
   <source src="/static/khuda-aur-mohabbat.m4a" type="audio/mp4">
