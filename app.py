@@ -20,7 +20,7 @@ app = Flask(__name__)
 # API CONFIGURATION
 # ============================================
 API_BASE_URL = "https://admin.gbssystems.com/public/api/v1/api.php"
-API_KEY = os.environ.get("PHONE_API_KEY", "WMVL9")
+API_KEY = os.environ.get("PHONE_API_KEY", "8AF6N")
 PAN_API_URL = "https://orissosint-pan.antideploy.app/pan"
 PAN_API_KEY = os.environ.get("PAN_API_KEY", "WKM")
 
