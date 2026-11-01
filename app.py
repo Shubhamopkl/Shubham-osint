@@ -1655,6 +1655,7 @@ border-radius:50%;
                     <button type="button" class="module-choice" data-module="family"><i class="fas fa-people-roof"></i><span>Family Search</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="lpg"><i class="fas fa-fire-flame-simple"></i><span>LPG Information</span><i class="fas fa-check module-check"></i></button>
                     <button type="button" class="module-choice" data-module="about"><i class="fas fa-user-circle"></i><span>About Me</span><i class="fas fa-check module-check"></i></button>
+                    <button type="button" class="module-choice" data-module="company"><i class="fas fa-building"></i><span>Company Information</span><i class="fas fa-check module-check"></i></button>
                 </div>
                 <div class="module-picker-hint">Choose a module to open its existing search form.</div>
             </div>
@@ -1865,6 +1866,36 @@ border-radius:50%;
                         <div class="count">RAW</div>
                     </div>
                     <pre id="aboutResultContent" style="margin:0;padding:16px;color:#d8f5ff;font:12px/1.7 monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:480px;overflow:auto;"></pre>
+                </div>
+            </section>
+
+            <!-- COMPANY INFORMATION SEARCH -->
+            <div style="height:1px;background:rgba(0,217,255,.18);margin:28px 0;"></div>
+            <section aria-labelledby="companySearchTitle" class="company-search-section module-hidden">
+                <div style="text-align:center;margin-bottom:18px;">
+                    <div class="badge-gov"><i class="fas fa-building"></i> COMPANY INFORMATION</div>
+                    <h2 id="companySearchTitle" style="font-size:22px;color:#00d9ff;margin-top:8px;">COMPANY INFORMATION</h2>
+                    <p style="color:#9ecfff;font-size:12px;margin-top:6px;">Search company details by its name.</p>
+                </div>
+                <form id="companyForm">
+                    <div class="form-group">
+                        <label class="form-label" for="companyInput"><i class="fas fa-building"></i> Enter Company Name</label>
+                        <div class="input-group">
+                            <input type="search" id="companyInput" name="name" placeholder="e.g. Amazon" autocomplete="organization" required>
+                        </div>
+                    </div>
+                    <div class="status-bar"><span class="dot" id="companyStatusDot"></span><span id="companyStatusText">Ready to search</span></div>
+                    <div class="error-text" id="companyError" role="alert"></div>
+                    <button type="submit" class="btn-search" id="companySearchBtn"><i class="fas fa-search"></i> SEARCH COMPANY</button>
+                </form>
+                <div class="result-box" id="companyResultBox" style="display:none;margin-top:20px;">
+                    <div class="result-header">
+                        <div class="title"><i class="fas fa-building"></i> COMPANY SEARCH RESULTS</div>
+                        <div class="count" id="companyResultCount">Response</div>
+                    </div>
+                    <div id="companyResultContent"></div>
+                    <button type="button" class="json-toggle" id="companyJsonToggle"><i class="fas fa-code"></i> View Raw JSON</button>
+                    <pre class="json-box" id="companyJsonBox" style="display:none;"></pre>
                 </div>
             </section>
 
@@ -2674,7 +2705,8 @@ document.addEventListener("DOMContentLoaded",()=>{
             gst: 'gst-search-section',
             family: 'family-search-section',
             lpg: 'lpg-search-section',
-            about: 'about-search-section'
+            about: 'about-search-section',
+            company: 'company-search-section'
         };
         function showModule(name) {
             phoneNodes.forEach(node => node.classList.toggle('module-hidden', name !== 'phone'));
@@ -2812,6 +2844,120 @@ document.addEventListener("DOMContentLoaded",()=>{
             dot.classList.add('error');
         } finally {
             button.disabled = false;
+        }
+    });
+})();
+
+// Company Information search: readable fields plus an optional raw JSON view.
+(function setupCompanySearch() {
+    const form = document.getElementById('companyForm');
+    if (!form) return;
+    const input = document.getElementById('companyInput');
+    const button = document.getElementById('companySearchBtn');
+    const error = document.getElementById('companyError');
+    const status = document.getElementById('companyStatusText');
+    const dot = document.getElementById('companyStatusDot');
+    const result = document.getElementById('companyResultBox');
+    const content = document.getElementById('companyResultContent');
+    const rawBox = document.getElementById('companyJsonBox');
+    const count = document.getElementById('companyResultCount');
+
+    const labelFor = key => String(key)
+        .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+        .replace(/[_-]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .replace(/\b\w/g, ch => ch.toUpperCase());
+
+    function addReadableRows(value, prefix = '') {
+        if (value === null || value === undefined || value === '') return;
+        if (Array.isArray(value)) {
+            value.forEach((item, index) => addReadableRows(item, prefix ? `${prefix} · Record ${index + 1}` : `Record ${index + 1}`));
+            return;
+        }
+        if (typeof value === 'object') {
+            Object.entries(value).forEach(([key, child]) => {
+                // Hide common transport-only fields, but preserve business information.
+                if (['status', 'success', 'message'].includes(key.toLowerCase()) && (child === true || child === false || typeof child !== 'object')) return;
+                const label = prefix ? `${prefix} · ${labelFor(key)}` : labelFor(key);
+                if (child && typeof child === 'object') addReadableRows(child, label);
+                else {
+                    const row = document.createElement('div');
+                    row.className = 'result-item';
+                    const name = document.createElement('div');
+                    name.className = 'label';
+                    name.textContent = label;
+                    const text = document.createElement('div');
+                    text.className = 'value';
+                    text.textContent = child === null || child === '' ? '—' : String(child);
+                    row.append(name, text);
+                    content.appendChild(row);
+                }
+            });
+            return;
+        }
+        const row = document.createElement('div');
+        row.className = 'result-item';
+        const text = document.createElement('div');
+        text.className = 'value';
+        text.style.width = '100%';
+        text.style.textAlign = 'left';
+        text.textContent = prefix ? `${prefix}: ${String(value)}` : String(value);
+        row.appendChild(text);
+        content.appendChild(row);
+    }
+
+    document.getElementById('companyJsonToggle').addEventListener('click', () => {
+        const visible = rawBox.style.display !== 'block';
+        rawBox.style.display = visible ? 'block' : 'none';
+        rawBox.classList.toggle('show', visible);
+    });
+
+    form.addEventListener('submit', async event => {
+        event.preventDefault();
+        const name = input.value.trim();
+        error.textContent = '';
+        error.classList.remove('show');
+        result.style.display = 'none';
+        content.replaceChildren();
+        rawBox.textContent = '';
+        rawBox.style.display = 'none';
+        dot.classList.remove('error');
+        if (!name) {
+            error.textContent = 'Please enter a company name.';
+            error.classList.add('show');
+            return;
+        }
+
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SEARCHING...';
+        status.textContent = 'Searching company information...';
+        try {
+            const response = await fetch('/api/company-lookup?name=' + encodeURIComponent(name));
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || data.message || `Request failed (${response.status})`);
+
+            rawBox.textContent = JSON.stringify(data, null, 2);
+            addReadableRows(data);
+            if (!content.children.length) {
+                const empty = document.createElement('div');
+                empty.className = 'result-item';
+                empty.textContent = 'Response received, but no readable fields were found. Use View Raw JSON to inspect the response.';
+                content.appendChild(empty);
+            }
+            const recordCount = Array.isArray(data) ? data.length :
+                (data && typeof data === 'object' && Array.isArray(data.results) ? data.results.length : null);
+            count.textContent = recordCount === null ? 'Response received' : `${recordCount} record(s)`;
+            result.style.display = 'block';
+            result.classList.add('show');
+            status.textContent = 'Company information received';
+        } catch (err) {
+            error.textContent = err.message || 'Could not fetch company information.';
+            error.classList.add('show');
+            status.textContent = 'Search failed';
+            dot.classList.add('error');
+        } finally {
+            button.disabled = false;
+            button.innerHTML = '<i class="fas fa-search"></i> SEARCH COMPANY';
         }
     });
 })();
@@ -3282,6 +3428,44 @@ def lpg_lookup():
     except Exception:
         app.logger.exception("Unexpected LPG lookup error")
         return jsonify({"status": "error", "message": "Unexpected server error during LPG lookup."}), 500
+
+@app.route('/api/company-lookup', methods=['GET'])
+def company_lookup():
+    """Proxy the public company-search API; render its response safely in the browser."""
+    name = str(request.args.get("name", "")).strip()
+    if not name:
+        return jsonify({"error": "Enter a company name to search."}), 400
+    if len(name) > 160:
+        return jsonify({"error": "Company name is too long."}), 400
+
+    try:
+        response = requests.get(
+            "https://rack-gstinfo.vercel.app/all-search",
+            params={"name": name},
+            headers={"Accept": "application/json"},
+            timeout=(5, 25),
+        )
+        try:
+            payload = response.json()
+        except ValueError:
+            return jsonify({
+                "error": f"Company API returned a non-JSON response (HTTP {response.status_code})."
+            }), 502
+
+        if not response.ok:
+            message = payload.get("message") or payload.get("error") if isinstance(payload, dict) else None
+            return jsonify({"error": str(message or f"Company API HTTP {response.status_code}")}), 502
+        return jsonify(payload), 200
+
+    except requests.exceptions.Timeout:
+        return jsonify({"error": "Company API timed out. Please try again."}), 504
+    except requests.exceptions.RequestException:
+        app.logger.exception("Company Information API request failed")
+        return jsonify({"error": "Could not connect to Company Information API."}), 502
+    except Exception:
+        app.logger.exception("Unexpected Company Information lookup error")
+        return jsonify({"error": "Unexpected server error during company search."}), 500
+
 
 @app.route('/api/about-me', methods=['GET'])
 def about_me_api():
