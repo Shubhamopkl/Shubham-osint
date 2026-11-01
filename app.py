@@ -2901,6 +2901,62 @@ document.addEventListener("DOMContentLoaded",()=>{
 })();
 </script>
 
+
+<style>
+#siteMusicControl{position:fixed;right:16px;bottom:18px;z-index:10000;display:flex;align-items:center;gap:10px;
+background:rgba(5,16,35,.94);border:1px solid rgba(0,195,255,.55);border-radius:999px;padding:9px 14px;
+color:#fff;box-shadow:0 0 18px rgba(0,183,255,.25);font:600 13px 'Segoe UI',sans-serif}
+#siteMusicControl button{width:38px;height:38px;border:0;border-radius:50%;background:#00b7ff;color:#03111e;
+font-size:16px;cursor:pointer}
+#siteMusicControl span{max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+</style>
+<div id="siteMusicControl">
+  <button id="siteMusicToggle" type="button" aria-label="Play music">▶</button>
+  <span>Khuda Aur Mohabbat</span>
+</div>
+<audio id="siteBackgroundMusic" loop preload="auto">
+  <source src="/static/khuda-aur-mohabbat.m4a" type="audio/mp4">
+</audio>
+<script>
+(() => {
+  const audio = document.getElementById('siteBackgroundMusic');
+  const button = document.getElementById('siteMusicToggle');
+  if (!audio || !button) return;
+
+  const setPlaying = (playing) => {
+    button.textContent = playing ? 'Ⅱ' : '▶';
+    button.setAttribute('aria-label', playing ? 'Pause music' : 'Play music');
+  };
+
+  const playMusic = async () => {
+    try {
+      await audio.play();
+      setPlaying(true);
+    } catch (e) {
+      setPlaying(false); // Browser may require a user gesture before audible autoplay.
+    }
+  };
+
+  button.addEventListener('click', async () => {
+    if (audio.paused) await playMusic();
+    else { audio.pause(); setPlaying(false); }
+  });
+
+  // Try autoplay. If the browser blocks it, the visible play button remains available.
+  playMusic();
+
+  // Some mobile browsers permit playback after the first user interaction.
+  const unlock = () => {
+    if (audio.paused) playMusic();
+    document.removeEventListener('pointerdown', unlock);
+    document.removeEventListener('keydown', unlock);
+  };
+  document.addEventListener('pointerdown', unlock, { once: true });
+  document.addEventListener('keydown', unlock, { once: true });
+  audio.addEventListener('ended', () => setPlaying(false));
+})();
+</script>
+
 </body>
 </html>
 '''
