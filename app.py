@@ -3323,9 +3323,13 @@ def ration_lookup():
         rc = str(payload.get('rc', '')).strip()
         if not re.fullmatch(r'\d{12}', rc):
             return jsonify({"status": "error", "message": "Valid 12-digit ration card number required"}), 400
+        ration_api_key = os.environ.get("RATION_API_KEY", "MADMAXFF").strip()
+        if not ration_api_key:
+            return jsonify({"status": "error", "message": "Ration API key is not configured on the server"}), 500
+
         response = requests.get(
-            "https://osint-apis-hub.onrender.com/api/ration-info",
-            params={"key": os.environ.get("RATION_API_KEY", "Demo"), "rc": rc},
+            "https://family-info-pied.vercel.app/ration",
+            params={"rc": rc, "key": ration_api_key},
             timeout=20,
         )
         if response.status_code == 404:
@@ -3335,6 +3339,8 @@ def ration_lookup():
             api_data = response.json()
         except ValueError:
             return jsonify({"status": "error", "message": "Ration API returned invalid JSON"}), 502
+        if not isinstance(api_data, (dict, list)):
+            return jsonify({"status": "error", "message": "Ration API returned an unexpected response"}), 502
         return jsonify({"status": "success", "data": api_data})
     except requests.exceptions.Timeout:
         return jsonify({"status": "error", "message": "Ration API timeout"}), 504
