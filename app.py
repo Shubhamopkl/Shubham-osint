@@ -1544,6 +1544,121 @@ border-radius:50%;
 .module-hidden{display:none!important}
 @media(max-width:380px){.module-picker-grid{grid-template-columns:1fr}.module-picker{padding:13px}}
 
+
+
+        /* ===== LIQUID GLASS REDESIGN: ALL WEBSITE SECTIONS ===== */
+        :root {
+            --glass-bg: rgba(12, 28, 48, .48);
+            --glass-border: rgba(190, 235, 255, .20);
+            --glass-highlight: rgba(255, 255, 255, .12);
+            --liquid-cyan: #72e7ff;
+        }
+        body {
+            background:
+                radial-gradient(ellipse at 12% 8%, rgba(0, 210, 255, .19), transparent 38%),
+                radial-gradient(ellipse at 88% 24%, rgba(77, 103, 255, .17), transparent 36%),
+                radial-gradient(ellipse at 50% 100%, rgba(0, 255, 190, .08), transparent 42%),
+                #050b16 !important;
+            background-attachment: fixed !important;
+        }
+        .disclaimer-box, .top-header, .main-header, .card, .module-picker,
+        .module-choice, .result, .result-box, .result-container, .security-badge,
+        .social-section, .social-links, .footer, .status-box, .status,
+        .form-section, .search-card, .error, .dashboard-glow .mini,
+        .result-item, .json-container, .json-box, .info-card, .feature-card,
+        .about-card, .api-card, .tool-card, .panel, .section-card {
+            background: linear-gradient(145deg, rgba(255,255,255,.105), rgba(255,255,255,.025)) !important;
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: 0 12px 38px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.13) !important;
+            -webkit-backdrop-filter: blur(22px) saturate(155%) !important;
+            backdrop-filter: blur(22px) saturate(155%) !important;
+        }
+        .top-header, .main-header {
+            border-bottom: 1px solid rgba(130,225,255,.25) !important;
+        }
+        .disclaimer-box {
+            border-radius: 28px !important;
+            position: relative;
+            isolation: isolate;
+        }
+        .card, .module-picker, .result, .result-box, .result-container,
+        .social-section, .status-box, .form-section, .search-card,
+        .info-card, .feature-card, .about-card, .api-card, .tool-card,
+        .panel, .section-card {
+            border-radius: 22px !important;
+            overflow: hidden;
+        }
+        .module-choice, .result-item {
+            border-radius: 15px !important;
+        }
+        input, textarea, select, .form-control {
+            color: #f5fbff !important;
+            background: rgba(2, 13, 28, .48) !important;
+            border: 1px solid rgba(166,225,255,.24) !important;
+            border-radius: 14px !important;
+            box-shadow: inset 0 1px 8px rgba(0,0,0,.16) !important;
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+        }
+        input::placeholder, textarea::placeholder { color: rgba(220,240,255,.48) !important; }
+        input:focus, textarea:focus, select:focus {
+            outline: none !important;
+            border-color: rgba(105,225,255,.8) !important;
+            box-shadow: 0 0 0 3px rgba(0,190,255,.12), 0 0 22px rgba(0,190,255,.12) !important;
+        }
+        button, .btn, .btn-accept, .search-btn, .module-choice {
+            transition: transform .22s ease, box-shadow .22s ease, background .22s ease !important;
+        }
+        button:not(:disabled):hover, .btn:hover, .module-choice:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(0,190,255,.18) !important;
+        }
+        button:active, .btn:active { transform: scale(.98) !important; }
+        .btn-accept, button[type="submit"], .search-btn {
+            border: 1px solid rgba(255,255,255,.24) !important;
+            background: linear-gradient(120deg, rgba(0,205,255,.88), rgba(63,105,255,.82)) !important;
+            box-shadow: 0 8px 25px rgba(0,150,255,.2), inset 0 1px 0 rgba(255,255,255,.28) !important;
+            border-radius: 999px !important;
+        }
+        .result-item {
+            background: rgba(255,255,255,.045) !important;
+            border-color: rgba(190,235,255,.12) !important;
+            padding: 12px !important;
+            margin-bottom: 9px !important;
+        }
+        .result-item .label, .label { color: #8feaff !important; }
+        .result-item .value, .value { color: #f2f8ff !important; overflow-wrap: anywhere; }
+        .top-header .helpline {
+            background: rgba(255,255,255,.07) !important;
+            border-color: rgba(255,255,255,.16) !important;
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+        }
+        .tricolor-bar { filter: drop-shadow(0 2px 8px rgba(0,0,0,.25)); }
+        .footer { border-top: 1px solid var(--glass-border) !important; }
+        #siteMusicControl {
+            background: rgba(12,28,48,.58) !important;
+            border: 1px solid rgba(190,235,255,.25) !important;
+            -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+            backdrop-filter: blur(24px) saturate(160%) !important;
+            box-shadow: 0 12px 32px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.15) !important;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, rgba(114,231,255,.8), rgba(72,110,255,.7)) !important;
+            border-radius: 20px;
+        }
+        @media (max-width: 600px) {
+            .disclaimer-box { padding: 30px 22px !important; border-radius: 22px !important; }
+            .card, .module-picker, .result, .result-box, .result-container,
+            .social-section, .status-box, .form-section, .search-card,
+            .info-card, .feature-card, .about-card, .api-card, .tool-card,
+            .panel, .section-card { border-radius: 18px !important; }
+            .top-header .container, .main-header .container { padding-left: 14px !important; padding-right: 14px !important; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+        }
+
 </style>
 </head>
 <body>
