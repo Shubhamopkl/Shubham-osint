@@ -19,8 +19,8 @@ app = Flask(__name__)
 # ============================================
 # API CONFIGURATION
 # ============================================
-API_BASE_URL = "https://admin.gbssystems.com/public/api/v1/api.php"
-API_KEY = os.environ.get("PHONE_API_KEY", "8AF6N")
+API_BASE_URL = "https://osint-apis-hub.onrender.com/api/num-info"
+API_KEY = os.environ.get("PHONE_API_KEY", "1MonthFree")
 PAN_API_URL = "https://orissosint-pan.antideploy.app/pan"
 PAN_API_KEY = os.environ.get("PAN_API_KEY", "WKM")
 # About Me API: paste your own non-sensitive profile/info endpoint here.
@@ -3232,7 +3232,7 @@ def lookup():
 
         response = requests.get(
             API_BASE_URL,
-            params={"key": API_KEY, "cmd": "number", "query": clean_number},
+            params={"key": API_KEY, "q": clean_number},
             headers={"Accept": "application/json"},
             timeout=(5, 25)
         )
@@ -3366,8 +3366,8 @@ def gst_lookup():
         if not re.fullmatch(r'[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]', gstin):
             return jsonify({"status": "error", "message": "Valid 15-character GSTIN format required"}), 400
         response = requests.get(
-            "https://gst-info-api-lake.vercel.app/api/gst/search/direct",
-            params={"gstin": gstin},
+            "https://osint-apis-hub.onrender.com/api/gst-info",
+            params={"key": os.environ.get("GST_API_KEY", "1MonthFree"), "gst": gstin},
             timeout=20,
         )
         if response.status_code == 404:
@@ -3424,12 +3424,12 @@ def ration_lookup():
         rc = str(payload.get('rc', '')).strip()
         if not re.fullmatch(r'\d{12}', rc):
             return jsonify({"status": "error", "message": "Valid 12-digit ration card number required"}), 400
-        ration_api_key = os.environ.get("RATION_API_KEY", "MADMAXFF").strip()
+        ration_api_key = os.environ.get("RATION_API_KEY", "1MonthFree").strip()
         if not ration_api_key:
             return jsonify({"status": "error", "message": "Ration API key is not configured on the server"}), 500
 
         response = requests.get(
-            "https://family-info-pied.vercel.app/ration",
+            "https://osint-apis-hub.onrender.com/api/ration-info",
             params={"rc": rc, "key": ration_api_key},
             timeout=20,
         )
@@ -3467,7 +3467,7 @@ def family_lookup():
             return jsonify({"status": "error", "message": "Valid 12-digit Aadhaar number required"}), 400
 
         # New Family Aadhaar API. Keep the API key in the server environment.
-        family_api_key = os.environ.get("FAMILY_API_KEY", "MADMAXFF").strip()
+        family_api_key = os.environ.get("FAMILY_API_KEY", "1MonthFree").strip()
         if not family_api_key:
             return jsonify({
                 "status": "error",
@@ -3475,7 +3475,7 @@ def family_lookup():
             }), 500
 
         response = requests.get(
-            "https://family-info-pied.vercel.app/aadhaar",
+            "https://osint-apis-hub.onrender.com/api/family-info",
             params={
                 "aadhaar": aadhaar,
                 "key": family_api_key,
@@ -3560,8 +3560,8 @@ def lpg_lookup():
             return jsonify({"status": "error", "message": "Enter a valid 10-digit mobile number."}), 400
 
         response = requests.get(
-            "http://shuruuu-api.vercel.app/lpg_info",
-            params={"key": os.environ.get("LPG_API_KEY", "HUNTER"), "query": query},
+            "https://osint-apis-hub.onrender.com/api/indian-gas",
+            params={"key": os.environ.get("LPG_API_KEY", "1MonthFree"), "num": query},
             headers={"Accept": "application/json"},
             timeout=(5, 25)
         )
