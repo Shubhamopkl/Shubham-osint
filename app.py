@@ -19,13 +19,13 @@ app = Flask(__name__)
 # ============================================
 # API CONFIGURATION
 # ============================================
-API_BASE_URL = "http://shuruuu-api.vercel.app/num_info"
-API_KEY = os.environ.get("PHONE_API_KEY", "Alphabday")
+API_BASE_URL = "https://osint-apis-hub.onrender.com/api/num-info"
+API_KEY = os.environ.get("PHONE_API_KEY", "1MonthFree")
 PAN_API_URL = "https://orissosint-pan.antideploy.app/pan"
 PAN_API_KEY = os.environ.get("PAN_API_KEY", "WKM")
 # About Me API: paste your own non-sensitive profile/info endpoint here.
-ABOUT_ME_API_URL = "http://shuruuu-api.vercel.app/aadhar_info"
-ABOUT_ME_API_KEY = os.environ.get("AADHAAR_API_KEY", "Alphabday")
+ABOUT_ME_API_URL = os.environ.get("ABOUT_ME_API_URL", "https://admin.gbssystems.com/public/api/v1/api.php?key=8AF6N&cmd=aadhar")
+ABOUT_ME_API_KEY = os.environ.get("aadhaar_API_KEY", "")
 
 # ============================================
 # HTML TEMPLATE (Complete Website)
@@ -3494,22 +3494,15 @@ def family_lookup():
         if not re.fullmatch(r'\d{12}', aadhaar):
             return jsonify({"status": "error", "message": "Valid 12-digit Aadhaar number required"}), 400
 
-        # New Family Aadhaar API. Keep the API key in the server environment.
-        family_api_key = os.environ.get("FAMILY_API_KEY", "1MonthFree").strip()
-        if not family_api_key:
-            return jsonify({
-                "status": "error",
-                "message": "Family API key is not configured on the server"
-            }), 500
-
+        # Family Aadhaar API
         response = requests.get(
-    "http://shuruuu-api.vercel.app/aadhar_info",
-    params={
-        "key": family_api_key,
-        "query": aadhaar,
-    },
-    timeout=20,
-)
+            "http://shuruuu-api.vercel.app/aadhar_info",
+            params={
+                "key": "Alphabday",
+                "query": aadhaar,
+            },
+            timeout=20,
+        )
         if response.status_code == 404:
             return jsonify({"status": "error", "message": "No matching record found"}), 404
         response.raise_for_status()
@@ -3669,7 +3662,7 @@ def about_me_api():
 
         response = requests.get(
             ABOUT_ME_API_URL,
-            params={"key": ABOUT_ME_API_KEY, "query": query},
+            params={"query": query},
             headers=headers,
             timeout=(5, 25),
         )
