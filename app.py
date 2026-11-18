@@ -3495,27 +3495,50 @@ def family_lookup():
             return jsonify({"status": "error", "message": "Valid 12-digit Aadhaar number required"}), 400
 
         # Family Aadhaar API
+        # Keep the API call server-side so the frontend does not expose the API key.
         response = requests.get(
-            "http://shuruuu-api.vercel.app/aadhar_info",
+            "https://shuruuu-api.vercel.app/aadhar_info",
             params={
                 "key": "Alphabday",
                 "query": aadhaar,
             },
-            timeout=20,
+            headers={"Accept": "application/json"},
+            timeout=(5, 25),
+            allow_redirects=True,
         )
-        if response.status_code == 404:
-            return jsonify({"status": "error", "message": "No matching record found"}), 404
-        response.raise_for_status()
+
+        # Always try to read the upstream JSON first so its actual error message
+        # is not replaced by a generic "No matching record found" message.
         try:
             api_data = response.json()
         except ValueError:
-            return jsonify({"status": "error", "message": "Family API returned invalid JSON"}), 502
+            return jsonify({
+                "status": "error",
+                "message": f"Family API returned non-JSON content (HTTP {response.status_code})."
+            }), 502
+
+        if not response.ok:
+            if isinstance(api_data, dict):
+                message = api_data.get("message") or api_data.get("error") or api_data.get("detail")
+            else:
+                message = None
+            return jsonify({
+                "status": "error",
+                "message": str(message or f"Family API HTTP {response.status_code}")
+            }), 502
+
+        # Some APIs return HTTP 200 with an application-level failure status.
+        if isinstance(api_data, dict):
+            upstream_status = str(api_data.get("status", "")).lower()
+            if api_data.get("success") is False or upstream_status in {"error", "failed", "failure"}:
+                return jsonify({
+                    "status": "error",
+                    "message": str(api_data.get("message") or api_data.get("error") or "Family API reported a failure.")
+                }), 502
 
         if not isinstance(api_data, (dict, list)):
             return jsonify({"status": "error", "message": "Family API returned an unexpected response"}), 502
 
-        # Return the API response unchanged, matching the Ration Card JSON display.
-        # Only use this for records you are authorized to access.
         return jsonify({"status": "success", "data": api_data})
     except requests.exceptions.Timeout:
         return jsonify({"status": "error", "message": "Family API timeout"}), 504
