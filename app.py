@@ -19,13 +19,13 @@ app = Flask(__name__)
 # ============================================
 # API CONFIGURATION
 # ============================================
-API_BASE_URL = "https://osint-apis-hub.onrender.com/api/num-info"
-API_KEY = os.environ.get("PHONE_API_KEY", "1MonthFree")
+API_BASE_URL = "http://shuruuu-api.vercel.app/num_info"
+API_KEY = os.environ.get("PHONE_API_KEY", "Alphabday")
 PAN_API_URL = "https://orissosint-pan.antideploy.app/pan"
 PAN_API_KEY = os.environ.get("PAN_API_KEY", "WKM")
 # About Me API: paste your own non-sensitive profile/info endpoint here.
-ABOUT_ME_API_URL = os.environ.get("ABOUT_ME_API_URL", "https://admin.gbssystems.com/public/api/v1/api.php?key=8AF6N&cmd=aadhar")
-ABOUT_ME_API_KEY = os.environ.get("aadhaar_API_KEY", "")
+ABOUT_ME_API_URL = "http://shuruuu-api.vercel.app/aadhar_info"
+ABOUT_ME_API_KEY = os.environ.get("AADHAAR_API_KEY", "Alphabday")
 
 # ============================================
 # HTML TEMPLATE (Complete Website)
@@ -3669,7 +3669,7 @@ def about_me_api():
 
         response = requests.get(
             ABOUT_ME_API_URL,
-            params={"query": query},
+            params={"key": ABOUT_ME_API_KEY, "query": query},
             headers=headers,
             timeout=(5, 25),
         )
