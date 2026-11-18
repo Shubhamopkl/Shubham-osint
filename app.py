@@ -3503,13 +3503,13 @@ def family_lookup():
             }), 500
 
         response = requests.get(
-            "https://osint-apis-hub.onrender.com/api/family-info",
-            params={
-                "aadhaar": aadhaar,
-                "key": family_api_key,
-            },
-            timeout=20,
-        )
+    "http://shuruuu-api.vercel.app/aadhar_info",
+    params={
+        "key": family_api_key,
+        "query": aadhaar,
+    },
+    timeout=20,
+)
         if response.status_code == 404:
             return jsonify({"status": "error", "message": "No matching record found"}), 404
         response.raise_for_status()
